@@ -40,4 +40,41 @@ public class Pair<K, V> {
     public V getValue() {
         return value;
     }
+
+    /**
+     * Check if a pair is equal to the other one.
+     *
+     * @param o object
+     * @return true if the key and vaule is the same, otherwise false
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Pair<?, ?> pair = (Pair<?, ?>) o;
+
+        if (key != null ? !key.equals(pair.key) : pair.key != null) {
+            return false;
+        }
+
+        return value != null ? value.equals(pair.value) : pair.value == null;
+    }
+
+    /**
+     * Get the hash code.
+     *
+     * @return hash code
+     */
+    @Override
+    public int hashCode() {
+        int result = key != null ? key.hashCode() : 0;
+        result = 31 * result + (value != null ? value.hashCode() : 0);
+
+        return result;
+    }
 }
