@@ -40,8 +40,17 @@ public interface Database {
      * @param uuid player uuid
      * @param chunk updated chunk
      * @param add true if the chunk will be added, otherwise false to remove it
+     * @param result database result
      */
-    void updateClaimInformation(UUID uuid, Pair<Integer, Integer> chunk, boolean add);
+    void updateClaimInformation(UUID uuid, Pair<Integer, Integer> chunk, boolean add, DatabaseResult<Void> result);
+
+    /**
+     * Check if a chunk is already claimed.
+     *
+     * @param chunk chunk
+     * @param result database result
+     */
+    void checkClaim(Pair<Integer, Integer> chunk, DatabaseResult<Boolean> result);
 
     /**
      * Disconnect from the database.

@@ -1,6 +1,8 @@
 package de.paul2708.claim;
 
 import de.paul2708.claim.command.ClaimCommand;
+import de.paul2708.claim.database.Database;
+import de.paul2708.claim.database.DatabaseException;
 import de.paul2708.claim.file.AbstractConfiguration;
 import de.paul2708.claim.file.InvalidValueException;
 import de.paul2708.claim.file.impl.ClaimConfiguration;
@@ -22,6 +24,8 @@ public class ClaimPlugin extends JavaPlugin {
 
     private AbstractConfiguration configuration;
 
+    private Database database;
+
     /**
      * Called, if the plugin is loaded.
      */
@@ -41,6 +45,16 @@ public class ClaimPlugin extends JavaPlugin {
         try {
             this.configuration.load();
         } catch (InvalidValueException e) {
+            e.printStackTrace();
+        }
+
+        // Setup the database
+        // TODO: Init database
+
+        try {
+            this.database.connect();
+            this.database.setUp();
+        } catch (DatabaseException e) {
             e.printStackTrace();
         }
 
@@ -72,5 +86,14 @@ public class ClaimPlugin extends JavaPlugin {
      */
     public AbstractConfiguration getConfiguration() {
         return configuration;
+    }
+
+    /**
+     * Get the database.
+     *
+     * @return database
+     */
+    public Database getDatabase() {
+        return database;
     }
 }
