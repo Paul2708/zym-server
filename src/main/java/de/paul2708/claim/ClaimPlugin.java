@@ -1,6 +1,9 @@
 package de.paul2708.claim;
 
 import de.paul2708.claim.command.ClaimCommand;
+import de.paul2708.claim.file.AbstractConfiguration;
+import de.paul2708.claim.file.InvalidValueException;
+import de.paul2708.claim.file.impl.ClaimConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -17,6 +20,8 @@ public class ClaimPlugin extends JavaPlugin {
 
     private static ClaimPlugin instance;
 
+    private AbstractConfiguration configuration;
+
     /**
      * Called, if the plugin is loaded.
      */
@@ -30,6 +35,15 @@ public class ClaimPlugin extends JavaPlugin {
      */
     @Override
     public void onEnable() {
+        // Load the configuration
+        this.configuration = new ClaimConfiguration();
+
+        try {
+            this.configuration.load();
+        } catch (InvalidValueException e) {
+            e.printStackTrace();
+        }
+
         // Register command
         getCommand("claim").setExecutor(new ClaimCommand());
     }
@@ -49,5 +63,14 @@ public class ClaimPlugin extends JavaPlugin {
      */
     public static ClaimPlugin getInstance() {
         return ClaimPlugin.instance;
+    }
+
+    /**
+     * Get the configuration.
+     *
+     * @return configuration
+     */
+    public AbstractConfiguration getConfiguration() {
+        return configuration;
     }
 }
