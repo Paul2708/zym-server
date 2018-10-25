@@ -3,6 +3,7 @@ package de.paul2708.claim.database;
 import de.paul2708.claim.model.ClaimInformation;
 import de.paul2708.claim.util.Pair;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -27,12 +28,12 @@ public interface Database {
     void setUp() throws DatabaseException;
 
     /**
-     * Resolve the claim information about a player.
+     * Get a list of all claim information.
      *
-     * @param uuid player uuid
-     * @param result database result
+     * @return list of claim information
+     * @throws DatabaseException if an exception is thrown
      */
-    void resolveClaimInformation(UUID uuid, DatabaseResult<ClaimInformation> result);
+    List<ClaimInformation> resolveClaimInformation() throws DatabaseException;
 
     /**
      * Update the claim information for a player.
@@ -40,17 +41,17 @@ public interface Database {
      * @param uuid player uuid
      * @param chunk updated chunk
      * @param add true if the chunk will be added, otherwise false to remove it
-     * @param result database result
+     * @throws DatabaseException if an exception is thrown
      */
-    void updateClaimInformation(UUID uuid, Pair<Integer, Integer> chunk, boolean add, DatabaseResult<Void> result);
+    void updateClaimInformation(UUID uuid, Pair<Integer, Integer> chunk, boolean add) throws DatabaseException;
 
     /**
      * Check if a chunk is already claimed.
      *
      * @param chunk chunk
-     * @param result database result
+     * @throws DatabaseException if an exception is thrown
      */
-    void checkClaim(Pair<Integer, Integer> chunk, DatabaseResult<Boolean> result);
+    boolean isClaimed(Pair<Integer, Integer> chunk) throws DatabaseException;
 
     /**
      * Disconnect from the database.

@@ -3,9 +3,8 @@ package de.paul2708.claim.command;
 import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.command.impl.ItemCommand;
 import de.paul2708.claim.command.impl.RemoveCommand;
+import de.paul2708.claim.database.Database;
 import de.paul2708.claim.database.DatabaseException;
-import de.paul2708.claim.database.DatabaseResult;
-import de.paul2708.claim.database.result.ClaimResult;
 import de.paul2708.claim.util.Pair;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
@@ -104,33 +103,52 @@ public class ClaimCommand implements CommandExecutor {
         }
 
         // Check chunk
+        Database database = ClaimPlugin.getInstance().getDatabase();
+
         Chunk chunk = player.getLocation().getChunk();
         Pair<Integer, Integer> pair = new Pair<>(chunk.getX(), chunk.getZ());
 
-        DatabaseResult<Boolean> result = new DatabaseResult<Boolean>() {
+        try {
+            if (database.isClaimed(pair)) {
+                player.sendMessage(ClaimPlugin.PREFIX + "§cDer Chunk ist bereits geclaimed.");
+                return;
+            }
 
-            @Override
-            public void success(Boolean result) {
-                if (!result) {
-                    player.sendMessage(ClaimPlugin.PREFIX + "§cDer Chunk ist bereits geclaimed.");
+            database.updateClaimInformation(player.getUniqueId(), pair, true);
+
+            this.removeItems(player, material, amount);
+
+            player.sendMessage(ClaimPlugin.PREFIX + "§6Du hast erfolgreich den Chunk geclaimed.");
+        } catch (DatabaseException e) {
+            player.sendMessage(ClaimPlugin.PREFIX + "§cEs ist ein Fehler aufgetreten. Reconnecte und versuche "
+                    + "es erneut.");
+
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Remove the items from the inventory.
+     *
+     * @param player player
+     * @param material material
+     * @param amount amount
+     */
+    private void removeItems(Player player, Material material, int amount) {
+        int current = amount;
+
+        for (ItemStack content : player.getInventory().getContents()) {
+            if (content != null && content.getType() == material) {
+                if (current - content.getAmount() > 0) {
+                    player.getInventory().remove(content);
+
+                    current -= content.getAmount();
+                } else {
+                    content.setAmount(content.getAmount() - current);
                     return;
                 }
-
-                // Claim the chunk
-                ClaimPlugin.getInstance().getDatabase().updateClaimInformation(player.getUniqueId(), pair, true,
-                        new ClaimResult(player, material, amount));
             }
-
-            @Override
-            public void exception(DatabaseException exception) {
-                player.sendMessage(ClaimPlugin.PREFIX + "§cEs ist ein Fehler aufgetreten. Reconnecte und versuche "
-                        + "es erneut.");
-
-                exception.printStackTrace();
-            }
-        };
-
-        ClaimPlugin.getInstance().getDatabase().checkClaim(pair, result);
+        }
     }
 
     /**
