@@ -1,9 +1,7 @@
 package de.paul2708.claim.database;
 
-import de.paul2708.claim.model.ClaimInformation;
 import de.paul2708.claim.util.Pair;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -30,10 +28,9 @@ public interface Database {
     /**
      * Get a list of all claim information.
      *
-     * @return list of claim information
      * @throws DatabaseException if an exception is thrown
      */
-    List<ClaimInformation> resolveClaimInformation() throws DatabaseException;
+    void resolveClaimInformation() throws DatabaseException;
 
     /**
      * Update the claim information for a player.
@@ -49,6 +46,7 @@ public interface Database {
      * Check if a chunk is already claimed.
      *
      * @param chunk chunk
+     * @return true if the chunk is claimed, otherwise false
      * @throws DatabaseException if an exception is thrown
      */
     boolean isClaimed(Pair<Integer, Integer> chunk) throws DatabaseException;

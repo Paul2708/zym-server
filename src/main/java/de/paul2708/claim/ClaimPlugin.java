@@ -3,6 +3,7 @@ package de.paul2708.claim;
 import de.paul2708.claim.command.ClaimCommand;
 import de.paul2708.claim.database.Database;
 import de.paul2708.claim.database.DatabaseException;
+import de.paul2708.claim.database.impl.JsonDatabase;
 import de.paul2708.claim.file.AbstractConfiguration;
 import de.paul2708.claim.file.InvalidValueException;
 import de.paul2708.claim.file.impl.ClaimConfiguration;
@@ -49,7 +50,7 @@ public class ClaimPlugin extends JavaPlugin {
         }
 
         // Setup the database
-        // TODO: Init database
+        this.database = new JsonDatabase();
 
         try {
             this.database.connect();
@@ -67,7 +68,11 @@ public class ClaimPlugin extends JavaPlugin {
      */
     @Override
     public void onDisable() {
-
+        try {
+            this.database.disconnect();
+        } catch (DatabaseException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
