@@ -59,9 +59,7 @@ public abstract class AbstractConfiguration {
 
             yamlProvider.load(file);
 
-            if (created) {
-                this.defaultValue();
-            }
+            this.defaultValue();
 
             this.save();
 
