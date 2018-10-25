@@ -1,5 +1,6 @@
 package de.paul2708.claim;
 
+import de.paul2708.claim.command.ClaimCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -29,7 +30,8 @@ public class ClaimPlugin extends JavaPlugin {
      */
     @Override
     public void onEnable() {
-
+        // Register command
+        getCommand("claim").setExecutor(new ClaimCommand());
     }
 
     /**
