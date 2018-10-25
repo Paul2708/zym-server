@@ -1,0 +1,9 @@
+name: Chunk-Claim
+author: Paul2708
+version: 0.1
+main: de.paul2708.claim.ClaimPlugin
+api-version: 1.13
+
+commands:
+  claim:
+    description: Claim den aktuellen Chunk
