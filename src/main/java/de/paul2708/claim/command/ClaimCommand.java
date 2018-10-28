@@ -109,6 +109,7 @@ public class ClaimCommand implements CommandExecutor {
         Pair<Integer, Integer> pair = new Pair<>(chunk.getX(), chunk.getZ());
 
         try {
+            // TODO: Check if a region is claimed there
             if (database.isClaimed(pair)) {
                 player.sendMessage(ClaimPlugin.PREFIX + "§cDer Chunk ist bereits geclaimed.");
                 return;

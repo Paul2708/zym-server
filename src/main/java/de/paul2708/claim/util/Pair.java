@@ -1,5 +1,7 @@
 package de.paul2708.claim.util;
 
+import org.bukkit.Chunk;
+
 /**
  * This class represents a pair with key and value.
  *
@@ -76,5 +78,15 @@ public class Pair<K, V> {
         result = 31 * result + (value != null ? value.hashCode() : 0);
 
         return result;
+    }
+
+    /**
+     * Create a new pair by a chunk.
+     *
+     * @param chunk chunk
+     * @return a new pair with x and z coordinate
+     */
+    public static Pair<Integer, Integer> createBy(Chunk chunk) {
+        return new Pair<>(chunk.getX(), chunk.getZ());
     }
 }

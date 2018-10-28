@@ -7,6 +7,8 @@ import de.paul2708.claim.database.impl.JsonDatabase;
 import de.paul2708.claim.file.AbstractConfiguration;
 import de.paul2708.claim.file.InvalidValueException;
 import de.paul2708.claim.file.impl.ClaimConfiguration;
+import de.paul2708.claim.listener.block.BlockBreakListener;
+import de.paul2708.claim.listener.block.BlockPlaceListener;
 import de.paul2708.claim.listener.PlayerJoinListener;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -65,6 +67,9 @@ public class ClaimPlugin extends JavaPlugin {
 
         // Register listener
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(), this);
+
+        Bukkit.getPluginManager().registerEvents(new BlockBreakListener(), this);
+        Bukkit.getPluginManager().registerEvents(new BlockPlaceListener(), this);
 
         // Register command
         getCommand("claim").setExecutor(new ClaimCommand());
