@@ -8,7 +8,6 @@ import org.json.simple.DeserializationException;
 import org.json.simple.JsonArray;
 import org.json.simple.JsonObject;
 import org.json.simple.Jsoner;
-import org.json.simple.parser.ParseException;
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -109,12 +108,13 @@ public class JsonDatabase implements Database {
         ClaimInformation information = ClaimInformation.get(uuid);
         information.updateChunk(chunk, add);
 
-        try (FileWriter writer = new FileWriter(JsonDatabase.PATH)) {
-            writer.write(Jsoner.prettyPrint(jsonArray.toJson()));
-            writer.flush();
-        } catch (IOException e) {
-            throw new DatabaseException("Couldn't update the claim information.", e);
+        this.jsonArray.clear();
+
+        for (ClaimInformation claimInformation : ClaimInformation.getAll()) {
+            jsonArray.add(claimInformation.toJson());
         }
+
+        this.save();
     }
 
     /**
@@ -134,10 +134,46 @@ public class JsonDatabase implements Database {
     }
 
     /**
+     * Create a new entry for the uuid.
+     *
+     * @param uuid player uuid
+     * @throws DatabaseException if an exception is thrown
+     */
+    @Override
+    public void create(UUID uuid) throws DatabaseException {
+        for (Object object : jsonArray) {
+            JsonObject jsonObject = (JsonObject) object;
+
+            if (jsonObject.getString("uuid").equalsIgnoreCase(uuid.toString())) {
+                return;
+            }
+        }
+
+        ClaimInformation.create(uuid, new ArrayList<>());
+        this.jsonArray.add(ClaimInformation.get(uuid).toJson());
+
+        this.save();
+    }
+
+    /**
      * Disconnect from the database.
      */
     @Override
     public void disconnect() {
         // Nothing to do here
+    }
+
+    /**
+     * Save the file.
+     *
+     * @throws DatabaseException if writing to the file throws any exceptions
+     */
+    private void save() throws DatabaseException {
+        try (FileWriter writer = new FileWriter(JsonDatabase.PATH)) {
+            writer.write(Jsoner.prettyPrint(jsonArray.toJson()));
+            writer.flush();
+        } catch (IOException e) {
+            throw new DatabaseException("Couldn't update the claim information.", e);
+        }
     }
 }

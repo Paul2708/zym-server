@@ -1,6 +1,8 @@
 package de.paul2708.claim.model;
 
 import de.paul2708.claim.util.Pair;
+import org.json.simple.JsonArray;
+import org.json.simple.JsonObject;
 
 import java.util.*;
 
@@ -49,6 +51,30 @@ public final class ClaimInformation {
      */
     public boolean contains(Pair<Integer, Integer> chunk) {
         return this.chunks.contains(chunk);
+    }
+
+    /**
+     * Get the json object of the information.
+     *
+     * @return json object
+     */
+    public JsonObject toJson() {
+        JsonObject object = new JsonObject();
+        object.put("uuid", uuid.toString());
+
+        JsonArray array = new JsonArray();
+
+        for (Pair<Integer, Integer> chunk : chunks) {
+            JsonObject chunkObject = new JsonObject();
+            chunkObject.put("x", chunk.getKey());
+            chunkObject.put("z", chunk.getValue());
+
+            array.add(chunkObject);
+        }
+
+        object.put("chunks", array);
+
+        return object;
     }
 
     /**

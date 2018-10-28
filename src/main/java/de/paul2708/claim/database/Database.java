@@ -52,6 +52,14 @@ public interface Database {
     boolean isClaimed(Pair<Integer, Integer> chunk) throws DatabaseException;
 
     /**
+     * Create a new entry for the uuid.
+     *
+     * @param uuid player uuid
+     * @throws DatabaseException if an exception is thrown
+     */
+    void create(UUID uuid) throws DatabaseException;
+
+    /**
      * Disconnect from the database.
      *
      * @throws DatabaseException if an exception is thrown

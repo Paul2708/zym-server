@@ -46,7 +46,6 @@ public abstract class AbstractConfiguration {
         try {
             Path path = Paths.get(this.path);
             this.file = path.toFile();
-            boolean created = false;
 
             if (Files.notExists(path)) {
                 if (path.getParent() != null && Files.notExists(path.getParent())) {
@@ -54,7 +53,6 @@ public abstract class AbstractConfiguration {
                 }
 
                 Files.createFile(path);
-                created = true;
             }
 
             yamlProvider.load(file);
