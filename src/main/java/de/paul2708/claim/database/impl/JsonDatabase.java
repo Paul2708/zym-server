@@ -160,7 +160,7 @@ public class JsonDatabase implements Database {
      */
     @Override
     public void disconnect() {
-        // Nothing to do here
+        ClaimInformation.clear();
     }
 
     /**

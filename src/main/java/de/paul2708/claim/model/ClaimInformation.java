@@ -90,6 +90,13 @@ public final class ClaimInformation {
     }
 
     /**
+     * Clear the cache.
+     */
+    public static void clear() {
+        ClaimInformation.CACHE.clear();
+    }
+
+    /**
      * Get the claim information for a player.
      *
      * @param uuid player uuid
