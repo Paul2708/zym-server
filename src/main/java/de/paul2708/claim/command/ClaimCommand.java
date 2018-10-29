@@ -5,7 +5,7 @@ import de.paul2708.claim.command.impl.ItemCommand;
 import de.paul2708.claim.command.impl.RemoveCommand;
 import de.paul2708.claim.database.Database;
 import de.paul2708.claim.database.DatabaseException;
-import de.paul2708.claim.util.Pair;
+import de.paul2708.claim.model.ChunkInformation;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -106,10 +106,9 @@ public class ClaimCommand implements CommandExecutor {
         Database database = ClaimPlugin.getInstance().getDatabase();
 
         Chunk chunk = player.getLocation().getChunk();
-        Pair<Integer, Integer> pair = new Pair<>(chunk.getX(), chunk.getZ());
+        ChunkInformation pair = new ChunkInformation(chunk.getX(), chunk.getZ());
 
         try {
-            // TODO: Check if a region is claimed there
             if (database.isClaimed(pair)) {
                 player.sendMessage(ClaimPlugin.PREFIX + "§cDer Chunk ist bereits geclaimed.");
                 return;

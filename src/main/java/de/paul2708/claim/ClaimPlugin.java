@@ -7,9 +7,9 @@ import de.paul2708.claim.database.impl.JsonDatabase;
 import de.paul2708.claim.file.AbstractConfiguration;
 import de.paul2708.claim.file.InvalidValueException;
 import de.paul2708.claim.file.impl.ClaimConfiguration;
-import de.paul2708.claim.listener.block.BlockBreakListener;
-import de.paul2708.claim.listener.block.BlockPlaceListener;
 import de.paul2708.claim.listener.PlayerJoinListener;
+import de.paul2708.claim.listener.block.*;
+import de.paul2708.claim.listener.entity.EntityDamageByEntityListener;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -19,6 +19,8 @@ import org.bukkit.plugin.java.JavaPlugin;
  * @author Paul2708
  */
 public class ClaimPlugin extends JavaPlugin {
+
+    // TODO: Interacting, like potions etc
 
     /**
      * Standard message prefix.
@@ -70,6 +72,11 @@ public class ClaimPlugin extends JavaPlugin {
 
         Bukkit.getPluginManager().registerEvents(new BlockBreakListener(), this);
         Bukkit.getPluginManager().registerEvents(new BlockPlaceListener(), this);
+        Bukkit.getPluginManager().registerEvents(new BlockDamageListener(), this);
+        Bukkit.getPluginManager().registerEvents(new StructureGrowListener(), this);
+        Bukkit.getPluginManager().registerEvents(new BlockFromToListener(), this);
+
+        Bukkit.getPluginManager().registerEvents(new EntityDamageByEntityListener(), this);
 
         // Register command
         getCommand("claim").setExecutor(new ClaimCommand());

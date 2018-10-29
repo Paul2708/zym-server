@@ -1,6 +1,5 @@
 package de.paul2708.claim.model;
 
-import de.paul2708.claim.util.Pair;
 import org.json.simple.JsonArray;
 import org.json.simple.JsonObject;
 
@@ -14,9 +13,10 @@ import java.util.*;
 public final class ClaimInformation {
 
     private static final Map<UUID, ClaimInformation> CACHE = new HashMap<>();
+    private static final Map<ChunkInformation, UUID> CHUNK_CACHE = new HashMap<>();
 
     private UUID uuid;
-    private List<Pair<Integer, Integer>> chunks;
+    private List<ChunkInformation> chunks;
 
     /**
      * Create a new claim information.
@@ -24,7 +24,7 @@ public final class ClaimInformation {
      * @param uuid uuid
      * @param chunks chunks
      */
-    private ClaimInformation(UUID uuid, List<Pair<Integer, Integer>> chunks) {
+    private ClaimInformation(UUID uuid, List<ChunkInformation> chunks) {
         this.uuid = uuid;
         this.chunks = chunks;
     }
@@ -35,7 +35,7 @@ public final class ClaimInformation {
      * @param chunk chunk
      * @param add true to add it, false to remove it
      */
-    public void updateChunk(Pair<Integer, Integer> chunk, boolean add) {
+    public void updateChunk(ChunkInformation chunk, boolean add) {
         if (add) {
             this.chunks.add(chunk);
         } else {
@@ -49,7 +49,7 @@ public final class ClaimInformation {
      * @param chunk chunk
      * @return true if the chunk is claimed, otherwise false
      */
-    public boolean contains(Pair<Integer, Integer> chunk) {
+    public boolean contains(ChunkInformation chunk) {
         return this.chunks.contains(chunk);
     }
 
@@ -64,10 +64,10 @@ public final class ClaimInformation {
 
         JsonArray array = new JsonArray();
 
-        for (Pair<Integer, Integer> chunk : chunks) {
+        for (ChunkInformation chunk : chunks) {
             JsonObject chunkObject = new JsonObject();
-            chunkObject.put("x", chunk.getKey());
-            chunkObject.put("z", chunk.getValue());
+            chunkObject.put("x", chunk.getX());
+            chunkObject.put("z", chunk.getZ());
 
             array.add(chunkObject);
         }
@@ -83,10 +83,14 @@ public final class ClaimInformation {
      * @param uuid player uuid
      * @param chunks claimed chunks
      */
-    public static void create(UUID uuid, List<Pair<Integer, Integer>> chunks) {
+    public static void create(UUID uuid, List<ChunkInformation> chunks) {
         ClaimInformation information = new ClaimInformation(uuid, chunks);
 
         ClaimInformation.CACHE.put(uuid, information);
+
+        for (ChunkInformation chunk : chunks) {
+            ClaimInformation.CHUNK_CACHE.put(chunk, uuid);
+        }
     }
 
     /**
@@ -104,6 +108,16 @@ public final class ClaimInformation {
      */
     public static ClaimInformation get(UUID uuid) {
         return ClaimInformation.CACHE.get(uuid);
+    }
+
+    /**
+     * Get the player uuid of a claimed chunk.
+     *
+     * @param chunk chunk
+     * @return the players uuid
+     */
+    public static UUID get(ChunkInformation chunk) {
+        return ClaimInformation.CHUNK_CACHE.get(chunk);
     }
 
     /**

@@ -1,6 +1,6 @@
 package de.paul2708.claim.database;
 
-import de.paul2708.claim.util.Pair;
+import de.paul2708.claim.model.ChunkInformation;
 
 import java.util.UUID;
 
@@ -40,7 +40,7 @@ public interface Database {
      * @param add true if the chunk will be added, otherwise false to remove it
      * @throws DatabaseException if an exception is thrown
      */
-    void updateClaimInformation(UUID uuid, Pair<Integer, Integer> chunk, boolean add) throws DatabaseException;
+    void updateClaimInformation(UUID uuid, ChunkInformation chunk, boolean add) throws DatabaseException;
 
     /**
      * Check if a chunk is already claimed.
@@ -49,7 +49,7 @@ public interface Database {
      * @return true if the chunk is claimed, otherwise false
      * @throws DatabaseException if an exception is thrown
      */
-    boolean isClaimed(Pair<Integer, Integer> chunk) throws DatabaseException;
+    boolean isClaimed(ChunkInformation chunk) throws DatabaseException;
 
     /**
      * Create a new entry for the uuid.
