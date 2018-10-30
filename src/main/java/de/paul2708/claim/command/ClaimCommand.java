@@ -1,11 +1,18 @@
 package de.paul2708.claim.command;
 
+import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.command.impl.ItemCommand;
 import de.paul2708.claim.command.impl.RemoveCommand;
 import de.paul2708.claim.database.Database;
 import de.paul2708.claim.database.DatabaseException;
 import de.paul2708.claim.model.ChunkData;
+import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -98,6 +105,24 @@ public class ClaimCommand implements CommandExecutor {
         if (this.count(player, material) < amount) {
             player.sendMessage(ClaimPlugin.PREFIX + "§cDu hast leider nicht genug Items um dir einen Chunk kaufen zu "
                     + "können. §7[§6" + this.count(player, material) + "§7/§6" + amount + "§7]");
+            return;
+        }
+
+        // Check region
+        RegionManager regionManager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(
+                BukkitAdapter.adapt(player.getWorld()));
+
+        Chunk chunk = player.getLocation().getChunk();
+        int bx = chunk.getX() << 4;
+        int bz = chunk.getZ() << 4;
+        BlockVector pt1 = new BlockVector(bx, 0, bz);
+        BlockVector pt2 = new BlockVector(bx + 15, 256, bz + 15);
+
+        ProtectedCuboidRegion region = new ProtectedCuboidRegion("ThisIsAnId", pt1, pt2);
+        ApplicableRegionSet regions = regionManager.getApplicableRegions(region);
+
+        if (regions.size() > 0) {
+            player.sendMessage(ClaimPlugin.PREFIX + "§cDiesen Chunk kannst du nicht claimen.");
             return;
         }
 
