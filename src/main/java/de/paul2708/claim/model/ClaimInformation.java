@@ -141,6 +141,19 @@ public final class ClaimInformation {
     }
 
     /**
+     * Check if the chunk is claimed by another player.
+     *
+     * @param player player
+     * @param chunk chunk
+     * @return true if the chunk is claimed by another player, otherwise false
+     */
+    public static boolean isClaimedByOthers(Player player, Chunk chunk) {
+        UUID uuid = ClaimInformation.CHUNK_CACHE.get(new ChunkData(chunk));
+
+        return uuid != null && !uuid.equals(player.getUniqueId());
+    }
+
+    /**
      * Clear the cache.
      */
     public static void clear() {

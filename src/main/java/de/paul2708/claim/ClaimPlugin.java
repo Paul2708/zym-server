@@ -10,6 +10,9 @@ import de.paul2708.claim.file.impl.ClaimConfiguration;
 import de.paul2708.claim.listener.PlayerJoinListener;
 import de.paul2708.claim.listener.block.*;
 import de.paul2708.claim.listener.entity.EntityDamageByEntityListener;
+import de.paul2708.claim.listener.entity.EntityExplodeListener;
+import de.paul2708.claim.listener.player.PlayerArmorStandManipulateListener;
+import de.paul2708.claim.listener.player.PlayerInteractListener;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -75,8 +78,14 @@ public class ClaimPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new BlockDamageListener(), this);
         Bukkit.getPluginManager().registerEvents(new StructureGrowListener(), this);
         Bukkit.getPluginManager().registerEvents(new BlockFromToListener(), this);
+        Bukkit.getPluginManager().registerEvents(new BlockPistonListener(), this);
+        Bukkit.getPluginManager().registerEvents(new BlockExplodeListener(), this);
 
         Bukkit.getPluginManager().registerEvents(new EntityDamageByEntityListener(), this);
+        Bukkit.getPluginManager().registerEvents(new EntityExplodeListener(), this);
+
+        Bukkit.getPluginManager().registerEvents(new PlayerInteractListener(), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerArmorStandManipulateListener(), this);
 
         // Register command
         getCommand("claim").setExecutor(new ClaimCommand());
