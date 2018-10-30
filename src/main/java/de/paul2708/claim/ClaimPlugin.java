@@ -14,6 +14,7 @@ import de.paul2708.claim.listener.entity.EntityExplodeListener;
 import de.paul2708.claim.listener.player.PlayerArmorStandManipulateListener;
 import de.paul2708.claim.listener.player.PlayerInteractListener;
 import org.bukkit.Bukkit;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -22,8 +23,6 @@ import org.bukkit.plugin.java.JavaPlugin;
  * @author Paul2708
  */
 public class ClaimPlugin extends JavaPlugin {
-
-    // TODO: Interacting, like potions etc
 
     /**
      * Standard message prefix.
@@ -71,21 +70,15 @@ public class ClaimPlugin extends JavaPlugin {
         }
 
         // Register listener
-        Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(), this);
+        registerEvents(new PlayerJoinListener());
 
-        Bukkit.getPluginManager().registerEvents(new BlockBreakListener(), this);
-        Bukkit.getPluginManager().registerEvents(new BlockPlaceListener(), this);
-        Bukkit.getPluginManager().registerEvents(new BlockDamageListener(), this);
-        Bukkit.getPluginManager().registerEvents(new StructureGrowListener(), this);
-        Bukkit.getPluginManager().registerEvents(new BlockFromToListener(), this);
-        Bukkit.getPluginManager().registerEvents(new BlockPistonListener(), this);
-        Bukkit.getPluginManager().registerEvents(new BlockExplodeListener(), this);
+        registerEvents(new BlockBreakListener(), new BlockPlaceListener(), new BlockDamageListener(),
+                new StructureGrowListener(), new BlockFromToListener(), new BlockPistonListener(),
+                new BlockExplodeListener());
 
-        Bukkit.getPluginManager().registerEvents(new EntityDamageByEntityListener(), this);
-        Bukkit.getPluginManager().registerEvents(new EntityExplodeListener(), this);
+        registerEvents(new EntityDamageByEntityListener(), new EntityExplodeListener());
 
-        Bukkit.getPluginManager().registerEvents(new PlayerInteractListener(), this);
-        Bukkit.getPluginManager().registerEvents(new PlayerArmorStandManipulateListener(), this);
+        registerEvents(new PlayerInteractListener(), new PlayerArmorStandManipulateListener());
 
         // Register command
         getCommand("claim").setExecutor(new ClaimCommand());
@@ -100,6 +93,17 @@ public class ClaimPlugin extends JavaPlugin {
             this.database.disconnect();
         } catch (DatabaseException e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Register some listener.
+     *
+     * @param listener listener
+     */
+    private void registerEvents(Listener... listener) {
+        for (Listener single : listener) {
+            Bukkit.getPluginManager().registerEvents(single, this);
         }
     }
 

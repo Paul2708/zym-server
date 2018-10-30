@@ -124,8 +124,6 @@ public class JsonDatabase implements Database {
      */
     @Override
     public boolean isClaimed(ChunkData chunk) {
-        // TODO: Check if a region is claimed there
-
         for (ClaimInformation information : ClaimInformation.getAll()) {
             if (information.contains(chunk)) {
                 return true;
