@@ -1,6 +1,10 @@
 package de.paul2708.claim.command.impl;
 
+import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.command.SubCommand;
+import de.paul2708.claim.database.DatabaseException;
+import de.paul2708.claim.model.ChunkData;
+import de.paul2708.claim.model.ClaimInformation;
 import org.bukkit.entity.Player;
 
 /**
@@ -25,7 +29,28 @@ public class RemoveCommand extends SubCommand {
      */
     @Override
     public void execute(Player player, String[] args) {
-        // TODO: Implement me
-        System.out.println("remove");
+        ChunkData chunkData = new ChunkData(player.getLocation().getChunk());
+
+        ClaimInformation marked = null;
+        for (ClaimInformation information : ClaimInformation.getAll()) {
+            if (information.contains(chunkData)) {
+                marked = information;
+            }
+        }
+
+        if (marked != null) {
+            try {
+                marked.updateChunk(chunkData, false);
+                ClaimPlugin.getInstance().getDatabase().updateClaimInformation(marked.getUuid(), chunkData, false);
+
+                player.sendMessage(ClaimPlugin.PREFIX + "§6Der Chunk wurde entfernt.");
+            } catch (DatabaseException e) {
+                e.printStackTrace();
+
+                player.sendMessage(ClaimPlugin.PREFIX + "§cDer Chunk konnte nicht entfernt werden.");
+            }
+        } else {
+            player.sendMessage(ClaimPlugin.PREFIX + "§cDer Chunk ist nicht geclaimed.");
+        }
     }
 }

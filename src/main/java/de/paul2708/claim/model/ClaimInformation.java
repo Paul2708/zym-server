@@ -41,8 +41,12 @@ public final class ClaimInformation {
     public void updateChunk(ChunkData chunk, boolean add) {
         if (add) {
             this.chunks.add(chunk);
+
+            ClaimInformation.CHUNK_CACHE.put(chunk, uuid);
         } else {
             this.chunks.remove(chunk);
+
+            ClaimInformation.CHUNK_CACHE.remove(chunk);
         }
     }
 
@@ -78,6 +82,15 @@ public final class ClaimInformation {
         object.put("chunks", array);
 
         return object;
+    }
+
+    /**
+     * Get the uuid.
+     *
+     * @return uuid
+     */
+    public UUID getUuid() {
+        return uuid;
     }
 
     /**
