@@ -2,7 +2,7 @@ package de.paul2708.claim.database.impl;
 
 import de.paul2708.claim.database.Database;
 import de.paul2708.claim.database.DatabaseException;
-import de.paul2708.claim.model.ChunkInformation;
+import de.paul2708.claim.model.ChunkData;
 import de.paul2708.claim.model.ClaimInformation;
 import org.json.simple.DeserializationException;
 import org.json.simple.JsonArray;
@@ -83,12 +83,12 @@ public class JsonDatabase implements Database {
             JsonObject jsonObject = (JsonObject) object;
 
             UUID uuid = UUID.fromString(jsonObject.getString("uuid"));
-            List<ChunkInformation> chunks = new ArrayList<>();
+            List<ChunkData> chunks = new ArrayList<>();
 
             for (Object otherObject : (JsonArray) jsonObject.get("chunks")) {
                 JsonObject jsonChunk = (JsonObject) otherObject;
 
-                chunks.add(new ChunkInformation(jsonChunk.getInteger("x"), jsonChunk.getInteger("z")));
+                chunks.add(new ChunkData(jsonChunk.getInteger("x"), jsonChunk.getInteger("z")));
             }
 
             ClaimInformation.create(uuid, chunks);
@@ -104,7 +104,7 @@ public class JsonDatabase implements Database {
      * @throws DatabaseException if an exception is thrown
      */
     @Override
-    public void updateClaimInformation(UUID uuid, ChunkInformation chunk, boolean add) throws DatabaseException {
+    public void updateClaimInformation(UUID uuid, ChunkData chunk, boolean add) throws DatabaseException {
         ClaimInformation information = ClaimInformation.get(uuid);
         information.updateChunk(chunk, add);
 
@@ -123,7 +123,7 @@ public class JsonDatabase implements Database {
      * @param chunk chunk
      */
     @Override
-    public boolean isClaimed(ChunkInformation chunk) {
+    public boolean isClaimed(ChunkData chunk) {
         // TODO: Check if a region is claimed there
 
         for (ClaimInformation information : ClaimInformation.getAll()) {

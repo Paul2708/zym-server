@@ -5,8 +5,7 @@ import de.paul2708.claim.command.impl.ItemCommand;
 import de.paul2708.claim.command.impl.RemoveCommand;
 import de.paul2708.claim.database.Database;
 import de.paul2708.claim.database.DatabaseException;
-import de.paul2708.claim.model.ChunkInformation;
-import org.bukkit.Chunk;
+import de.paul2708.claim.model.ChunkData;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -104,17 +103,15 @@ public class ClaimCommand implements CommandExecutor {
 
         // Check chunk
         Database database = ClaimPlugin.getInstance().getDatabase();
-
-        Chunk chunk = player.getLocation().getChunk();
-        ChunkInformation pair = new ChunkInformation(chunk.getX(), chunk.getZ());
+        ChunkData chunkData = new ChunkData(player.getLocation().getChunk());
 
         try {
-            if (database.isClaimed(pair)) {
+            if (database.isClaimed(chunkData)) {
                 player.sendMessage(ClaimPlugin.PREFIX + "§cDer Chunk ist bereits geclaimed.");
                 return;
             }
 
-            database.updateClaimInformation(player.getUniqueId(), pair, true);
+            database.updateClaimInformation(player.getUniqueId(), chunkData, true);
 
             this.removeItems(player, material, amount);
 

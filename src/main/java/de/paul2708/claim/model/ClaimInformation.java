@@ -1,5 +1,7 @@
 package de.paul2708.claim.model;
 
+import org.bukkit.Chunk;
+import org.bukkit.entity.Player;
 import org.json.simple.JsonArray;
 import org.json.simple.JsonObject;
 
@@ -13,10 +15,11 @@ import java.util.*;
 public final class ClaimInformation {
 
     private static final Map<UUID, ClaimInformation> CACHE = new HashMap<>();
-    private static final Map<ChunkInformation, UUID> CHUNK_CACHE = new HashMap<>();
+
+    private static final Map<ChunkData, UUID> CHUNK_CACHE = new HashMap<>();
 
     private UUID uuid;
-    private List<ChunkInformation> chunks;
+    private List<ChunkData> chunks;
 
     /**
      * Create a new claim information.
@@ -24,7 +27,7 @@ public final class ClaimInformation {
      * @param uuid uuid
      * @param chunks chunks
      */
-    private ClaimInformation(UUID uuid, List<ChunkInformation> chunks) {
+    private ClaimInformation(UUID uuid, List<ChunkData> chunks) {
         this.uuid = uuid;
         this.chunks = chunks;
     }
@@ -35,7 +38,7 @@ public final class ClaimInformation {
      * @param chunk chunk
      * @param add true to add it, false to remove it
      */
-    public void updateChunk(ChunkInformation chunk, boolean add) {
+    public void updateChunk(ChunkData chunk, boolean add) {
         if (add) {
             this.chunks.add(chunk);
         } else {
@@ -49,7 +52,7 @@ public final class ClaimInformation {
      * @param chunk chunk
      * @return true if the chunk is claimed, otherwise false
      */
-    public boolean contains(ChunkInformation chunk) {
+    public boolean contains(ChunkData chunk) {
         return this.chunks.contains(chunk);
     }
 
@@ -64,7 +67,7 @@ public final class ClaimInformation {
 
         JsonArray array = new JsonArray();
 
-        for (ChunkInformation chunk : chunks) {
+        for (ChunkData chunk : chunks) {
             JsonObject chunkObject = new JsonObject();
             chunkObject.put("x", chunk.getX());
             chunkObject.put("z", chunk.getZ());
@@ -83,21 +86,14 @@ public final class ClaimInformation {
      * @param uuid player uuid
      * @param chunks claimed chunks
      */
-    public static void create(UUID uuid, List<ChunkInformation> chunks) {
+    public static void create(UUID uuid, List<ChunkData> chunks) {
         ClaimInformation information = new ClaimInformation(uuid, chunks);
 
         ClaimInformation.CACHE.put(uuid, information);
 
-        for (ChunkInformation chunk : chunks) {
+        for (ChunkData chunk : chunks) {
             ClaimInformation.CHUNK_CACHE.put(chunk, uuid);
         }
-    }
-
-    /**
-     * Clear the cache.
-     */
-    public static void clear() {
-        ClaimInformation.CACHE.clear();
     }
 
     /**
@@ -111,13 +107,44 @@ public final class ClaimInformation {
     }
 
     /**
-     * Get the player uuid of a claimed chunk.
+     * Check if two chunks are owned by the same player.
      *
-     * @param chunk chunk
-     * @return the players uuid
+     * @param firstChunk first chunk
+     * @param secondChunk second chunk
+     * @return true if the same player owns the two chunks, otherwise false
      */
-    public static UUID get(ChunkInformation chunk) {
-        return ClaimInformation.CHUNK_CACHE.get(chunk);
+    public static boolean hasSameOwner(Chunk firstChunk, Chunk secondChunk) {
+        ChunkData firstData = new ChunkData(firstChunk);
+        ChunkData secondData = new ChunkData(secondChunk);
+
+        UUID firstOwner = ClaimInformation.CHUNK_CACHE.get(firstData);
+        UUID secondOwner = ClaimInformation.CHUNK_CACHE.get(secondData);
+
+        if (firstOwner != null && secondOwner != null) {
+            return firstOwner.equals(secondOwner);
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if the player owns the chunk.
+     *
+     * @param player player
+     * @param chunk chunk
+     * @return true if the player owns the chunk, otherwise false
+     */
+    public static boolean owns(Player player, Chunk chunk) {
+        ClaimInformation information = ClaimInformation.get(player.getUniqueId());
+
+        return information.contains(new ChunkData(chunk));
+    }
+
+    /**
+     * Clear the cache.
+     */
+    public static void clear() {
+        ClaimInformation.CACHE.clear();
     }
 
     /**
