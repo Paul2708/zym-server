@@ -118,6 +118,25 @@ public final class Utility {
     /**
      * Check if the player owns the claimer.
      *
+     * @param claimer claimer item stack
+     * @return true if the item is the claimer, otherwise false
+     */
+    public static boolean isClaimer(ItemStack claimer) {
+        if (claimer == null) {
+            return false;
+        }
+
+        net.minecraft.server.v1_13_R1.ItemStack nmsCopy = CraftItemStack.asNMSCopy(claimer);
+        if (nmsCopy.getTag() == null) {
+            return false;
+        }
+
+        return nmsCopy.getTag().hasKey("owner");
+    }
+
+    /**
+     * Check if the player owns the claimer.
+     *
      * @param uuid player uuid
      * @param claimer claimer item stack
      * @return true if the player owns the claimer, otherwise false
