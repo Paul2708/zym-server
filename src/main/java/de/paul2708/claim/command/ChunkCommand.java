@@ -1,7 +1,7 @@
 package de.paul2708.claim.command;
 
 import de.paul2708.claim.ClaimPlugin;
-import de.paul2708.claim.command.impl.ClaimChunkCommand;
+import de.paul2708.claim.command.impl.ClaimCommand;
 import de.paul2708.claim.command.impl.HelpCommand;
 import de.paul2708.claim.command.impl.RemoveCommand;
 import org.bukkit.command.Command;
@@ -18,18 +18,18 @@ import java.util.List;
  *
  * @author Paul2708
  */
-public class ClaimCommand implements CommandExecutor {
+public class ChunkCommand implements CommandExecutor {
 
     private List<SubCommand> subCommands;
 
     /**
      * Create a new claim command with some sub commands.
      */
-    public ClaimCommand() {
+    public ChunkCommand() {
         this.subCommands = new ArrayList<>();
 
         this.subCommands.add(new RemoveCommand());
-        this.subCommands.add(new ClaimChunkCommand());
+        this.subCommands.add(new ClaimCommand());
         this.subCommands.add(new HelpCommand(this.subCommands));
     }
 

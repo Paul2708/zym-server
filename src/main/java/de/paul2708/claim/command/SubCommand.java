@@ -3,7 +3,7 @@ package de.paul2708.claim.command;
 import org.bukkit.entity.Player;
 
 /**
- * This class represents a sub command of the {@link ClaimCommand}.
+ * This class represents a sub command of the {@link ChunkCommand}.
  *
  * @author Paul2708
  */

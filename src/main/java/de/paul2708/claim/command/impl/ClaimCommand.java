@@ -22,12 +22,12 @@ import org.bukkit.inventory.ItemStack;
  *
  * @author Paul2708
  */
-public class ClaimChunkCommand extends SubCommand {
+public class ClaimCommand extends SubCommand {
 
     /**
      * Create a new claim command.
      */
-    public ClaimChunkCommand() {
+    public ClaimCommand() {
         super("claim", "claim", "Claime den aktuellen Chunk", SubCommand.NONE_PERMISSION);
     }
 
