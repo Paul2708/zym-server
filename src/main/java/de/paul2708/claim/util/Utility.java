@@ -1,6 +1,15 @@
 package de.paul2708.claim.util;
 
+import com.sk89q.worldedit.BlockVector;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
+import de.paul2708.claim.model.ChunkData;
+import de.paul2708.claim.model.ClaimInformation;
 import net.minecraft.server.v1_13_R1.NBTTagCompound;
+import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_13_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
@@ -41,6 +50,62 @@ public final class Utility {
         }
 
         return Utility.PRICES.get(level);
+    }
+
+    /**
+     * Check if a player can claim a chunk.<br>
+     * A chunk can be claimed, if the chunk isn't claimed yet, if the chunks next to it is not claimed and there is
+     * no region.
+     *
+     * @param player player
+     * @param chunkData chunk to claim
+     * @return true if the chunk can be claimed, otherwise false
+     */
+    public static boolean canClaim(Player player, ChunkData chunkData) {
+        // Check chunk
+        for (ClaimInformation information : ClaimInformation.getAll()) {
+            if (information.contains(chunkData)) {
+                return false;
+            }
+        }
+
+        // Check other chunks
+        for (ClaimInformation information : ClaimInformation.getAll()) {
+            if (information.getUuid().equals(player.getUniqueId())) {
+                continue;
+            }
+
+            for (ChunkData chunk : information.getChunks()) {
+                for (int x = -1; x <= 1; x++) {
+                    for (int z = -1; z <= 1; z++) {
+                        ChunkData nextChunk = new ChunkData(chunk.getX() + x, chunk.getZ() + z);
+
+                        if (chunkData.equals(nextChunk)) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Check existing regions
+        RegionManager regionManager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(
+                BukkitAdapter.adapt(player.getWorld()));
+
+        Chunk chunk = player.getLocation().getChunk();
+        int bx = chunk.getX() << 4;
+        int bz = chunk.getZ() << 4;
+        BlockVector pt1 = new BlockVector(bx, 0, bz);
+        BlockVector pt2 = new BlockVector(bx + 15, 256, bz + 15);
+
+        ProtectedCuboidRegion region = new ProtectedCuboidRegion("ThisIsAnId", pt1, pt2);
+        ApplicableRegionSet regions = regionManager.getApplicableRegions(region);
+
+        if (regions.size() > 0) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

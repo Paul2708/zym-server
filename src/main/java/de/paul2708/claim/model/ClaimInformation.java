@@ -105,6 +105,15 @@ public final class ClaimInformation {
     }
 
     /**
+     * Get the list of chunks.
+     *
+     * @return list of chunks
+     */
+    public List<ChunkData> getChunks() {
+        return chunks;
+    }
+
+    /**
      * Get the buy level.
      *
      * @return buy level
