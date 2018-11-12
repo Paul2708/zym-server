@@ -20,7 +20,7 @@ import java.util.UUID;
  */
 public final class Utility {
 
-    private static List<Integer> PRICES = Arrays.asList(0, 8, 16, 32, 64, 64, 128, 128, 192);
+    private static final List<Integer> PRICES = Arrays.asList(0, 8, 16, 32, 64, 64, 128, 128, 192);
 
     /**
      * Nothing to call here.

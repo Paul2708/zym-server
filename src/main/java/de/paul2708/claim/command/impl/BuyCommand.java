@@ -53,7 +53,7 @@ public class BuyCommand extends SubCommand {
             return;
         }
 
-        Utility.removeItems(player, Material.DIAMOND, count);
+        Utility.removeItems(player, Material.DIAMOND, price);
 
         ItemStack claimer = Utility.buildClaimer(player.getUniqueId());
         if (player.getInventory().firstEmpty() == -1) {
