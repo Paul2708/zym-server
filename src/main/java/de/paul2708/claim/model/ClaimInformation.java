@@ -20,16 +20,19 @@ public final class ClaimInformation {
 
     private UUID uuid;
     private List<ChunkData> chunks;
+    private int buyLevel;
 
     /**
      * Create a new claim information.
      *
      * @param uuid uuid
      * @param chunks chunks
+     * @param level buy level
      */
-    private ClaimInformation(UUID uuid, List<ChunkData> chunks) {
+    private ClaimInformation(UUID uuid, List<ChunkData> chunks, int level) {
         this.uuid = uuid;
         this.chunks = chunks;
+        this.buyLevel = level;
     }
 
     /**
@@ -80,6 +83,7 @@ public final class ClaimInformation {
         }
 
         object.put("chunks", array);
+        object.put("level", buyLevel);
 
         return object;
     }
@@ -98,9 +102,10 @@ public final class ClaimInformation {
      *
      * @param uuid player uuid
      * @param chunks claimed chunks
+     * @param level level
      */
-    public static void create(UUID uuid, List<ChunkData> chunks) {
-        ClaimInformation information = new ClaimInformation(uuid, chunks);
+    public static void create(UUID uuid, List<ChunkData> chunks, int level) {
+        ClaimInformation information = new ClaimInformation(uuid, chunks, level);
 
         ClaimInformation.CACHE.put(uuid, information);
 

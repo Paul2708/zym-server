@@ -91,7 +91,9 @@ public class JsonDatabase implements Database {
                 chunks.add(new ChunkData(jsonChunk.getInteger("x"), jsonChunk.getInteger("z")));
             }
 
-            ClaimInformation.create(uuid, chunks);
+            int level = jsonObject.getInteger("level");
+
+            ClaimInformation.create(uuid, chunks, level);
         }
     }
 
@@ -124,6 +126,7 @@ public class JsonDatabase implements Database {
      */
     @Override
     public boolean isClaimed(ChunkData chunk) {
+        // TODO: Remove me
         for (ClaimInformation information : ClaimInformation.getAll()) {
             if (information.contains(chunk)) {
                 return true;
@@ -149,7 +152,7 @@ public class JsonDatabase implements Database {
             }
         }
 
-        ClaimInformation.create(uuid, new ArrayList<>());
+        ClaimInformation.create(uuid, new ArrayList<>(), 0);
         this.jsonArray.add(ClaimInformation.get(uuid).toJson());
 
         this.save();
