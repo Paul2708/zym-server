@@ -1,18 +1,10 @@
 package de.paul2708.claim.command.impl;
 
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.command.SubCommand;
-import de.paul2708.claim.database.Database;
 import de.paul2708.claim.database.DatabaseException;
 import de.paul2708.claim.model.ChunkData;
-import de.paul2708.claim.model.ClaimInformation;
-import org.bukkit.Chunk;
+import de.paul2708.claim.util.Utility;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -39,106 +31,59 @@ public class ClaimCommand extends SubCommand {
      */
     @Override
     public void execute(Player player, String[] args) {
-        System.out.println("lol claimed");
-    }
-
-    /**
-     * Execute the main command.
-     *
-     * @param player player
-     */
-    private void executeMainCommand(Player player) {
-        // Check inventory
-        Material material = Material.matchMaterial(ClaimPlugin.getInstance().getConfiguration().get("item.type"));
-        int amount = ClaimPlugin.getInstance().getConfiguration().get("item.amount");
-
-        if (this.count(player, material) < amount) {
-            player.sendMessage(ClaimPlugin.PREFIX + "§cDu hast leider nicht genug Items um dir einen Chunk kaufen zu "
-                    + "können. §7[§6" + this.count(player, material) + "§7/§6" + amount + "§7]");
-            return;
+        // Check claimer
+        boolean found = false;
+        for (ItemStack itemStack : player.getInventory()) {
+            if (Utility.ownsClaimer(player.getUniqueId(), itemStack)) {
+                found = true;
+                break;
+            }
         }
 
-        // Check region
-        RegionManager regionManager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(
-                BukkitAdapter.adapt(player.getWorld()));
-
-        Chunk chunk = player.getLocation().getChunk();
-        int bx = chunk.getX() << 4;
-        int bz = chunk.getZ() << 4;
-        BlockVector pt1 = new BlockVector(bx, 0, bz);
-        BlockVector pt2 = new BlockVector(bx + 15, 256, bz + 15);
-
-        ProtectedCuboidRegion region = new ProtectedCuboidRegion("ThisIsAnId", pt1, pt2);
-        ApplicableRegionSet regions = regionManager.getApplicableRegions(region);
-
-        if (regions.size() > 0) {
-            player.sendMessage(ClaimPlugin.PREFIX + "§cDiesen Chunk kannst du nicht claimen.");
+        if (!found) {
+            player.sendMessage(ClaimPlugin.PREFIX + "§cDu hast keinen Claimer im Inventar, der dir gehört.");
             return;
         }
 
         // Check chunk
-        Database database = ClaimPlugin.getInstance().getDatabase();
-        ChunkData chunkData = new ChunkData(player.getLocation().getChunk());
-
-        try {
-            if (database.isClaimed(chunkData)) {
-                player.sendMessage(ClaimPlugin.PREFIX + "§cDer Chunk ist bereits geclaimed.");
-                return;
-            }
-
-            database.updateClaimInformation(player.getUniqueId(), chunkData, true);
-
-            this.removeItems(player, material, amount);
-
-            player.sendMessage(ClaimPlugin.PREFIX + "§6Du hast erfolgreich den Chunk geclaimed.");
-        } catch (DatabaseException e) {
-            player.sendMessage(ClaimPlugin.PREFIX + "§cEs ist ein Fehler aufgetreten. Reconnecte und versuche "
-                    + "es erneut.");
-
-            e.printStackTrace();
+        if (!Utility.canClaim(player, new ChunkData(player.getLocation().getChunk()))) {
+            player.sendMessage(ClaimPlugin.PREFIX + "§cDu kannst diesen Chunk nicht claimen.");
+            return;
         }
-    }
 
-    /**
-     * Remove the items from the inventory.
-     *
-     * @param player player
-     * @param material material
-     * @param amount amount
-     */
-    private void removeItems(Player player, Material material, int amount) {
-        int current = amount;
+        // Claim the chunk
+        try {
+            ClaimPlugin.getInstance().getDatabase().updateClaimInformation(player.getUniqueId(),
+                    new ChunkData(player.getLocation().getChunk()), true);
 
-        for (ItemStack content : player.getInventory().getContents()) {
-            if (content != null && content.getType() == material) {
-                if (current - content.getAmount() > 0) {
-                    player.getInventory().remove(content);
+            int index = -1;
+            ItemStack replaced = null;
 
-                    current -= content.getAmount();
-                } else {
-                    content.setAmount(content.getAmount() - current);
-                    return;
+            for (int i = 0; i < player.getInventory().getSize(); i++) {
+                ItemStack itemStack = player.getInventory().getItem(i);
+
+                if (Utility.ownsClaimer(player.getUniqueId(), itemStack)) {
+                    index = i;
+
+                    if (itemStack.getAmount() == 1) {
+                        replaced = new ItemStack(Material.AIR);
+                    } else {
+                        replaced = itemStack.clone();
+                        replaced.setAmount(itemStack.getAmount() - 1);
+                    }
+
+                    break;
                 }
             }
+
+            player.getInventory().setItem(index, replaced);
+
+            player.sendMessage(ClaimPlugin.PREFIX + "Du hast den Chunk §6erfolgreich §7geclaimed.");
+        } catch (DatabaseException e) {
+            e.printStackTrace();
+
+            player.sendMessage(ClaimPlugin.PREFIX + "§cEin Datenbank-Fehler ist aufgetreten...");
         }
     }
 
-    /**
-     * Count specific items in a players inventory.
-     *
-     * @param player player
-     * @param material material
-     * @return amount of specific items
-     */
-    private int count(Player player, Material material) {
-        int amount = 0;
-
-        for (ItemStack content : player.getInventory().getContents()) {
-            if (content != null && content.getType() == material) {
-                amount += content.getAmount();
-            }
-        }
-
-        return amount;
-    }
 }
