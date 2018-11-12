@@ -14,6 +14,7 @@ import de.paul2708.claim.listener.entity.EntityExplodeListener;
 import de.paul2708.claim.listener.item.CraftItemListener;
 import de.paul2708.claim.listener.player.*;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -65,6 +66,10 @@ public class ClaimPlugin extends JavaPlugin {
             this.database.setUp();
 
             this.database.resolveClaimInformation();
+
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                this.database.create(player.getUniqueId());
+            }
         } catch (DatabaseException e) {
             e.printStackTrace();
         }

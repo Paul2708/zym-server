@@ -121,9 +121,9 @@ public final class Utility {
         for (ItemStack content : player.getInventory().getContents()) {
             if (content != null && content.getType() == material) {
                 if (current - content.getAmount() > 0) {
-                    player.getInventory().remove(content);
-
                     current -= content.getAmount();
+
+                    content.setAmount(0);
                 } else {
                     content.setAmount(content.getAmount() - current);
                     return;
