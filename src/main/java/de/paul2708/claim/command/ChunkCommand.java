@@ -1,10 +1,7 @@
 package de.paul2708.claim.command;
 
 import de.paul2708.claim.ClaimPlugin;
-import de.paul2708.claim.command.impl.BuyCommand;
-import de.paul2708.claim.command.impl.ClaimCommand;
-import de.paul2708.claim.command.impl.HelpCommand;
-import de.paul2708.claim.command.impl.RemoveCommand;
+import de.paul2708.claim.command.impl.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -31,6 +28,7 @@ public class ChunkCommand implements CommandExecutor {
 
         this.subCommands.add(new BuyCommand());
         this.subCommands.add(new ClaimCommand());
+        this.subCommands.add(new UnClaimCommand());
         this.subCommands.add(new RemoveCommand());
         this.subCommands.add(new HelpCommand(this.subCommands));
     }
