@@ -51,15 +51,6 @@ public interface Database {
     void save(UUID uuid) throws DatabaseException;
 
     /**
-     * Check if a chunk is already claimed.
-     *
-     * @param chunk chunk
-     * @return true if the chunk is claimed, otherwise false
-     * @throws DatabaseException if an exception is thrown
-     */
-    boolean isClaimed(ChunkData chunk) throws DatabaseException;
-
-    /**
      * Create a new entry for the uuid.
      *
      * @param uuid player uuid

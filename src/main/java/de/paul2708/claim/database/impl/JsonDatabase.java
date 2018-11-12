@@ -120,23 +120,6 @@ public class JsonDatabase implements Database {
     }
 
     /**
-     * Check if a chunk is already claimed.
-     *
-     * @param chunk chunk
-     */
-    @Override
-    public boolean isClaimed(ChunkData chunk) {
-        // TODO: Remove me
-        for (ClaimInformation information : ClaimInformation.getAll()) {
-            if (information.contains(chunk)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Save the player data.
      *
      * @param uuid player uuid
