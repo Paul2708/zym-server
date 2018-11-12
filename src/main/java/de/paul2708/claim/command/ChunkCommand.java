@@ -1,6 +1,7 @@
 package de.paul2708.claim.command;
 
 import de.paul2708.claim.ClaimPlugin;
+import de.paul2708.claim.command.impl.BuyCommand;
 import de.paul2708.claim.command.impl.ClaimCommand;
 import de.paul2708.claim.command.impl.HelpCommand;
 import de.paul2708.claim.command.impl.RemoveCommand;
@@ -28,8 +29,9 @@ public class ChunkCommand implements CommandExecutor {
     public ChunkCommand() {
         this.subCommands = new ArrayList<>();
 
-        this.subCommands.add(new RemoveCommand());
+        this.subCommands.add(new BuyCommand());
         this.subCommands.add(new ClaimCommand());
+        this.subCommands.add(new RemoveCommand());
         this.subCommands.add(new HelpCommand(this.subCommands));
     }
 

@@ -43,6 +43,14 @@ public interface Database {
     void updateClaimInformation(UUID uuid, ChunkData chunk, boolean add) throws DatabaseException;
 
     /**
+     * Save the player data.
+     *
+     * @param uuid player uuid
+     * @throws DatabaseException if an exception is thrown
+     */
+    void save(UUID uuid) throws DatabaseException;
+
+    /**
      * Check if a chunk is already claimed.
      *
      * @param chunk chunk

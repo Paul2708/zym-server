@@ -38,6 +38,12 @@
             <version>1.13-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.bukkit</groupId>
+            <artifactId>craftbukkit</artifactId>
+            <version>1.13-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
         <!-- Simple JSON -->
         <dependency>
             <groupId>com.github.cliftonlabs</groupId>

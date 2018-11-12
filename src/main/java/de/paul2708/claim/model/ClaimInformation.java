@@ -54,6 +54,13 @@ public final class ClaimInformation {
     }
 
     /**
+     * Add a level to the current level.
+     */
+    public void addLevel() {
+        this.buyLevel++;
+    }
+
+    /**
      * Check if the chunk is claimed.
      *
      * @param chunk chunk
@@ -95,6 +102,15 @@ public final class ClaimInformation {
      */
     public UUID getUuid() {
         return uuid;
+    }
+
+    /**
+     * Get the buy level.
+     *
+     * @return buy level
+     */
+    public int getBuyLevel() {
+        return buyLevel;
     }
 
     /**

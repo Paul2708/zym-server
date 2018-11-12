@@ -137,6 +137,23 @@ public class JsonDatabase implements Database {
     }
 
     /**
+     * Save the player data.
+     *
+     * @param uuid player uuid
+     * @throws DatabaseException if an exception is thrown
+     */
+    @Override
+    public void save(UUID uuid) throws DatabaseException {
+        this.jsonArray.clear();
+
+        for (ClaimInformation claimInformation : ClaimInformation.getAll()) {
+            jsonArray.add(claimInformation.toJson());
+        }
+
+        this.save();
+    }
+
+    /**
      * Create a new entry for the uuid.
      *
      * @param uuid player uuid
