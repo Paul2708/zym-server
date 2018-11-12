@@ -9,6 +9,11 @@ import org.bukkit.entity.Player;
  */
 public abstract class SubCommand {
 
+    /**
+     * None permission is needed.
+     */
+    public static final String NONE_PERMISSION = "NONE_PERMISSION";
+
     private final String name;
     private final String usage;
     private final String description;

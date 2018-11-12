@@ -81,7 +81,7 @@ public class ClaimPlugin extends JavaPlugin {
         registerEvents(new PlayerInteractListener(), new PlayerArmorStandManipulateListener());
 
         // Register command
-        getCommand("claim").setExecutor(new ClaimCommand());
+        getCommand("chunk").setExecutor(new ClaimCommand());
     }
 
     /**
