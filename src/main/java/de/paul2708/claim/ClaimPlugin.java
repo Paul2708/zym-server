@@ -4,9 +4,6 @@ import de.paul2708.claim.command.ChunkCommand;
 import de.paul2708.claim.database.Database;
 import de.paul2708.claim.database.DatabaseException;
 import de.paul2708.claim.database.impl.JsonDatabase;
-import de.paul2708.claim.file.AbstractConfiguration;
-import de.paul2708.claim.file.InvalidValueException;
-import de.paul2708.claim.file.impl.ClaimConfiguration;
 import de.paul2708.claim.listener.PlayerJoinListener;
 import de.paul2708.claim.listener.block.*;
 import de.paul2708.claim.listener.entity.EntityDamageByEntityListener;
@@ -32,8 +29,6 @@ public class ClaimPlugin extends JavaPlugin {
 
     private static ClaimPlugin instance;
 
-    private AbstractConfiguration configuration;
-
     private Database database;
 
     /**
@@ -49,15 +44,6 @@ public class ClaimPlugin extends JavaPlugin {
      */
     @Override
     public void onEnable() {
-        // Load the configuration
-        this.configuration = new ClaimConfiguration();
-
-        try {
-            this.configuration.load();
-        } catch (InvalidValueException e) {
-            e.printStackTrace();
-        }
-
         // Setup the database
         this.database = new JsonDatabase();
 
@@ -122,15 +108,6 @@ public class ClaimPlugin extends JavaPlugin {
      */
     public static ClaimPlugin getInstance() {
         return ClaimPlugin.instance;
-    }
-
-    /**
-     * Get the configuration.
-     *
-     * @return configuration
-     */
-    public AbstractConfiguration getConfiguration() {
-        return configuration;
     }
 
     /**
