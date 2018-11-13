@@ -55,7 +55,7 @@ public class BuyCommand extends SubCommand {
 
         Utility.removeItems(player, Material.DIAMOND, price);
 
-        ItemStack claimer = Utility.buildClaimer(player.getUniqueId());
+        ItemStack claimer = Utility.buildClaimer(player);
         if (player.getInventory().firstEmpty() == -1) {
             player.getWorld().dropItemNaturally(player.getLocation(), claimer);
         } else {

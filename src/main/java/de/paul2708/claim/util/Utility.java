@@ -154,15 +154,15 @@ public final class Utility {
     /**
      * Build the claimer with nbt owner tag.
      *
-     * @param uuid player uuid
+     * @param player player
      * @return claimer item stack
      */
-    public static ItemStack buildClaimer(UUID uuid) {
+    public static ItemStack buildClaimer(Player player) {
         // Build item stack
         ItemStack itemStack = new ItemStack(Material.NAME_TAG);
         ItemMeta itemMeta = itemStack.getItemMeta();
 
-        itemMeta.setDisplayName("§6Claimer");
+        itemMeta.setDisplayName("§6" + player.getName() + "'s §7Claimer");
         itemMeta.setLore(Arrays.asList(" ", "§7Nutze §6/chunk claim §7um einen Chunk zu claimen.",
                 "§7Oder §6rechtsklicke §7in einem freien Chunk."));
         itemMeta.setUnbreakable(true);
@@ -174,7 +174,7 @@ public final class Utility {
         // Add NBT Tag
         net.minecraft.server.v1_13_R1.ItemStack nmsCopy = CraftItemStack.asNMSCopy(itemStack);
         NBTTagCompound tag = nmsCopy.getTag() != null ? nmsCopy.getTag() : new NBTTagCompound();
-        tag.setString("owner", uuid.toString());
+        tag.setString("owner", player.getUniqueId().toString());
         nmsCopy.setTag(tag);
 
         return CraftItemStack.asCraftMirror(nmsCopy);
