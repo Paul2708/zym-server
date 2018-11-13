@@ -260,8 +260,9 @@ public final class Utility {
      * Open the buy inventory.
      *
      * @param player player
+     * @param price price
      */
-    public static void openInventory(Player player) {
+    public static void openInventory(Player player, int price) {
         if (Utility.inventory == null) {
             Utility.inventory = Bukkit.createInventory(null, 27, "§7Willst du einen §6Claimer §7kaufen?");
 
@@ -281,14 +282,15 @@ public final class Utility {
             }
 
             Utility.inventory.setItem(0, yellowBorder);
-            Utility.inventory.setItem(8, blackBorder);
+            Utility.inventory.setItem(8, yellowBorder);
             Utility.inventory.setItem(Utility.inventory.getSize() - 9, yellowBorder);
             Utility.inventory.setItem(Utility.inventory.getSize() - 1, yellowBorder);
 
             // Set claimer
             ItemStack itemStack = Utility.buildClaimer(player);
             ItemMeta meta = itemStack.getItemMeta();
-            meta.setLore(Arrays.asList(" ", "§aKlick um den Claimer zu kaufen."));
+            meta.setLore(Arrays.asList(" ", "§aKlicke um den Claimer zu kaufen.", "§7Kosten: §6" + price
+                    + " §7Diamanten"));
             itemStack.setItemMeta(meta);
 
             Utility.inventory.setItem(13, itemStack);

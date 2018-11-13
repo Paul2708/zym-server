@@ -1,13 +1,9 @@
 package de.paul2708.claim.command.impl;
 
-import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.command.SubCommand;
-import de.paul2708.claim.database.DatabaseException;
 import de.paul2708.claim.model.ClaimInformation;
 import de.paul2708.claim.util.Utility;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 /**
  * This sub command is called, if a player wants to buy a new claimer.
@@ -31,6 +27,9 @@ public class BuyCommand extends SubCommand {
      */
     @Override
     public void execute(Player player, String[] args) {
-        Utility.openInventory(player);
+        ClaimInformation information = ClaimInformation.get(player.getUniqueId());
+        int price = Utility.getPrice(information.getBuyLevel());
+
+        Utility.openInventory(player, price);
     }
 }
