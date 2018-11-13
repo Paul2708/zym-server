@@ -218,4 +218,14 @@ public final class Utility {
 
         return nmsCopy.getTag().hasKey("owner") && nmsCopy.getTag().getString("owner").equals(uuid.toString());
     }
+
+    /**
+     * Check if the player has a bypass.
+     *
+     * @param player player
+     * @return true if the player has the bypass, otherwise false
+     */
+    public static boolean hasBypass(Player player) {
+        return player.isOp();
+    }
 }

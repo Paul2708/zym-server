@@ -2,6 +2,7 @@ package de.paul2708.claim.listener.block;
 
 import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.model.ClaimInformation;
+import de.paul2708.claim.util.Utility;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,6 +23,10 @@ public class BlockPlaceListener implements Listener {
     @EventHandler
     public void onPlace(BlockPlaceEvent event) {
         Player player = event.getPlayer();
+
+        if (Utility.hasBypass(player)) {
+            return;
+        }
 
         if (ClaimInformation.isClaimedByOthers(player, event.getBlock().getChunk())) {
             event.setCancelled(true);
