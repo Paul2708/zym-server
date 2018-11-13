@@ -26,6 +26,7 @@ public class ChunkCommand implements CommandExecutor {
     public ChunkCommand() {
         this.subCommands = new ArrayList<>();
 
+        this.subCommands.add(new InfoCommand());
         this.subCommands.add(new BuyCommand());
         this.subCommands.add(new ClaimCommand());
         this.subCommands.add(new UnClaimCommand());
