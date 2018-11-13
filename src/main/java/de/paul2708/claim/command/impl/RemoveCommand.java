@@ -18,7 +18,7 @@ public class RemoveCommand extends SubCommand {
      * Create a new remove command.
      */
     public RemoveCommand() {
-        super("remove", "remove", "den aktuellen Chunk zu entfernen", "chunk.remove");
+        super("remove", "remove", "Entferne den aktuellen Chunk", "chunk.remove");
     }
 
     /**

@@ -31,6 +31,7 @@ public class ChunkCommand implements CommandExecutor {
         this.subCommands.add(new ClaimCommand());
         this.subCommands.add(new UnClaimCommand());
         this.subCommands.add(new OpInfoCommand());
+        this.subCommands.add(new PlayerInfoCommand());
         this.subCommands.add(new RemoveCommand());
         this.subCommands.add(new HelpCommand(this.subCommands));
     }
