@@ -48,13 +48,9 @@ public class PlayerInteractListener implements Listener {
             Player player = event.getPlayer();
             Block block = event.getClickedBlock();
 
-            if (Utility.hasBypass(player)) {
-                return;
-            }
-
             Chunk chunk = block == null ? player.getLocation().getChunk() : block.getChunk();
 
-            if (ClaimInformation.isClaimedByOthers(player, chunk)) {
+            if (ClaimInformation.isClaimedByOthers(player, chunk) && !Utility.hasBypass(player)) {
                 event.setCancelled(true);
             }
 
