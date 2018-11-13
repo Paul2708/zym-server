@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * This command executor handles the <code>claim</code> command.
+ * This command executor handles the <code>chunk</code> command.
  *
  * @author Paul2708
  */
