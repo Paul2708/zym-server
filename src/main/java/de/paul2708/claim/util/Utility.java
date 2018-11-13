@@ -80,7 +80,7 @@ public final class Utility {
                     for (int z = -1; z <= 1; z++) {
                         ChunkData nextChunk = new ChunkData(chunk.getX() + x, chunk.getZ() + z);
 
-                        if (chunkData.equals(nextChunk)) {
+                        if (chunkData.equals(nextChunk) && !hasChunkNextTo(player, chunkData)) {
                             return ClaimResponse.BORDER;
                         }
                     }
@@ -106,6 +106,29 @@ public final class Utility {
         }
 
         return ClaimResponse.CLAIMABLE;
+    }
+
+    /**
+     * Check if a player has the chunk next to it.
+     *
+     * @param player player
+     * @param chunkData chunk to check
+     * @return true if player owns it, otherwise false
+     */
+    private static boolean hasChunkNextTo(Player player, ChunkData chunkData) {
+        for (ChunkData chunk : ClaimInformation.get(player.getUniqueId()).getChunks()) {
+            for (int x = -1; x <= 1; x++) {
+                for (int z = -1; z <= 1; z++) {
+                    ChunkData nextChunk = new ChunkData(chunk.getX() + x, chunk.getZ() + z);
+
+                    if (chunkData.equals(nextChunk)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
