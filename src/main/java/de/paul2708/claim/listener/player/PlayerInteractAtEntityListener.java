@@ -1,6 +1,6 @@
 package de.paul2708.claim.listener.player;
 
-import de.paul2708.claim.util.Utility;
+import de.paul2708.claim.util.ItemManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,7 +22,7 @@ public class PlayerInteractAtEntityListener implements Listener {
     public void onInteract(PlayerInteractEntityEvent event) {
         Player player = event.getPlayer();
 
-        if (Utility.isClaimer(player.getInventory().getItemInMainHand())) {
+        if (ItemManager.isClaimer(player.getInventory().getItemInMainHand())) {
             event.setCancelled(true);
 
             player.updateInventory();

@@ -6,23 +6,18 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
+import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.model.ChunkData;
 import de.paul2708.claim.model.ClaimInformation;
-import net.minecraft.server.v1_13_R1.NBTTagCompound;
-import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
-import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_13_R1.inventory.CraftItemStack;
-import org.bukkit.enchantments.Enchantment;
+import org.bukkit.*;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.FireworkMeta;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
+import java.util.Random;
 
 /**
  * This class provides some utility methods like math-functions and help methods.
@@ -177,74 +172,6 @@ public final class Utility {
     }
 
     /**
-     * Build the claimer with nbt owner tag.
-     *
-     * @param player player
-     * @return claimer item stack
-     */
-    public static ItemStack buildClaimer(Player player) {
-        // Build item stack
-        ItemStack itemStack = new ItemStack(Material.NAME_TAG);
-        ItemMeta itemMeta = itemStack.getItemMeta();
-
-        itemMeta.setDisplayName("§6" + player.getName() + "'s §7Claimer");
-        itemMeta.setLore(Arrays.asList(" ", "§7Nutze §6/chunk claim §7um einen Chunk zu claimen.",
-                "§7Oder §6rechtsklicke §7in einem freien Chunk."));
-        itemMeta.setUnbreakable(true);
-        itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
-        itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
-
-        itemStack.setItemMeta(itemMeta);
-
-        // Add NBT Tag
-        net.minecraft.server.v1_13_R1.ItemStack nmsCopy = CraftItemStack.asNMSCopy(itemStack);
-        NBTTagCompound tag = nmsCopy.getTag() != null ? nmsCopy.getTag() : new NBTTagCompound();
-        tag.setString("owner", player.getUniqueId().toString());
-        nmsCopy.setTag(tag);
-
-        return CraftItemStack.asCraftMirror(nmsCopy);
-    }
-
-    /**
-     * Check if the player owns the claimer.
-     *
-     * @param claimer claimer item stack
-     * @return true if the item is the claimer, otherwise false
-     */
-    public static boolean isClaimer(ItemStack claimer) {
-        if (claimer == null) {
-            return false;
-        }
-
-        net.minecraft.server.v1_13_R1.ItemStack nmsCopy = CraftItemStack.asNMSCopy(claimer);
-        if (nmsCopy.getTag() == null) {
-            return false;
-        }
-
-        return nmsCopy.getTag().hasKey("owner");
-    }
-
-    /**
-     * Check if the player owns the claimer.
-     *
-     * @param uuid player uuid
-     * @param claimer claimer item stack
-     * @return true if the player owns the claimer, otherwise false
-     */
-    public static boolean ownsClaimer(UUID uuid, ItemStack claimer) {
-        if (claimer == null) {
-            return false;
-        }
-
-        net.minecraft.server.v1_13_R1.ItemStack nmsCopy = CraftItemStack.asNMSCopy(claimer);
-        if (nmsCopy.getTag() == null) {
-            return false;
-        }
-
-        return nmsCopy.getTag().hasKey("owner") && nmsCopy.getTag().getString("owner").equals(uuid.toString());
-    }
-
-    /**
      * Check if the player has a bypass.
      *
      * @param player player
@@ -254,48 +181,54 @@ public final class Utility {
         return player.isOp();
     }
 
-    private static Inventory inventory;
-
     /**
-     * Open the buy inventory.
+     * Play an effect.
      *
      * @param player player
-     * @param price price
      */
-    public static void openInventory(Player player, int price) {
-        if (Utility.inventory == null) {
-            Utility.inventory = Bukkit.createInventory(null, 27, "§7Willst du einen §6Claimer §7kaufen?");
+    public static void playEffect(Player player) {
+        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
 
-            // Create border
-            ItemStack blackBorder = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
-            ItemStack yellowBorder = new ItemStack(Material.YELLOW_STAINED_GLASS_PANE);
+        player.sendTitle("§aChunk geclaimed.", "§7Viel Spaß beim Bauen!", 10, 100, 20);
 
-            ItemMeta itemMeta = blackBorder.getItemMeta();
-            itemMeta.setDisplayName(" ");
 
-            blackBorder.setItemMeta(itemMeta);
-            yellowBorder.setItemMeta(itemMeta);
-
-            // Apply border
-            for (int i = 0; i < Utility.inventory.getSize(); i++) {
-                Utility.inventory.setItem(i, blackBorder);
-            }
-
-            Utility.inventory.setItem(0, yellowBorder);
-            Utility.inventory.setItem(8, yellowBorder);
-            Utility.inventory.setItem(Utility.inventory.getSize() - 9, yellowBorder);
-            Utility.inventory.setItem(Utility.inventory.getSize() - 1, yellowBorder);
-
-            // Set claimer
-            ItemStack itemStack = Utility.buildClaimer(player);
-            ItemMeta meta = itemStack.getItemMeta();
-            meta.setLore(Arrays.asList(" ", "§aKlicke um den Claimer zu kaufen.", "§7Kosten: §6" + price
-                    + " §7Diamanten"));
-            itemStack.setItemMeta(meta);
-
-            Utility.inventory.setItem(13, itemStack);
+        for (int i = 0; i < 10; i++) {
+            Bukkit.getScheduler().scheduleSyncDelayedTask(ClaimPlugin.getInstance(), new Runnable() {
+                @Override
+                public void run() {
+                    randomFirework(player);
+                }
+            }, i * 5L);
         }
+    }
 
-        player.openInventory(inventory);
+    /**
+     * Spawn a random firework.
+     *
+     * @param player player
+     * @return spawned firework
+     */
+    private static Firework randomFirework(Player player) {
+        Random random = new Random();
+
+        FireworkEffect.Builder builder = FireworkEffect.builder()
+                .trail(random.nextBoolean())
+                .flicker(random.nextBoolean());
+
+        for (int i = 0; i < random.nextInt(8) + 3; i++) {
+            builder.withColor(Color.fromBGR(random.nextInt(256), random.nextInt(256), random.nextInt(256)));
+        }
+        builder.with(random.nextBoolean() ? FireworkEffect.Type.STAR
+                : random.nextBoolean() ? FireworkEffect.Type.BALL
+                : random.nextBoolean() ? FireworkEffect.Type.CREEPER : FireworkEffect.Type.BALL_LARGE);
+
+
+        Firework firework = player.getLocation().getWorld().spawn(player.getLocation(), Firework.class);
+        FireworkMeta meta = firework.getFireworkMeta();
+        meta.addEffect(builder.build());
+        meta.setPower(random.nextBoolean() ? 0 : 1);
+        firework.setFireworkMeta(meta);
+
+        return firework;
     }
 }

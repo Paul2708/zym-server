@@ -1,6 +1,6 @@
 package de.paul2708.claim.listener.player;
 
-import de.paul2708.claim.util.Utility;
+import de.paul2708.claim.util.ItemManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -25,7 +25,7 @@ public class PlayerDeathListener implements Listener {
     public void onDeath(PlayerDeathEvent event) {
         List<ItemStack> list = new LinkedList<>();
         for (ItemStack drop : event.getDrops()) {
-            if (Utility.isClaimer(drop)) {
+            if (ItemManager.isClaimer(drop)) {
                 list.add(drop);
             }
         }

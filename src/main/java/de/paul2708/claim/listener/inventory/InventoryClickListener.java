@@ -3,6 +3,7 @@ package de.paul2708.claim.listener.inventory;
 import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.database.DatabaseException;
 import de.paul2708.claim.model.ClaimInformation;
+import de.paul2708.claim.util.ItemManager;
 import de.paul2708.claim.util.Utility;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -36,7 +37,7 @@ public class InventoryClickListener implements Listener {
                     || openInventory.getName().equals("§7Willst du einen §6Claimer §7kaufen?")) {
                 event.setCancelled(true);
 
-                if (Utility.isClaimer(event.getCurrentItem())) {
+                if (ItemManager.isClaimer(event.getCurrentItem())) {
                     ClaimInformation information = ClaimInformation.get(player.getUniqueId());
                     int price = Utility.getPrice(information.getBuyLevel());
                     int count = Utility.count(player, Material.DIAMOND);
@@ -63,7 +64,7 @@ public class InventoryClickListener implements Listener {
 
                     Utility.removeItems(player, Material.DIAMOND, price);
 
-                    ItemStack claimer = Utility.buildClaimer(player);
+                    ItemStack claimer = ItemManager.buildClaimer(player);
                     if (player.getInventory().firstEmpty() == -1) {
                         player.getWorld().dropItemNaturally(player.getLocation(), claimer);
                     } else {

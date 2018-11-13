@@ -5,6 +5,7 @@ import de.paul2708.claim.database.DatabaseException;
 import de.paul2708.claim.model.ChunkData;
 import de.paul2708.claim.model.ClaimInformation;
 import de.paul2708.claim.util.ClaimResponse;
+import de.paul2708.claim.util.ItemManager;
 import de.paul2708.claim.util.Utility;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
@@ -55,7 +56,7 @@ public class PlayerInteractListener implements Listener {
             }
 
             // Start claiming
-            if (!Utility.isClaimer(player.getInventory().getItemInMainHand())) {
+            if (!ItemManager.isClaimer(player.getInventory().getItemInMainHand())) {
                 return;
             }
 
@@ -64,7 +65,7 @@ public class PlayerInteractListener implements Listener {
             // Check claimer
             boolean found = false;
             for (ItemStack itemStack : player.getInventory()) {
-                if (Utility.ownsClaimer(player.getUniqueId(), itemStack)) {
+                if (ItemManager.ownsClaimer(player.getUniqueId(), itemStack)) {
                     found = true;
                     break;
                 }
@@ -85,7 +86,8 @@ public class PlayerInteractListener implements Listener {
                     player.sendMessage(ClaimPlugin.PREFIX + "§cIm Chunk liegt eine geschützte Region.");
                     return;
                 case BORDER:
-                    player.sendMessage(ClaimPlugin.PREFIX + "§cDer Chunk grenzt an einen Chunk, der bereits geclaimed ist.");
+                    player.sendMessage(ClaimPlugin.PREFIX
+                            + "§cDer Chunk grenzt an einen Chunk, der bereits geclaimed ist.");
                     return;
                 case CLAIMABLE:
                     break;
@@ -101,7 +103,7 @@ public class PlayerInteractListener implements Listener {
                 for (int i = 0; i < player.getInventory().getSize(); i++) {
                     ItemStack itemStack = player.getInventory().getItem(i);
 
-                    if (Utility.ownsClaimer(player.getUniqueId(), itemStack)) {
+                    if (ItemManager.ownsClaimer(player.getUniqueId(), itemStack)) {
                         if (itemStack.getAmount() == 1) {
                             player.getInventory().setItem(i, new ItemStack(Material.AIR));
                         } else {
@@ -112,6 +114,8 @@ public class PlayerInteractListener implements Listener {
                         break;
                     }
                 }
+
+                Utility.playEffect(player);
 
                 player.sendMessage(ClaimPlugin.PREFIX + "Du hast den Chunk §6erfolgreich §7geclaimed.");
             } catch (DatabaseException e) {

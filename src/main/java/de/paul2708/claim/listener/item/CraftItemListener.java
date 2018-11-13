@@ -1,6 +1,6 @@
 package de.paul2708.claim.listener.item;
 
-import de.paul2708.claim.util.Utility;
+import de.paul2708.claim.util.ItemManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.CraftItemEvent;
@@ -21,7 +21,7 @@ public class CraftItemListener implements Listener {
     @EventHandler
     public void onCraft(CraftItemEvent event) {
         for (ItemStack matrix : event.getInventory().getMatrix()) {
-            if (Utility.isClaimer(matrix)) {
+            if (ItemManager.isClaimer(matrix)) {
                 event.setCancelled(true);
             }
         }

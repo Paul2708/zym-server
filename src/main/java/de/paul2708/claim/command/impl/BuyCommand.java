@@ -2,6 +2,7 @@ package de.paul2708.claim.command.impl;
 
 import de.paul2708.claim.command.SubCommand;
 import de.paul2708.claim.model.ClaimInformation;
+import de.paul2708.claim.util.ItemManager;
 import de.paul2708.claim.util.Utility;
 import org.bukkit.entity.Player;
 
@@ -30,6 +31,6 @@ public class BuyCommand extends SubCommand {
         ClaimInformation information = ClaimInformation.get(player.getUniqueId());
         int price = Utility.getPrice(information.getBuyLevel());
 
-        Utility.openInventory(player, price);
+        ItemManager.openInventory(player, price);
     }
 }

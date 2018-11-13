@@ -4,8 +4,8 @@ import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.command.SubCommand;
 import de.paul2708.claim.database.DatabaseException;
 import de.paul2708.claim.model.ChunkData;
-import de.paul2708.claim.model.ClaimInformation;
 import de.paul2708.claim.util.ClaimResponse;
+import de.paul2708.claim.util.ItemManager;
 import de.paul2708.claim.util.Utility;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -36,7 +36,7 @@ public class ClaimCommand extends SubCommand {
         // Check claimer
         boolean found = false;
         for (ItemStack itemStack : player.getInventory()) {
-            if (Utility.ownsClaimer(player.getUniqueId(), itemStack)) {
+            if (ItemManager.ownsClaimer(player.getUniqueId(), itemStack)) {
                 found = true;
                 break;
             }
@@ -57,7 +57,8 @@ public class ClaimCommand extends SubCommand {
                 player.sendMessage(ClaimPlugin.PREFIX + "§cIm Chunk liegt eine geschützte Region.");
                 return;
             case BORDER:
-                player.sendMessage(ClaimPlugin.PREFIX + "§cDer Chunk grenzt an einen Chunk, der bereits geclaimed ist.");
+                player.sendMessage(ClaimPlugin.PREFIX
+                        + "§cDer Chunk grenzt an einen Chunk, der bereits geclaimed ist.");
                 return;
             case CLAIMABLE:
                 break;
@@ -76,7 +77,7 @@ public class ClaimCommand extends SubCommand {
             for (int i = 0; i < player.getInventory().getSize(); i++) {
                 ItemStack itemStack = player.getInventory().getItem(i);
 
-                if (Utility.ownsClaimer(player.getUniqueId(), itemStack)) {
+                if (ItemManager.ownsClaimer(player.getUniqueId(), itemStack)) {
                     index = i;
 
                     if (itemStack.getAmount() == 1) {
@@ -91,6 +92,8 @@ public class ClaimCommand extends SubCommand {
             }
 
             player.getInventory().setItem(index, replaced);
+
+            Utility.playEffect(player);
 
             player.sendMessage(ClaimPlugin.PREFIX + "Du hast den Chunk §6erfolgreich §7geclaimed.");
         } catch (DatabaseException e) {
