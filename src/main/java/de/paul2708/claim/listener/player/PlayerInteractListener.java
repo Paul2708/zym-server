@@ -41,7 +41,15 @@ public class PlayerInteractListener implements Listener {
             }
         } else if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR) {
             Player player = event.getPlayer();
+            Block block = event.getClickedBlock();
 
+            Chunk chunk = block == null ? player.getLocation().getChunk() : block.getChunk();
+
+            if (ClaimInformation.isClaimedByOthers(player, chunk)) {
+                event.setCancelled(true);
+            }
+
+            // Start claiming
             if (!Utility.isClaimer(player.getInventory().getItemInMainHand())) {
                 return;
             }
