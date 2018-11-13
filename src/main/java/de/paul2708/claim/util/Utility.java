@@ -9,11 +9,13 @@ import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import de.paul2708.claim.model.ChunkData;
 import de.paul2708.claim.model.ClaimInformation;
 import net.minecraft.server.v1_13_R1.NBTTagCompound;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_13_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -250,5 +252,48 @@ public final class Utility {
      */
     public static boolean hasBypass(Player player) {
         return player.isOp();
+    }
+
+    private static Inventory inventory;
+
+    /**
+     * Open the buy inventory.
+     *
+     * @param player player
+     */
+    public static void openInventory(Player player) {
+        if (Utility.inventory == null) {
+            Utility.inventory = Bukkit.createInventory(null, 27, "§7Willst du einen §6Claimer §7kaufen?");
+
+            // Create border
+            ItemStack blackBorder = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
+            ItemStack yellowBorder = new ItemStack(Material.YELLOW_STAINED_GLASS_PANE);
+
+            ItemMeta itemMeta = blackBorder.getItemMeta();
+            itemMeta.setDisplayName(" ");
+
+            blackBorder.setItemMeta(itemMeta);
+            yellowBorder.setItemMeta(itemMeta);
+
+            // Apply border
+            for (int i = 0; i < Utility.inventory.getSize(); i++) {
+                Utility.inventory.setItem(i, blackBorder);
+            }
+
+            Utility.inventory.setItem(0, yellowBorder);
+            Utility.inventory.setItem(8, blackBorder);
+            Utility.inventory.setItem(Utility.inventory.getSize() - 9, yellowBorder);
+            Utility.inventory.setItem(Utility.inventory.getSize() - 1, yellowBorder);
+
+            // Set claimer
+            ItemStack itemStack = Utility.buildClaimer(player);
+            ItemMeta meta = itemStack.getItemMeta();
+            meta.setLore(Arrays.asList(" ", "§aKlick um den Claimer zu kaufen."));
+            itemStack.setItemMeta(meta);
+
+            Utility.inventory.setItem(13, itemStack);
+        }
+
+        player.openInventory(inventory);
     }
 }

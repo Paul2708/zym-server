@@ -8,6 +8,7 @@ import de.paul2708.claim.listener.PlayerJoinListener;
 import de.paul2708.claim.listener.block.*;
 import de.paul2708.claim.listener.entity.EntityDamageByEntityListener;
 import de.paul2708.claim.listener.entity.EntityExplodeListener;
+import de.paul2708.claim.listener.inventory.InventoryClickListener;
 import de.paul2708.claim.listener.item.CraftItemListener;
 import de.paul2708.claim.listener.player.*;
 import org.bukkit.Bukkit;
@@ -69,10 +70,13 @@ public class ClaimPlugin extends JavaPlugin {
 
         registerEvents(new EntityDamageByEntityListener(), new EntityExplodeListener());
 
+        registerEvents(new InventoryClickListener());
+
         registerEvents(new CraftItemListener());
 
         registerEvents(new PlayerInteractListener(), new PlayerArmorStandManipulateListener(),
-                new PlayerDropItemListener(), new PlayerInteractAtEntityListener(), new PlayerDeathListener());
+                new PlayerDropItemListener(), new PlayerInteractAtEntityListener(), new PlayerDeathListener(),
+                new PlayerMoveListener());
 
         // Register command
         getCommand("chunk").setExecutor(new ChunkCommand());
