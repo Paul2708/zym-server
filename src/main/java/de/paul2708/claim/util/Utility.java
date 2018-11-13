@@ -59,13 +59,13 @@ public final class Utility {
      *
      * @param player player
      * @param chunkData chunk to claim
-     * @return true if the chunk can be claimed, otherwise false
+     * @return claim response
      */
-    public static boolean canClaim(Player player, ChunkData chunkData) {
+    public static ClaimResponse canClaim(Player player, ChunkData chunkData) {
         // Check chunk
         for (ClaimInformation information : ClaimInformation.getAll()) {
             if (information.contains(chunkData)) {
-                return false;
+                return ClaimResponse.ALREADY_CLAIMED;
             }
         }
 
@@ -81,7 +81,7 @@ public final class Utility {
                         ChunkData nextChunk = new ChunkData(chunk.getX() + x, chunk.getZ() + z);
 
                         if (chunkData.equals(nextChunk)) {
-                            return false;
+                            return ClaimResponse.BORDER;
                         }
                     }
                 }
@@ -102,10 +102,10 @@ public final class Utility {
         ApplicableRegionSet regions = regionManager.getApplicableRegions(region);
 
         if (regions.size() > 0) {
-            return false;
+            return ClaimResponse.REGION;
         }
 
-        return true;
+        return ClaimResponse.CLAIMABLE;
     }
 
     /**

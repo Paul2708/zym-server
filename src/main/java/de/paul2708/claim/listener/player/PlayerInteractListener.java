@@ -4,6 +4,7 @@ import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.database.DatabaseException;
 import de.paul2708.claim.model.ChunkData;
 import de.paul2708.claim.model.ClaimInformation;
+import de.paul2708.claim.util.ClaimResponse;
 import de.paul2708.claim.util.Utility;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
@@ -71,9 +72,21 @@ public class PlayerInteractListener implements Listener {
             }
 
             // Check chunk
-            if (!Utility.canClaim(player, new ChunkData(player.getLocation().getChunk()))) {
-                player.sendMessage(ClaimPlugin.PREFIX + "§cDu kannst diesen Chunk nicht claimen.");
-                return;
+            ClaimResponse response = Utility.canClaim(player, new ChunkData(player.getLocation().getChunk()));
+            switch (response) {
+                case ALREADY_CLAIMED:
+                    player.sendMessage(ClaimPlugin.PREFIX + "§cDer Chunk wurde bereits geclaimed.");
+                    return;
+                case REGION:
+                    player.sendMessage(ClaimPlugin.PREFIX + "§cIm Chunk liegt eine geschützte Region.");
+                    return;
+                case BORDER:
+                    player.sendMessage(ClaimPlugin.PREFIX + "§cDer Chunk grenzt an einen Chunk, der bereits geclaimed ist.");
+                    return;
+                case CLAIMABLE:
+                    break;
+                default:
+                    break;
             }
 
             // Claim the chunk
