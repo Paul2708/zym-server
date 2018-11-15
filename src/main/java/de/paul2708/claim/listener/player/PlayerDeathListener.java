@@ -25,7 +25,7 @@ public class PlayerDeathListener implements Listener {
     public void onDeath(PlayerDeathEvent event) {
         List<ItemStack> list = new LinkedList<>();
         for (ItemStack drop : event.getDrops()) {
-            if (ItemManager.isClaimer(drop)) {
+            if (ItemManager.getInstance().isClaimer(drop)) {
                 list.add(drop);
             }
         }

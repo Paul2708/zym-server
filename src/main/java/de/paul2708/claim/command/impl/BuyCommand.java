@@ -31,6 +31,6 @@ public class BuyCommand extends SubCommand {
         ClaimInformation information = ClaimInformation.get(player.getUniqueId());
         int price = Utility.getPrice(information.getBuyLevel());
 
-        ItemManager.openInventory(player, price);
+        ItemManager.getInstance().openInventory(player, price);
     }
 }

@@ -36,7 +36,7 @@ public class ClaimCommand extends SubCommand {
         // Check claimer
         boolean found = false;
         for (ItemStack itemStack : player.getInventory()) {
-            if (ItemManager.ownsClaimer(player.getUniqueId(), itemStack)) {
+            if (ItemManager.getInstance().ownsClaimer(player.getUniqueId(), itemStack)) {
                 found = true;
                 break;
             }
@@ -77,7 +77,7 @@ public class ClaimCommand extends SubCommand {
             for (int i = 0; i < player.getInventory().getSize(); i++) {
                 ItemStack itemStack = player.getInventory().getItem(i);
 
-                if (ItemManager.ownsClaimer(player.getUniqueId(), itemStack)) {
+                if (ItemManager.getInstance().ownsClaimer(player.getUniqueId(), itemStack)) {
                     index = i;
 
                     if (itemStack.getAmount() == 1) {

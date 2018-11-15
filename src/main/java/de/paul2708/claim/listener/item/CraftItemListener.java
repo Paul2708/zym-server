@@ -21,7 +21,7 @@ public class CraftItemListener implements Listener {
     @EventHandler
     public void onCraft(CraftItemEvent event) {
         for (ItemStack matrix : event.getInventory().getMatrix()) {
-            if (ItemManager.isClaimer(matrix)) {
+            if (ItemManager.getInstance().isClaimer(matrix)) {
                 event.setCancelled(true);
             }
         }

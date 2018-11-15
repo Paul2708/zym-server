@@ -37,7 +37,7 @@ public class InventoryClickListener implements Listener {
                     || openInventory.getName().equals("§7Willst du einen §6Claimer §7kaufen?")) {
                 event.setCancelled(true);
 
-                if (ItemManager.isClaimer(event.getCurrentItem())) {
+                if (ItemManager.getInstance().isClaimer(event.getCurrentItem())) {
                     ClaimInformation information = ClaimInformation.get(player.getUniqueId());
                     int price = Utility.getPrice(information.getBuyLevel());
                     int count = Utility.count(player, Material.DIAMOND);
@@ -64,7 +64,7 @@ public class InventoryClickListener implements Listener {
 
                     Utility.removeItems(player, Material.DIAMOND, price);
 
-                    ItemStack claimer = ItemManager.buildClaimer(player);
+                    ItemStack claimer = ItemManager.getInstance().buildClaimer(player);
                     if (player.getInventory().firstEmpty() == -1) {
                         player.getWorld().dropItemNaturally(player.getLocation(), claimer);
                     } else {

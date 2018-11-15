@@ -56,7 +56,7 @@ public class PlayerInteractListener implements Listener {
             }
 
             // Start claiming
-            if (!ItemManager.isClaimer(player.getInventory().getItemInMainHand())) {
+            if (!ItemManager.getInstance().isClaimer(player.getInventory().getItemInMainHand())) {
                 return;
             }
 
@@ -65,7 +65,7 @@ public class PlayerInteractListener implements Listener {
             // Check claimer
             boolean found = false;
             for (ItemStack itemStack : player.getInventory()) {
-                if (ItemManager.ownsClaimer(player.getUniqueId(), itemStack)) {
+                if (ItemManager.getInstance().ownsClaimer(player.getUniqueId(), itemStack)) {
                     found = true;
                     break;
                 }
@@ -103,7 +103,7 @@ public class PlayerInteractListener implements Listener {
                 for (int i = 0; i < player.getInventory().getSize(); i++) {
                     ItemStack itemStack = player.getInventory().getItem(i);
 
-                    if (ItemManager.ownsClaimer(player.getUniqueId(), itemStack)) {
+                    if (ItemManager.getInstance().ownsClaimer(player.getUniqueId(), itemStack)) {
                         if (itemStack.getAmount() == 1) {
                             player.getInventory().setItem(i, new ItemStack(Material.AIR));
                         } else {

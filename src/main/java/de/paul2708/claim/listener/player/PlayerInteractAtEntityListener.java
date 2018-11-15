@@ -22,7 +22,7 @@ public class PlayerInteractAtEntityListener implements Listener {
     public void onInteract(PlayerInteractEntityEvent event) {
         Player player = event.getPlayer();
 
-        if (ItemManager.isClaimer(player.getInventory().getItemInMainHand())) {
+        if (ItemManager.getInstance().isClaimer(player.getInventory().getItemInMainHand())) {
             event.setCancelled(true);
 
             player.updateInventory();

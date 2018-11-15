@@ -23,7 +23,7 @@ public class PlayerDropItemListener implements Listener {
     public void onDrop(PlayerDropItemEvent event) {
         Player player = event.getPlayer();
 
-        if (ItemManager.isClaimer(event.getItemDrop().getItemStack())) {
+        if (ItemManager.getInstance().isClaimer(event.getItemDrop().getItemStack())) {
             player.sendMessage(ClaimPlugin.PREFIX + "§cDu kannst deinen Claimer nicht droppen.");
 
             event.setCancelled(true);

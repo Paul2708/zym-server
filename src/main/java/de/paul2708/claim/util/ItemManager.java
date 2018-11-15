@@ -23,8 +23,6 @@ public final class ItemManager {
 
     private static ItemManager instance;
 
-    private static Inventory inventory;
-
     /**
      * Create a new item manager.
      */
@@ -38,7 +36,7 @@ public final class ItemManager {
      * @param player player
      * @return claimer item stack
      */
-    public static ItemStack buildClaimer(Player player) {
+    public ItemStack buildClaimer(Player player) {
         // Build item stack
         ItemStack itemStack = new ItemStack(Material.NAME_TAG);
         ItemMeta itemMeta = itemStack.getItemMeta();
@@ -67,7 +65,7 @@ public final class ItemManager {
      * @param claimer claimer item stack
      * @return true if the item is the claimer, otherwise false
      */
-    public static boolean isClaimer(ItemStack claimer) {
+    public boolean isClaimer(ItemStack claimer) {
         if (claimer == null) {
             return false;
         }
@@ -87,7 +85,7 @@ public final class ItemManager {
      * @param claimer claimer item stack
      * @return true if the player owns the claimer, otherwise false
      */
-    public static boolean ownsClaimer(UUID uuid, ItemStack claimer) {
+    public boolean ownsClaimer(UUID uuid, ItemStack claimer) {
         if (claimer == null) {
             return false;
         }
@@ -106,39 +104,37 @@ public final class ItemManager {
      * @param player player
      * @param price price
      */
-    public static void openInventory(Player player, int price) {
-        if (ItemManager.inventory == null) {
-            ItemManager.inventory = Bukkit.createInventory(null, 27, "§7Willst du einen §6Claimer §7kaufen?");
+    public void openInventory(Player player, int price) {
+        Inventory inventory = Bukkit.createInventory(null, 27, "§7Willst du einen §6Claimer §7kaufen?");
 
-            // Create border
-            ItemStack blackBorder = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
-            ItemStack yellowBorder = new ItemStack(Material.YELLOW_STAINED_GLASS_PANE);
+        // Create border
+        ItemStack blackBorder = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
+        ItemStack yellowBorder = new ItemStack(Material.YELLOW_STAINED_GLASS_PANE);
 
-            ItemMeta itemMeta = blackBorder.getItemMeta();
-            itemMeta.setDisplayName(" ");
+        ItemMeta itemMeta = blackBorder.getItemMeta();
+        itemMeta.setDisplayName(" ");
 
-            blackBorder.setItemMeta(itemMeta);
-            yellowBorder.setItemMeta(itemMeta);
+        blackBorder.setItemMeta(itemMeta);
+        yellowBorder.setItemMeta(itemMeta);
 
-            // Apply border
-            for (int i = 0; i < ItemManager.inventory.getSize(); i++) {
-                ItemManager.inventory.setItem(i, blackBorder);
-            }
-
-            ItemManager.inventory.setItem(0, yellowBorder);
-            ItemManager.inventory.setItem(8, yellowBorder);
-            ItemManager.inventory.setItem(ItemManager.inventory.getSize() - 9, yellowBorder);
-            ItemManager.inventory.setItem(ItemManager.inventory.getSize() - 1, yellowBorder);
-
-            // Set claimer
-            ItemStack itemStack = ItemManager.buildClaimer(player);
-            ItemMeta meta = itemStack.getItemMeta();
-            meta.setLore(Arrays.asList(" ", "§aKlicke um den Claimer zu kaufen.", "§7Kosten: §6" + price
-                    + " §7Diamanten"));
-            itemStack.setItemMeta(meta);
-
-            ItemManager.inventory.setItem(13, itemStack);
+        // Apply border
+        for (int i = 0; i < inventory.getSize(); i++) {
+            inventory.setItem(i, blackBorder);
         }
+
+        inventory.setItem(0, yellowBorder);
+        inventory.setItem(8, yellowBorder);
+        inventory.setItem(inventory.getSize() - 9, yellowBorder);
+        inventory.setItem(inventory.getSize() - 1, yellowBorder);
+
+        // Set claimer
+        ItemStack itemStack = buildClaimer(player);
+        ItemMeta meta = itemStack.getItemMeta();
+        meta.setLore(Arrays.asList(" ", "§aKlicke um den Claimer zu kaufen.", "§7Kosten: §6" + price
+                + " §7Diamanten"));
+        itemStack.setItemMeta(meta);
+
+        inventory.setItem(13, itemStack);
 
         player.openInventory(inventory);
     }
