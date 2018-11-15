@@ -2,15 +2,16 @@ package de.paul2708.claim.listener.player;
 
 import de.paul2708.claim.model.ChunkData;
 import de.paul2708.claim.model.ClaimInformation;
+import de.paul2708.claim.util.ItemManager;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.util.Vector;
 
 /**
  * This listener is called, if a player moves.
@@ -28,6 +29,10 @@ public class PlayerMoveListener implements Listener {
     public void onMove(PlayerMoveEvent event) {
         ChunkData fromChunk = new ChunkData(event.getFrom().getChunk());
         ChunkData toChunk = new ChunkData(event.getTo().getChunk());
+
+        if (ItemManager.getInstance().isClaimer(event.getPlayer().getInventory().getItemInMainHand())) {
+            this.drawBorder(event.getPlayer());
+        }
 
         if (fromChunk.equals(toChunk) || sameType(fromChunk, toChunk)) {
             return;
@@ -81,5 +86,53 @@ public class PlayerMoveListener implements Listener {
 
         return fromFree && toFree;
 
+    }
+
+    /**
+     * Draw a chunk border.
+     *
+     * @param player player
+     */
+    private void drawBorder(Player player) {
+        Chunk playerChunk = player.getLocation().getChunk();
+        int[] positions = new int[] { 0, 15 };
+        int y = player.getLocation().getBlockY();
+
+        for (int i : positions) {
+            for (int j : positions) {
+                Block corner = playerChunk.getBlock(i, y - 3, j);
+                Block upper = playerChunk.getBlock(i, y + 10, j);
+
+                this.drawLine(corner, upper);
+            }
+        }
+
+        this.drawLine(playerChunk.getBlock(0, y + 10, 0), playerChunk.getBlock(0, y + 10, 15));
+        this.drawLine(playerChunk.getBlock(0, y + 10, 0), playerChunk.getBlock(15, y + 10, 0));
+        this.drawLine(playerChunk.getBlock(15, y + 10, 15), playerChunk.getBlock(0, y + 10, 15));
+        this.drawLine(playerChunk.getBlock(15, y + 10, 15), playerChunk.getBlock(15, y + 10, 0));
+    }
+
+    /**
+     * Draw a line from a block to another.
+     *
+     * @param first first block
+     * @param second second block
+     */
+    private void drawLine(Block first, Block second) {
+        Location firstLocation = first.getLocation().clone();
+
+        Vector vector = second.getLocation().toVector().subtract(firstLocation.toVector());
+
+        for (double i = 1; i <= firstLocation.distance(second.getLocation()); i += 0.75D) {
+            vector.multiply(i);
+
+            firstLocation.add(vector);
+
+            Particle.DustOptions options = new Particle.DustOptions(Color.BLUE, 0.75f);
+            first.getLocation().getWorld().spawnParticle(Particle.REDSTONE, firstLocation, 1, options);
+            firstLocation.subtract(vector);
+            vector.normalize();
+        }
     }
 }
