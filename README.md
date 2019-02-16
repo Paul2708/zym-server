@@ -1,17 +1,55 @@
 # Chunk - Claim
 ---
-This spigot plugin provides a simple claim and plot system, to claim certain chunks. They have a small griefing protection to avoid abusing.
+This spigot plugin provides a claim and plot system, to claim certain chunks. They have a griefing protection to avoid abusing.
+This plugin is used on a subscriber-only server by [Clym](https://www.youtube.com/user/TheClym) and [Zinus](https://www.youtube.com/user/ZinusHD).
 
 ## Features
-- simple command usage (`/claim` and `/claim [setitem|remove]`)
-- set a custom item as price per chunk
+- simple command usage (`/chunk claim` and `/chunk buy`)
 - local data storage (json)
-- small griefing protection
+- griefing protection
+- claiming chunks in a freebuild world
+- higher prices for more chunks
 
 ## Usage
-1. Put the jar into your plugin folder and reload the server.
-2. Set the item by `/claim setitem [amount]` and reload the server again.
+### Installation
+1. Put WorldEdit and WorldGuard into your plugin folder.
+2. Put the jar into your plugin folder and reload the server.
 3. Enjoy!
+
+### How to use?
+- Join the server and search for chunk you want to claim.
+- If you found one, use `/chunk buy` to buy a chunk claimer.
+Hint: Hold the claimer in your main hand or use `F3 + G` to draw the chunk border.
+- Right-click the claimer or use `/chunk claim` to claim your current chunk. It's now yours!
+- Type `/chunk buy` to buy another claimer - but the price will be increased.
+
+### Prices
+This table shows the prices for the chunks.
+
+| Chunk number | Price (in diamonds) |
+|--------------|---------------------|
+| 1            | free                |
+| 2            | 8                   |
+| 3            | 16                  |
+| 4            | 32                  |
+| 5            | 64                  |
+| 6            | 64                  |
+| 7            | 128                 |
+| 8            | 128                 |
+| >= 9         | 192                 |
+
+
+### Commands
+| Command           | Description                                       | Usage                      | Permission       |
+|-------------------|---------------------------------------------------|----------------------------|------------------|
+| /chunk help       | Show the help overview.                           | /chunk help                | none             |
+| /chunk buy        | Open a GUI to buy a chunk claimer.                | /chunk buy                 | none             |
+| /chunk claim      | Claim your current chunk.                         | /chunk claim               | none             |
+| /chunk info       | Show information about the current chunk.         | /chunk info                | none             |
+| /chunk opinfo     | Show more information about the current chunk.    | /chunk opinfo              | chunk.opinfo     |
+| /chunk playerinfo | Show information about a player.                  | /chunk playerinfo [player] | chunk.playerinfo |
+| /chunk unclaim    | Unclaim the current chunk.                        | /chunk unclaim             | none             |
+| /chunk remove     | Unclaim the current chunk even if it's not yours. | /chunk remove              | chunk.remove     |
 
 ## Protection
 ### Global protection

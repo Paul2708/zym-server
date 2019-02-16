@@ -1,9 +1,9 @@
 package de.paul2708.claim.util;
 
-import net.minecraft.server.v1_13_R1.NBTTagCompound;
+import net.minecraft.server.v1_13_R2.NBTTagCompound;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_13_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -51,7 +51,7 @@ public final class ItemManager {
         itemStack.setItemMeta(itemMeta);
 
         // Add NBT Tag
-        net.minecraft.server.v1_13_R1.ItemStack nmsCopy = CraftItemStack.asNMSCopy(itemStack);
+        net.minecraft.server.v1_13_R2.ItemStack nmsCopy = CraftItemStack.asNMSCopy(itemStack);
         NBTTagCompound tag = nmsCopy.getTag() != null ? nmsCopy.getTag() : new NBTTagCompound();
         tag.setString("owner", player.getUniqueId().toString());
         nmsCopy.setTag(tag);
@@ -70,7 +70,7 @@ public final class ItemManager {
             return false;
         }
 
-        net.minecraft.server.v1_13_R1.ItemStack nmsCopy = CraftItemStack.asNMSCopy(claimer);
+        net.minecraft.server.v1_13_R2.ItemStack nmsCopy = CraftItemStack.asNMSCopy(claimer);
         if (nmsCopy.getTag() == null) {
             return false;
         }
@@ -90,7 +90,7 @@ public final class ItemManager {
             return false;
         }
 
-        net.minecraft.server.v1_13_R1.ItemStack nmsCopy = CraftItemStack.asNMSCopy(claimer);
+        net.minecraft.server.v1_13_R2.ItemStack nmsCopy = CraftItemStack.asNMSCopy(claimer);
         if (nmsCopy.getTag() == null) {
             return false;
         }
