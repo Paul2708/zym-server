@@ -192,7 +192,7 @@ public final class Utility {
         player.sendTitle("§aChunk geclaimed.", "§7Viel Spaß beim Bauen!", 10, 100, 20);
 
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 3; i++) {
             Bukkit.getScheduler().scheduleSyncDelayedTask(ClaimPlugin.getInstance(), new Runnable() {
                 @Override
                 public void run() {

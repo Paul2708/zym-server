@@ -1,13 +1,10 @@
 package de.paul2708.claim.listener.player;
 
-import de.paul2708.claim.util.ItemManager;
+import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * This listener is called, if a player dies.
@@ -23,15 +20,18 @@ public class PlayerDeathListener implements Listener {
      */
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
-        List<ItemStack> list = new LinkedList<>();
-        for (ItemStack drop : event.getDrops()) {
-            if (ItemManager.getInstance().isClaimer(drop)) {
-                list.add(drop);
+        if (event.getEntity().hasMetadata("elytra")) {
+            ItemStack elytra = null;
+            for (ItemStack drop : event.getDrops()) {
+                if (drop.getType() == Material.ELYTRA) {
+                    elytra = drop;
+                    break;
+                }
             }
-        }
 
-        for (ItemStack itemStack : list) {
-            event.getDrops().remove(itemStack);
+            if (elytra != null) {
+                event.getDrops().remove(elytra);
+            }
         }
     }
 }

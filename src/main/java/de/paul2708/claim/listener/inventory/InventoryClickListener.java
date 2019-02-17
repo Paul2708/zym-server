@@ -32,6 +32,13 @@ public class InventoryClickListener implements Listener {
 
         Player player = (Player) event.getWhoClicked();
 
+        // Elytra stuff
+        if (player.hasMetadata("elytra")) {
+            if (event.getCurrentItem() != null && event.getCurrentItem().getType() == Material.ELYTRA) {
+                event.setCancelled(true);
+            }
+        }
+
         if (clickedInventory != null && openInventory != null) {
             if (clickedInventory.getName().equals("§7Willst du einen §6Claimer §7kaufen?")
                     || openInventory.getName().equals("§7Willst du einen §6Claimer §7kaufen?")) {

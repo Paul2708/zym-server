@@ -77,7 +77,8 @@ public class ClaimPlugin extends JavaPlugin {
         registerEvents(new CraftItemListener());
 
         registerEvents(new PlayerInteractListener(), new PlayerArmorStandManipulateListener(),
-                new PlayerDropItemListener(), new PlayerInteractAtEntityListener(), new PlayerMoveListener());
+                new PlayerDropItemListener(), new PlayerInteractAtEntityListener(), new PlayerMoveListener(),
+                new PlayerDeathListener());
 
         // Register command
         getCommand("chunk").setExecutor(new ChunkCommand());

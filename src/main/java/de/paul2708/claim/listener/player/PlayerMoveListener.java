@@ -24,10 +24,10 @@ import org.bukkit.util.Vector;
 public class PlayerMoveListener implements Listener {
 
     private static final Location TELEPORT_FROM =
-            new Location(Bukkit.getWorld("world"), 123.5, 69, 78.5);
+            new Location(Bukkit.getWorld("NewWorld"), 123.5, 69, 78.5);
 
     private static final Location TELEPORT_TO =
-            new Location(Bukkit.getWorld("world"), 126.5, 232, 75.5);
+            new Location(Bukkit.getWorld("NewWorld"), 126.5, 232, 75.5);
 
     /**
      * Send information about the chunk and handle elytra stuff.

@@ -4,9 +4,11 @@ import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.command.SubCommand;
 import de.paul2708.claim.database.DatabaseException;
 import de.paul2708.claim.model.ChunkData;
+import de.paul2708.claim.model.ClaimInformation;
 import de.paul2708.claim.util.ClaimResponse;
 import de.paul2708.claim.util.ItemManager;
 import de.paul2708.claim.util.Utility;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -96,11 +98,14 @@ public class ClaimCommand extends SubCommand {
             Utility.playEffect(player);
 
             player.sendMessage(ClaimPlugin.PREFIX + "Du hast den Chunk §6erfolgreich §7geclaimed.");
+
+            Bukkit.broadcastMessage(ClaimPlugin.PREFIX + "§a§l" + player.getName()
+                    + " §7hat seinen §e" + ClaimInformation.get(player.getUniqueId()).getChunks().size()
+                    + ". Chunk §7geclaimed!");
         } catch (DatabaseException e) {
             e.printStackTrace();
 
             player.sendMessage(ClaimPlugin.PREFIX + "§cEin Datenbank-Fehler ist aufgetreten...");
         }
     }
-
 }

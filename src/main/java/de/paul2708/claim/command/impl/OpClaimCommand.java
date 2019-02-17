@@ -3,6 +3,7 @@ package de.paul2708.claim.command.impl;
 import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.command.SubCommand;
 import de.paul2708.claim.util.ItemManager;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 /**
@@ -16,7 +17,7 @@ public class OpClaimCommand extends SubCommand {
      * Create a new op claim command.
      */
     public OpClaimCommand() {
-        super("opclaim", "opclaim", "Bekomme einen Claimer umsonst", "chunk.opclaim");
+        super("opclaim", "opclaim [Name]", "Bekomme einen Claimer umsonst", "chunk.opclaim");
     }
 
     /**
@@ -27,8 +28,19 @@ public class OpClaimCommand extends SubCommand {
      */
     @Override
     public void execute(Player player, String[] args) {
-        player.getInventory().addItem(ItemManager.getInstance().buildClaimer(player));
+        if (args.length == 1) {
+            Player target = Bukkit.getPlayer(args[0]);
+            if (target == null || !target.isOnline()) {
+                player.sendMessage(ClaimPlugin.PREFIX + "§cDer Spieler ist offline.");
+                return;
+            }
 
-        player.sendMessage(ClaimPlugin.PREFIX + "Du hast einen Claimer erhalten.");
+            target.getInventory().addItem(ItemManager.getInstance().buildClaimer(target));
+
+            target.sendMessage(ClaimPlugin.PREFIX + "Du hast einen Claimer erhalten.");
+            player.sendMessage(ClaimPlugin.PREFIX + "§6" + target.getName() + " §7hat einen Claimer erhalten.");
+        } else {
+            player.sendMessage(ClaimPlugin.PREFIX + "§cGebe einen Spielernamen an.");
+        }
     }
 }

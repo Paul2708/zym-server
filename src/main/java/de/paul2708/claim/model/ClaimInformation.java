@@ -193,7 +193,7 @@ public final class ClaimInformation {
     public static boolean isClaimedByOthers(Player player, Chunk chunk) {
         UUID uuid = ClaimInformation.CHUNK_CACHE.get(new ChunkData(chunk));
 
-        return uuid != null && !uuid.equals(player.getUniqueId());
+        return uuid != null && (player == null || !uuid.equals(player.getUniqueId()));
     }
 
     /**

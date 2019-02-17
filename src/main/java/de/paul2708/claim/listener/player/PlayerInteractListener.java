@@ -7,6 +7,7 @@ import de.paul2708.claim.model.ClaimInformation;
 import de.paul2708.claim.util.ClaimResponse;
 import de.paul2708.claim.util.ItemManager;
 import de.paul2708.claim.util.Utility;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -118,6 +119,10 @@ public class PlayerInteractListener implements Listener {
                 Utility.playEffect(player);
 
                 player.sendMessage(ClaimPlugin.PREFIX + "Du hast den Chunk §6erfolgreich §7geclaimed.");
+
+                Bukkit.broadcastMessage(ClaimPlugin.PREFIX + "§a§l" + player.getName()
+                        + " §7hat seinen §e" + ClaimInformation.get(player.getUniqueId()).getChunks().size()
+                        + ". Chunk §7geclaimed!");
             } catch (DatabaseException e) {
                 e.printStackTrace();
 
