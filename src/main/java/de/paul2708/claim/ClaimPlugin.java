@@ -25,6 +25,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class ClaimPlugin extends JavaPlugin {
 
     /**
+     * Name of the main world.S
+     */
+    public static final String MAIN_WORLD = "NewWorld";
+
+    /**
      * Standard message prefix.
      */
     public static final String PREFIX = "§8[§3Claim§8] §7";
@@ -63,20 +68,20 @@ public class ClaimPlugin extends JavaPlugin {
         }
 
         // Register listener
-        registerEvents(new PlayerJoinListener());
+        registerListener(new PlayerJoinListener());
 
-        registerEvents(new BlockBreakListener(), new BlockPlaceListener(), new BlockDamageListener(),
+        registerListener(new BlockBreakListener(), new BlockPlaceListener(), new BlockDamageListener(),
                 new StructureGrowListener(), new BlockFromToListener(), new BlockPistonListener(),
                 new BlockExplodeListener());
 
-        registerEvents(new EntityDamageByEntityListener(), new EntityExplodeListener(),
+        registerListener(new EntityDamageByEntityListener(), new EntityExplodeListener(),
                 new EntityToggleGlideListener());
 
-        registerEvents(new InventoryClickListener());
+        registerListener(new InventoryClickListener());
 
-        registerEvents(new CraftItemListener());
+        registerListener(new CraftItemListener());
 
-        registerEvents(new PlayerInteractListener(), new PlayerArmorStandManipulateListener(),
+        registerListener(new PlayerInteractListener(), new PlayerArmorStandManipulateListener(),
                 new PlayerDropItemListener(), new PlayerInteractAtEntityListener(), new PlayerMoveListener(),
                 new PlayerDeathListener());
 
@@ -101,7 +106,7 @@ public class ClaimPlugin extends JavaPlugin {
      *
      * @param listener listener
      */
-    private void registerEvents(Listener... listener) {
+    private void registerListener(Listener... listener) {
         for (Listener single : listener) {
             Bukkit.getPluginManager().registerEvents(single, this);
         }
