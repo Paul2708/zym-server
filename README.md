@@ -3,6 +3,8 @@
 This spigot plugin provides a claim and plot system, to claim certain chunks. They have a griefing protection to avoid abusing.
 This plugin is used on a subscriber-only server by [Clym](https://www.youtube.com/user/TheClym) and [Zinus](https://www.youtube.com/user/ZinusHD).
 
+Note: As the plugin has to be fast developed, the code is not as clean as it should be. Refactoring is planned.
+
 ## Features
 - simple command usage (`/chunk claim` and `/chunk buy`)
 - local data storage (json)
@@ -50,6 +52,7 @@ This table shows the prices for the chunks.
 | /chunk playerinfo | Show information about a player.                  | /chunk playerinfo [player] | chunk.playerinfo |
 | /chunk unclaim    | Unclaim the current chunk.                        | /chunk unclaim             | none             |
 | /chunk remove     | Unclaim the current chunk even if it's not yours. | /chunk remove              | chunk.remove     |
+| /chunk opclaim    | Give a claimer to a player.                       | /chunk opclaim [player]    | chunk.opclaim    |
 
 ## Protection
 ### Global protection
@@ -63,6 +66,9 @@ This table shows the prices for the chunks.
 - cancel damage to entities (expect players) in other claimed chunks
 - cancel armor stand manipulation in other claimed chunks
 - cancel interacting on other chunks
+
+## Video
+Explanation by Clym: https://www.youtube.com/watch?v=fHIRHCWPx1Y
 
 ## Contact
 If you find any issues, please let me know! Also if you are using the plugin.

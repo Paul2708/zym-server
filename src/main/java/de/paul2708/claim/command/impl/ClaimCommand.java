@@ -8,6 +8,10 @@ import de.paul2708.claim.model.ClaimInformation;
 import de.paul2708.claim.util.ClaimResponse;
 import de.paul2708.claim.util.ItemManager;
 import de.paul2708.claim.util.Utility;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -67,6 +71,20 @@ public class ClaimCommand extends SubCommand {
             default:
                 break;
         }
+
+        /*player.sendMessage(ClaimPlugin.PREFIX + "§7Bist du dir §6sicher, dass du §6diesen Chunk §7claimen willst?");
+
+        TextComponent yesMessage = new TextComponent("§a[Ja]");
+        yesMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "chunk help"));
+        yesMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                new ComponentBuilder("§6Claime den Chunk (verbindlich)").create()));
+
+        TextComponent noMessage = new TextComponent("§c[Nein]");
+        noMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "chunk help"));
+        noMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                new ComponentBuilder("§6Breche den Vorgang ab").create()));
+
+        player.spigot().sendMessage(new ComponentBuilder(yesMessage).append(" ").append(noMessage).create());*/
 
         // Claim the chunk
         try {
