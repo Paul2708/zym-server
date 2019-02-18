@@ -88,8 +88,7 @@ public class JsonDatabase implements Database {
             for (Object otherObject : (JsonArray) jsonObject.get("chunks")) {
                 JsonObject jsonChunk = (JsonObject) otherObject;
 
-                chunks.add(new ChunkData(jsonChunk.getString("world"), jsonChunk.getInteger("x"),
-                        jsonChunk.getInteger("z")));
+                chunks.add(new ChunkData(jsonChunk.getInteger("x"), jsonChunk.getInteger("z")));
             }
 
             int level = jsonObject.getInteger("level");

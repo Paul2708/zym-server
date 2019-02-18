@@ -84,7 +84,6 @@ public final class ClaimInformation {
 
         for (ChunkData chunk : chunks) {
             JsonObject chunkObject = new JsonObject();
-            chunkObject.put("world", chunk.getWorld());
             chunkObject.put("x", chunk.getX());
             chunkObject.put("z", chunk.getZ());
 
@@ -159,6 +158,11 @@ public final class ClaimInformation {
      * @return true if the same player owns the two chunks, otherwise false
      */
     public static boolean hasSameOwner(Chunk firstChunk, Chunk secondChunk) {
+        if (!firstChunk.getWorld().getName().equals(ClaimPlugin.MAIN_WORLD)
+                || !secondChunk.getWorld().getName().equals(ClaimPlugin.MAIN_WORLD)) {
+            return false;
+        }
+
         ChunkData firstData = new ChunkData(firstChunk);
         ChunkData secondData = new ChunkData(secondChunk);
 
@@ -180,6 +184,10 @@ public final class ClaimInformation {
      * @return true if the player owns the chunk, otherwise false
      */
     public static boolean owns(Player player, Chunk chunk) {
+        if (!chunk.getWorld().getName().equals(ClaimPlugin.MAIN_WORLD)) {
+            return false;
+        }
+
         ClaimInformation information = ClaimInformation.get(player.getUniqueId());
 
         return information.contains(new ChunkData(chunk));
@@ -193,6 +201,10 @@ public final class ClaimInformation {
      * @return true if the chunk is claimed by another player, otherwise false
      */
     public static boolean isClaimedByOthers(Player player, Chunk chunk) {
+        if (!chunk.getWorld().getName().equals(ClaimPlugin.MAIN_WORLD)) {
+            return false;
+        }
+
         UUID uuid = ClaimInformation.CHUNK_CACHE.get(new ChunkData(chunk));
 
         return uuid != null && (player == null || !uuid.equals(player.getUniqueId()));
