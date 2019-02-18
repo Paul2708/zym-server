@@ -53,7 +53,9 @@ public class PlayerInteractListener implements Listener {
             Chunk chunk = block == null ? player.getLocation().getChunk() : block.getChunk();
 
             if (ClaimInformation.isClaimedByOthers(player, chunk) && !Utility.hasBypass(player)) {
-                event.setCancelled(true);
+                if (block != null && block.getType().isInteractable()) {
+                    event.setCancelled(true);
+                }
             }
 
             // Start claiming
@@ -63,77 +65,7 @@ public class PlayerInteractListener implements Listener {
 
             event.setCancelled(true);
 
-            // Check claimer
-            boolean found = false;
-            for (ItemStack itemStack : player.getInventory()) {
-                if (ItemManager.getInstance().ownsClaimer(player.getUniqueId(), itemStack)) {
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found) {
-                player.sendMessage(ClaimPlugin.PREFIX + "§cDu hast keinen Claimer im Inventar, der dir gehört.");
-                return;
-            }
-
-            // Check world
-            if (!player.getLocation().getChunk().getWorld().getName().equals(ClaimPlugin.MAIN_WORLD)) {
-                player.sendMessage(ClaimPlugin.PREFIX + "§cDerzeit kann man im Nether nicht claimen.");
-                return;
-            }
-
-            // Check chunk
-            ClaimResponse response = Utility.canClaim(player, new ChunkData(player.getLocation().getChunk()));
-            switch (response) {
-                case ALREADY_CLAIMED:
-                    player.sendMessage(ClaimPlugin.PREFIX + "§cDer Chunk wurde bereits geclaimed.");
-                    return;
-                case REGION:
-                    player.sendMessage(ClaimPlugin.PREFIX + "§cIm Chunk liegt eine geschützte Region.");
-                    return;
-                case BORDER:
-                    player.sendMessage(ClaimPlugin.PREFIX
-                            + "§cDer Chunk grenzt an einen Chunk, der bereits geclaimed ist.");
-                    return;
-                case CLAIMABLE:
-                    break;
-                default:
-                    break;
-            }
-
-            // Claim the chunk
-            try {
-                ClaimPlugin.getInstance().getDatabase().updateClaimInformation(player.getUniqueId(),
-                        new ChunkData(player.getLocation().getChunk()), true);
-
-                for (int i = 0; i < player.getInventory().getSize(); i++) {
-                    ItemStack itemStack = player.getInventory().getItem(i);
-
-                    if (ItemManager.getInstance().ownsClaimer(player.getUniqueId(), itemStack)) {
-                        if (itemStack.getAmount() == 1) {
-                            player.getInventory().setItem(i, new ItemStack(Material.AIR));
-                        } else {
-                            itemStack.setAmount(itemStack.getAmount() - 1);
-                            player.getInventory().setItem(i, itemStack);
-                        }
-
-                        break;
-                    }
-                }
-
-                Utility.playEffect(player);
-
-                player.sendMessage(ClaimPlugin.PREFIX + "Du hast den Chunk §6erfolgreich §7geclaimed.");
-
-                Bukkit.broadcastMessage(ClaimPlugin.PREFIX + "§a§l" + player.getName()
-                        + " §7hat seinen §e" + ClaimInformation.get(player.getUniqueId()).getChunks().size()
-                        + ". Chunk §7geclaimed!");
-            } catch (DatabaseException e) {
-                e.printStackTrace();
-
-                player.sendMessage(ClaimPlugin.PREFIX + "§cEin Datenbank-Fehler ist aufgetreten...");
-            }
+            player.performCommand("chunk claim");
         }
     }
 }

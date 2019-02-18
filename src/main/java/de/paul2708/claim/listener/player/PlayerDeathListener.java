@@ -53,6 +53,7 @@ public class PlayerDeathListener implements Listener {
             inventory.remove(itemStack);
         }
         event.getEntity().getInventory().setArmorContents(new ItemStack[4]);
+        event.getEntity().getInventory().setItemInOffHand(new ItemStack(Material.AIR));
 
         event.setKeepInventory(true);
     }

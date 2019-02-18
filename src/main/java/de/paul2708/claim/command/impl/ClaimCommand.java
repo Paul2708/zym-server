@@ -16,6 +16,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
 
 /**
  * This sub command is called, if a player wants to claim a chunk.
@@ -78,58 +79,74 @@ public class ClaimCommand extends SubCommand {
                 break;
         }
 
-        /*player.sendMessage(ClaimPlugin.PREFIX + "§7Bist du dir §6sicher, dass du §6diesen Chunk §7claimen willst?");
-
-        TextComponent yesMessage = new TextComponent("§a[Ja]");
-        yesMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "chunk help"));
-        yesMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                new ComponentBuilder("§6Claime den Chunk (verbindlich)").create()));
-
-        TextComponent noMessage = new TextComponent("§c[Nein]");
-        noMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "chunk help"));
-        noMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                new ComponentBuilder("§6Breche den Vorgang ab").create()));
-
-        player.spigot().sendMessage(new ComponentBuilder(yesMessage).append(" ").append(noMessage).create());*/
-
-        // Claim the chunk
-        try {
-            ClaimPlugin.getInstance().getDatabase().updateClaimInformation(player.getUniqueId(),
-                    new ChunkData(player.getLocation().getChunk()), true);
-
-            int index = -1;
-            ItemStack replaced = null;
-
-            for (int i = 0; i < player.getInventory().getSize(); i++) {
-                ItemStack itemStack = player.getInventory().getItem(i);
-
-                if (ItemManager.getInstance().ownsClaimer(player.getUniqueId(), itemStack)) {
-                    index = i;
-
-                    if (itemStack.getAmount() == 1) {
-                        replaced = new ItemStack(Material.AIR);
-                    } else {
-                        replaced = itemStack.clone();
-                        replaced.setAmount(itemStack.getAmount() - 1);
-                    }
-
-                    break;
-                }
+        if (args.length == 1) {
+            if (!player.hasMetadata("confirm")) {
+                return;
             }
 
-            player.getInventory().setItem(index, replaced);
+            if (args[0].equals("confirm")) {
+                // Claim the chunk
+                try {
+                    ClaimPlugin.getInstance().getDatabase().updateClaimInformation(player.getUniqueId(),
+                            new ChunkData(player.getLocation().getChunk()), true);
 
-            Utility.playEffect(player);
+                    int index = -1;
+                    ItemStack replaced = null;
 
-            player.sendMessage(ClaimPlugin.PREFIX + "Du hast den Chunk §6erfolgreich §7geclaimed.");
+                    for (int i = 0; i < player.getInventory().getSize(); i++) {
+                        ItemStack itemStack = player.getInventory().getItem(i);
 
-            Bukkit.broadcastMessage(ClaimPlugin.PREFIX + "§a§l" + player.getName()
-                    + " §7hat seinen §e" + ClaimInformation.get(player.getUniqueId()).getChunks().size()
-                    + ". Chunk §7geclaimed!");
-        } catch (DatabaseException e) {
-            e.printStackTrace();
+                        if (ItemManager.getInstance().ownsClaimer(player.getUniqueId(), itemStack)) {
+                            index = i;
 
-            player.sendMessage(ClaimPlugin.PREFIX + "§cEin Datenbank-Fehler ist aufgetreten...");
+                            if (itemStack.getAmount() == 1) {
+                                replaced = new ItemStack(Material.AIR);
+                            } else {
+                                replaced = itemStack.clone();
+                                replaced.setAmount(itemStack.getAmount() - 1);
+                            }
+
+                            break;
+                        }
+                    }
+
+                    player.getInventory().setItem(index, replaced);
+
+                    Utility.playEffect(player);
+
+                    player.sendMessage(ClaimPlugin.PREFIX + "Du hast den Chunk §6erfolgreich §7geclaimed.");
+
+                    Bukkit.broadcastMessage(ClaimPlugin.PREFIX + "§a§l" + player.getName()
+                            + " §7hat seinen §e" + ClaimInformation.get(player.getUniqueId()).getChunks().size()
+                            + ". Chunk §7geclaimed!");
+                } catch (DatabaseException e) {
+                    e.printStackTrace();
+
+                    player.sendMessage(ClaimPlugin.PREFIX + "§cEin Datenbank-Fehler ist aufgetreten...");
+                }
+            } else if (args[0].equals("cancel")) {
+                player.sendMessage(ClaimPlugin.PREFIX + "Du hast den Vorgang abgebrochen.");
+            }
+
+            player.removeMetadata("confirm", ClaimPlugin.getInstance());
+        } else {
+            player.sendMessage(ClaimPlugin.PREFIX + "§7Bist du dir §6sicher§7, dass du §6diesen Chunk §7claimen willst?");
+            player.sendMessage(ClaimPlugin.PREFIX + "Hinweis: Hiermit geht dein Claimer §c§lverloren§7.");
+
+            TextComponent yesMessage = new TextComponent("§a[Ja, ich will den Chunk]");
+            yesMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/chunk claim confirm"));
+            yesMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                    new ComponentBuilder("§7Claime den Chunk (verbindlich)").create()));
+
+            TextComponent noMessage = new TextComponent("§c[Nein, ich breche ab]");
+            noMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/chunk claim cancel"));
+            noMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                    new ComponentBuilder("§7Breche den Vorgang ab").create()));
+
+            player.spigot().sendMessage(new ComponentBuilder(ClaimPlugin.PREFIX)
+                    .append(yesMessage).append("   ").append(noMessage).create());
+
+            player.setMetadata("confirm", new FixedMetadataValue(ClaimPlugin.getInstance(), true));
         }
     }
 }
