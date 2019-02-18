@@ -43,14 +43,14 @@ public class PlayerDeathListener implements Listener {
         List<ItemStack> list = new LinkedList<>();
         Inventory inventory = event.getEntity().getInventory();
         for (ItemStack itemStack : inventory) {
-            if (ItemManager.getInstance().isClaimer(itemStack)) {
+            if (itemStack != null && !ItemManager.getInstance().isClaimer(itemStack)) {
                 list.add(itemStack);
             }
         }
 
-        inventory.clear();
         for (ItemStack itemStack : list) {
-            inventory.addItem(itemStack);
+            event.getEntity().getLocation().getWorld().dropItemNaturally(event.getEntity().getLocation(), itemStack);
+            inventory.remove(itemStack);
         }
 
         event.setKeepInventory(true);
