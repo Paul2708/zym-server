@@ -24,21 +24,10 @@ public class StructureGrowListener implements Listener {
     public void onGrow(StructureGrowEvent event) {
         Player player = event.getPlayer();
 
-        if (player != null) {
-            for (BlockState block : event.getBlocks()) {
-                if (!ClaimInformation.owns(player, block.getChunk())) {
-                    block.setType(Material.AIR);
-                }
-            }
-        } else {
-            for (BlockState block : event.getBlocks()) {
-                for (BlockState otherBlock : event.getBlocks()) {
-                    if (!ClaimInformation.hasSameOwner(block.getChunk(), otherBlock.getChunk())) {
-                        event.setCancelled(true);
-                    }
-                }
+        for (BlockState block : event.getBlocks()) {
+            if (ClaimInformation.isClaimedByOthers(player, block.getChunk())) {
+                block.setType(Material.AIR);
             }
         }
-
     }
 }

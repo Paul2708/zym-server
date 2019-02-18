@@ -3,6 +3,7 @@ package de.paul2708.claim.listener.entity;
 import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.model.ClaimInformation;
 import de.paul2708.claim.util.Utility;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -30,6 +31,10 @@ public class EntityDamageByEntityListener implements Listener {
             }
 
             if (ClaimInformation.isClaimedByOthers(player, event.getEntity().getLocation().getChunk())) {
+                if (event.getEntity() instanceof Monster) {
+                    return;
+                }
+
                 event.setCancelled(true);
 
                 player.sendMessage(ClaimPlugin.PREFIX + "§CDu kannst hier keine Mobs töten.");

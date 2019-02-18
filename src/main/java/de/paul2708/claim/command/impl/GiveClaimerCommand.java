@@ -11,13 +11,13 @@ import org.bukkit.entity.Player;
  *
  * @author Paul2708
  */
-public class OpClaimCommand extends SubCommand {
+public class GiveClaimerCommand extends SubCommand {
 
     /**
-     * Create a new op claim command.
+     * Create a new give claimer command.
      */
-    public OpClaimCommand() {
-        super("opclaim", "opclaim [Name]", "Bekomme einen Claimer umsonst", "chunk.opclaim");
+    public GiveClaimerCommand() {
+        super("giveclaimer", "giveclaimer [Name]", "Bekomme einen Claimer umsonst", "chunk.giveclaimer");
     }
 
     /**
