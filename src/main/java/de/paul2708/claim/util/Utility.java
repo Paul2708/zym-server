@@ -75,7 +75,7 @@ public final class Utility {
             for (ChunkData chunk : information.getChunks()) {
                 for (int x = -1; x <= 1; x++) {
                     for (int z = -1; z <= 1; z++) {
-                        ChunkData nextChunk = new ChunkData(chunk.getX() + x, chunk.getZ() + z);
+                        ChunkData nextChunk = new ChunkData(chunk.getWorld(), chunk.getX() + x, chunk.getZ() + z);
 
                         if (chunkData.equals(nextChunk) && !hasChunkNextTo(player, chunkData)) {
                             return ClaimResponse.BORDER;
@@ -116,7 +116,7 @@ public final class Utility {
         for (ChunkData chunk : ClaimInformation.get(player.getUniqueId()).getChunks()) {
             for (int x = -1; x <= 1; x++) {
                 for (int z = -1; z <= 1; z++) {
-                    ChunkData nextChunk = new ChunkData(chunk.getX() + x, chunk.getZ() + z);
+                    ChunkData nextChunk = new ChunkData(chunk.getWorld(), chunk.getX() + x, chunk.getZ() + z);
 
                     if (chunkData.equals(nextChunk)) {
                         return true;

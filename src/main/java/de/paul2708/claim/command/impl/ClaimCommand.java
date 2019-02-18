@@ -49,12 +49,6 @@ public class ClaimCommand extends SubCommand {
             return;
         }
 
-        // Check world
-        if (!player.getLocation().getChunk().getWorld().getName().equals(ClaimPlugin.MAIN_WORLD)) {
-            player.sendMessage(ClaimPlugin.PREFIX + "§cDerzeit kann man im Nether nicht claimen.");
-            return;
-        }
-
         // Check chunk
         ClaimResponse response = Utility.canClaim(player, new ChunkData(player.getLocation().getChunk()));
         switch (response) {

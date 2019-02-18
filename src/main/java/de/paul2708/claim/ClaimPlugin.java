@@ -25,11 +25,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class ClaimPlugin extends JavaPlugin {
 
     /**
-     * Name of the main world.S
-     */
-    public static final String MAIN_WORLD = "NewWorld";
-
-    /**
      * Standard message prefix.
      */
     public static final String PREFIX = "§8[§3Claim§8] §7";

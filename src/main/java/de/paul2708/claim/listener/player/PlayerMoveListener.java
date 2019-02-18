@@ -59,11 +59,6 @@ public class PlayerMoveListener implements Listener {
         }
 
         // Chunk stuff
-        if (!event.getFrom().getChunk().getWorld().getName().equals(ClaimPlugin.MAIN_WORLD)
-                || !event.getTo().getChunk().getWorld().getName().equals(ClaimPlugin.MAIN_WORLD)) {
-            return;
-        }
-
         ChunkData fromChunk = new ChunkData(event.getFrom().getChunk());
         ChunkData toChunk = new ChunkData(event.getTo().getChunk());
 

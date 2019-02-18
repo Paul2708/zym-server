@@ -9,6 +9,7 @@ import org.bukkit.Chunk;
  */
 public class ChunkData {
 
+    private final String world;
     private final int x;
     private final int z;
 
@@ -18,16 +19,18 @@ public class ChunkData {
      * @param chunk chunk
      */
     public ChunkData(Chunk chunk) {
-        this(chunk.getX(), chunk.getZ());
+        this(chunk.getWorld().getName(), chunk.getX(), chunk.getZ());
     }
 
     /**
      * Create a new chunk data.
      *
+     * @param world world name
      * @param x x coordinate
      * @param z y coordinate
      */
-    public ChunkData(int x, int z) {
+    public ChunkData(String world, int x, int z) {
+        this.world = world;
         this.x = x;
         this.z = z;
     }
@@ -51,6 +54,15 @@ public class ChunkData {
     }
 
     /**
+     * Get the world name.
+     *
+     * @return world name
+     */
+    public String getWorld() {
+        return world;
+    }
+
+    /**
      * Check if two chunk data are equal. They are equal, if the coordinates are the same.
      *
      * @param o object
@@ -67,7 +79,7 @@ public class ChunkData {
 
         ChunkData chunkData = (ChunkData) o;
 
-        return x == chunkData.x && z == chunkData.z;
+        return world.equals(chunkData.world) && x == chunkData.x && z == chunkData.z;
     }
 
     /**
@@ -77,7 +89,8 @@ public class ChunkData {
      */
     @Override
     public int hashCode() {
-        int result = x;
+        int result = world != null ? world.hashCode() : 0;
+        result = 31 * result + x;
         result = 31 * result + z;
         return result;
     }
