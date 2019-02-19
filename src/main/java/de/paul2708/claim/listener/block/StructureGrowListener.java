@@ -1,9 +1,5 @@
 package de.paul2708.claim.listener.block;
 
-import de.paul2708.claim.model.ClaimInformation;
-import org.bukkit.Material;
-import org.bukkit.block.BlockState;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.StructureGrowEvent;
@@ -22,12 +18,6 @@ public class StructureGrowListener implements Listener {
      */
     @EventHandler
     public void onGrow(StructureGrowEvent event) {
-        Player player = event.getPlayer();
-
-        for (BlockState block : event.getBlocks()) {
-            if (ClaimInformation.isClaimedByOthers(player, block.getChunk())) {
-                block.setType(Material.AIR);
-            }
-        }
+        // TODO: Cancel growing into claimed chunks
     }
 }

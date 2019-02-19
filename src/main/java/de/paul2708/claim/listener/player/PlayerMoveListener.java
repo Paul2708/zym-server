@@ -47,15 +47,18 @@ public class PlayerMoveListener implements Listener {
                 && Math.abs(to.getZ() - TELEPORT_FROM.getZ()) <= 0.2) {
             player.teleport(PlayerMoveListener.TELEPORT_TO);
 
-            int freeSlot = player.getInventory().firstEmpty();
-            if (freeSlot != -1) {
-                player.getInventory().setItem(freeSlot, player.getInventory().getChestplate());
+            if (player.getInventory().getChestplate() == null
+                    || player.getInventory().getChestplate().getType() != Material.ELYTRA) {
+                int freeSlot = player.getInventory().firstEmpty();
+                if (freeSlot != -1) {
+                    player.getInventory().setItem(freeSlot, player.getInventory().getChestplate());
+                }
+
+                player.getInventory().setChestplate(new ItemStack(Material.ELYTRA));
+                player.updateInventory();
+
+                player.setMetadata("elytra", new FixedMetadataValue(ClaimPlugin.getInstance(), true));
             }
-
-            player.getInventory().setChestplate(new ItemStack(Material.ELYTRA));
-            player.updateInventory();
-
-            player.setMetadata("elytra", new FixedMetadataValue(ClaimPlugin.getInstance(), true));
         }
 
         // Chunk stuff
