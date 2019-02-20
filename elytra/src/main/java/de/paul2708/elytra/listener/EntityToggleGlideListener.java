@@ -1,6 +1,6 @@
-package de.paul2708.claim.listener.entity;
+package de.paul2708.elytra.listener;
 
-import de.paul2708.claim.ClaimPlugin;
+import de.paul2708.elytra.ElytraPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -40,7 +40,7 @@ public class EntityToggleGlideListener implements Listener {
                     player.getInventory().setChestplate(new ItemStack(Material.AIR));
                     player.updateInventory();
 
-                    player.removeMetadata("elytra", ClaimPlugin.getInstance());
+                    player.removeMetadata("elytra", ElytraPlugin.getInstance());
                 }
             }
         }

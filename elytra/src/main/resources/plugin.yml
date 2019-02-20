@@ -1,0 +1,5 @@
+name: Spawn-Elytra
+author: Paul2708
+version: 0.1
+main: de.paul2708.elytra.ElytraPlugin
+api-version: 1.13

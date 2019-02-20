@@ -23,12 +23,6 @@ import org.bukkit.util.Vector;
  */
 public class PlayerMoveListener implements Listener {
 
-    private static final Location TELEPORT_FROM =
-            new Location(Bukkit.getWorld("NewWorld"), 123.5, 69, 78.5);
-
-    private static final Location TELEPORT_TO =
-            new Location(Bukkit.getWorld("NewWorld"), 126.5, 232, 75.5);
-
     /**
      * Send information about the chunk and handle elytra stuff.
      *
@@ -37,29 +31,6 @@ public class PlayerMoveListener implements Listener {
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-
-        // Elytra stuff
-        Location to = event.getTo();
-
-        if (to.getWorld().equals(TELEPORT_FROM.getWorld())
-                && Math.abs(to.getX() - TELEPORT_FROM.getX()) <= 0.2
-                && Math.abs(to.getY() - TELEPORT_FROM.getY()) <= 0.5
-                && Math.abs(to.getZ() - TELEPORT_FROM.getZ()) <= 0.2) {
-            player.teleport(PlayerMoveListener.TELEPORT_TO);
-
-            if (player.getInventory().getChestplate() == null
-                    || player.getInventory().getChestplate().getType() != Material.ELYTRA) {
-                int freeSlot = player.getInventory().firstEmpty();
-                if (freeSlot != -1) {
-                    player.getInventory().setItem(freeSlot, player.getInventory().getChestplate());
-                }
-
-                player.getInventory().setChestplate(new ItemStack(Material.ELYTRA));
-                player.updateInventory();
-
-                player.setMetadata("elytra", new FixedMetadataValue(ClaimPlugin.getInstance(), true));
-            }
-        }
 
         // Chunk stuff
         if (!event.getFrom().getChunk().getWorld().getName().equals(ClaimPlugin.MAIN_WORLD)
