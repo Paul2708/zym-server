@@ -1,18 +1,13 @@
 package de.paul2708.elytra.listener;
 
-import de.paul2708.elytra.ElytraPlugin;
 import de.paul2708.elytra.item.ItemManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.metadata.FixedMetadataValue;
 
 /**
  * This listener is called, if a player moves.
@@ -54,6 +49,10 @@ public class PlayerMoveListener implements Listener {
 
             PlayerInventory inventory = player.getInventory();
 
+            if (itemManager.isElytra(inventory.getChestplate())) {
+                return;
+            }
+
             if (inventory.getChestplate() != null && !inventory.getChestplate().isSimilar(itemManager.getEmptyItem())) {
                 int freeSlot = inventory.firstEmpty();
 
@@ -66,8 +65,6 @@ public class PlayerMoveListener implements Listener {
 
             inventory.setChestplate(itemManager.getElytra());
             player.updateInventory();
-
-            player.setMetadata(ElytraPlugin.METADATA_TAG, new FixedMetadataValue(ElytraPlugin.getInstance(), true));
         }
     }
 }

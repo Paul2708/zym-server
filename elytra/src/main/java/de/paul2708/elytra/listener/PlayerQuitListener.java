@@ -50,5 +50,7 @@ public class PlayerQuitListener implements Listener {
                 player.getInventory().remove(item);
             }
         }
+
+        player.updateInventory();
     }
 }
