@@ -1,6 +1,8 @@
 package de.paul2708.elytra;
 
+import de.paul2708.elytra.item.ItemManager;
 import de.paul2708.elytra.listener.EntityToggleGlideListener;
+import de.paul2708.elytra.listener.PlayerDeathListener;
 import de.paul2708.elytra.listener.PlayerMoveListener;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
@@ -12,6 +14,11 @@ import org.bukkit.plugin.java.JavaPlugin;
  * @author Paul2708
  */
 public class ElytraPlugin extends JavaPlugin {
+
+    /**
+     * Meta data tag for players, if they have a spawn elytra.
+     */
+    public static final String METADATA_TAG = "elytra";
 
     /**
      * Standard message prefix.
@@ -33,8 +40,12 @@ public class ElytraPlugin extends JavaPlugin {
      */
     @Override
     public void onEnable() {
+        ItemManager itemManager = new ItemManager();
+        itemManager.createElytra();
+
         // Register listener
-        registerListener(new PlayerMoveListener(), new EntityToggleGlideListener());
+        registerListener(new PlayerMoveListener(), new EntityToggleGlideListener(),
+                new PlayerDeathListener(itemManager));
     }
 
     /**

@@ -36,11 +36,11 @@ public class EntityToggleGlideListener implements Listener {
                     return;
                 }
 
-                if (player.hasMetadata("elytra")) {
+                if (player.hasMetadata(ElytraPlugin.METADATA_TAG)) {
                     player.getInventory().setChestplate(new ItemStack(Material.AIR));
                     player.updateInventory();
 
-                    player.removeMetadata("elytra", ElytraPlugin.getInstance());
+                    player.removeMetadata(ElytraPlugin.METADATA_TAG, ElytraPlugin.getInstance());
                 }
             }
         }
