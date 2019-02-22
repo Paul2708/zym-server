@@ -3,7 +3,7 @@ package de.paul2708.claim.listener.inventory;
 import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.database.DatabaseException;
 import de.paul2708.claim.model.ClaimInformation;
-import de.paul2708.claim.util.ItemManager;
+import de.paul2708.claim.item.ItemManager;
 import de.paul2708.claim.util.Utility;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -31,13 +31,6 @@ public class InventoryClickListener implements Listener {
         Inventory openInventory = event.getInventory();
 
         Player player = (Player) event.getWhoClicked();
-
-        // Elytra stuff
-        if (player.hasMetadata("elytra")) {
-            if (event.getCurrentItem() != null && event.getCurrentItem().getType() == Material.ELYTRA) {
-                event.setCancelled(true);
-            }
-        }
 
         if (clickedInventory != null && openInventory != null) {
             if (clickedInventory.getName().equals("§7Willst du einen §6Claimer §7kaufen?")

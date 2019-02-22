@@ -3,7 +3,7 @@ package de.paul2708.claim.listener.player;
 import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.model.ChunkData;
 import de.paul2708.claim.model.ClaimInformation;
-import de.paul2708.claim.util.ItemManager;
+import de.paul2708.claim.item.ItemManager;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
@@ -12,8 +12,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
 /**
@@ -22,12 +20,6 @@ import org.bukkit.util.Vector;
  * @author Paul2708
  */
 public class PlayerMoveListener implements Listener {
-
-    private static final Location TELEPORT_FROM =
-            new Location(Bukkit.getWorld("NewWorld"), 123.5, 69, 78.5);
-
-    private static final Location TELEPORT_TO =
-            new Location(Bukkit.getWorld("NewWorld"), 126.5, 232, 75.5);
 
     /**
      * Send information about the chunk and handle elytra stuff.
@@ -38,30 +30,6 @@ public class PlayerMoveListener implements Listener {
     public void onMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
 
-        // Elytra stuff
-        Location to = event.getTo();
-
-        if (to.getWorld().equals(TELEPORT_FROM.getWorld())
-                && Math.abs(to.getX() - TELEPORT_FROM.getX()) <= 0.2
-                && Math.abs(to.getY() - TELEPORT_FROM.getY()) <= 0.5
-                && Math.abs(to.getZ() - TELEPORT_FROM.getZ()) <= 0.2) {
-            player.teleport(PlayerMoveListener.TELEPORT_TO);
-
-            if (player.getInventory().getChestplate() == null
-                    || player.getInventory().getChestplate().getType() != Material.ELYTRA) {
-                int freeSlot = player.getInventory().firstEmpty();
-                if (freeSlot != -1) {
-                    player.getInventory().setItem(freeSlot, player.getInventory().getChestplate());
-                }
-
-                player.getInventory().setChestplate(new ItemStack(Material.ELYTRA));
-                player.updateInventory();
-
-                player.setMetadata("elytra", new FixedMetadataValue(ClaimPlugin.getInstance(), true));
-            }
-        }
-
-        // Chunk stuff
         if (!event.getFrom().getChunk().getWorld().getName().equals(ClaimPlugin.MAIN_WORLD)
                 || !event.getTo().getChunk().getWorld().getName().equals(ClaimPlugin.MAIN_WORLD)) {
             return;

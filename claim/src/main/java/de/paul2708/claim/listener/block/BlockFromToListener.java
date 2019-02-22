@@ -19,10 +19,15 @@ public class BlockFromToListener implements Listener {
      */
     @EventHandler
     public void onFromTo(BlockFromToEvent event) {
-        if (ClaimInformation.hasSameOwner(event.getBlock().getChunk(), event.getToBlock().getChunk())) {
-            event.setCancelled(false);
-        } else if (ClaimInformation.isClaimedByOthers(null, event.getToBlock().getChunk())) {
-            event.setCancelled(true);
+        if (ClaimInformation.isClaimed(event.getToBlock().getChunk())) {
+            ClaimInformation originInformation = ClaimInformation.get(event.getBlock().getChunk());
+
+            if (originInformation == null) {
+                event.setCancelled(true);
+            } else if (!originInformation.getUuid().equals(ClaimInformation.get(event.getToBlock().getChunk())
+                    .getUuid())) {
+                event.setCancelled(true);
+            }
         }
     }
 }

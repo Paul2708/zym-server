@@ -1,5 +1,4 @@
 # Chunk - Claim
----
 This spigot plugin provides a claim and plot system, to claim certain chunks. They have a griefing protection to avoid abusing.
 
 Note: As the plugin has to be fast developed, the code is not as clean as it should be. Refactoring is planned.
@@ -56,6 +55,7 @@ This table shows the prices for the chunks.
 ## Protection
 ### Global protection
 - canceled any explosion
+- canceled fire spreading and burning blocks
 
 ### Claimed chunk protection
 - cancel building and breaking blocks
@@ -65,6 +65,7 @@ This table shows the prices for the chunks.
 - cancel damage to entities (expect players) in other claimed chunks
 - cancel armor stand manipulation in other claimed chunks
 - cancel interacting on other chunks
+- and more...
 
 ## Contact
 If you find any issues, please let me know!

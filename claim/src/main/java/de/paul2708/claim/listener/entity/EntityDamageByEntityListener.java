@@ -40,6 +40,5 @@ public class EntityDamageByEntityListener implements Listener {
                 player.sendMessage(ClaimPlugin.PREFIX + "§CDu kannst hier keine Mobs töten.");
             }
         }
-
     }
 }

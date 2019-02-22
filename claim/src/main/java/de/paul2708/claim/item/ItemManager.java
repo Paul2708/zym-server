@@ -1,4 +1,4 @@
-package de.paul2708.claim.util;
+package de.paul2708.claim.item;
 
 import net.minecraft.server.v1_13_R2.NBTTagCompound;
 import org.bukkit.Bukkit;

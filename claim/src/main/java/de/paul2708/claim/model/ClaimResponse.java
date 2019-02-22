@@ -1,4 +1,4 @@
-package de.paul2708.claim.util;
+package de.paul2708.claim.model;
 
 /**
  * This enum holds information about claiming.

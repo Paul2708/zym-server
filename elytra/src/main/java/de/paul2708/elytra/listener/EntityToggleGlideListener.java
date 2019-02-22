@@ -1,14 +1,12 @@
-package de.paul2708.claim.listener.entity;
+package de.paul2708.elytra.listener;
 
-import de.paul2708.claim.ClaimPlugin;
+import de.paul2708.elytra.item.ItemManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityToggleGlideEvent;
-import org.bukkit.inventory.ItemStack;
 
 /**
  * This listener is called, if an entity toggles gliding.
@@ -20,6 +18,17 @@ public class EntityToggleGlideListener implements Listener {
     private static final Location UPPER_CORNER = new Location(Bukkit.getWorld("NewWorld"), 108, 220, 95);
 
     private static final Location LOWER_CORNER = new Location(Bukkit.getWorld("NewWorld"), 141, 248, 61);
+
+    private ItemManager itemManager;
+
+    /**
+     * Create a new entity toggle glide listener.
+     *
+     * @param itemManager item manager
+     */
+    public EntityToggleGlideListener(ItemManager itemManager) {
+        this.itemManager = itemManager;
+    }
 
     /**
      * Remove the elytra.
@@ -36,11 +45,9 @@ public class EntityToggleGlideListener implements Listener {
                     return;
                 }
 
-                if (player.hasMetadata("elytra")) {
-                    player.getInventory().setChestplate(new ItemStack(Material.AIR));
+                if (itemManager.isElytra(player.getInventory().getChestplate())) {
+                    player.getInventory().setChestplate(itemManager.getEmptyItem());
                     player.updateInventory();
-
-                    player.removeMetadata("elytra", ClaimPlugin.getInstance());
                 }
             }
         }

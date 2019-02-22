@@ -5,16 +5,11 @@ import de.paul2708.claim.command.SubCommand;
 import de.paul2708.claim.database.DatabaseException;
 import de.paul2708.claim.model.ChunkData;
 import de.paul2708.claim.model.ClaimInformation;
-import de.paul2708.claim.util.ItemManager;
-import de.paul2708.claim.util.Utility;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
 /**

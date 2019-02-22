@@ -1,6 +1,6 @@
 package de.paul2708.claim.listener.item;
 
-import de.paul2708.claim.util.ItemManager;
+import de.paul2708.claim.item.ItemManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.CraftItemEvent;

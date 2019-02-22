@@ -151,6 +151,21 @@ public final class ClaimInformation {
     }
 
     /**
+     * Get the claim information by chunk.
+     *
+     * @param chunk chunk
+     * @return the players claim information
+     */
+    public static ClaimInformation get(Chunk chunk) {
+        ChunkData data = new ChunkData(chunk);
+        if (ClaimInformation.CHUNK_CACHE.containsKey(data)) {
+            return ClaimInformation.get(ClaimInformation.CHUNK_CACHE.get(data));
+        }
+
+        return null;
+    }
+
+    /**
      * Check if two chunks are owned by the same player.
      *
      * @param firstChunk first chunk
@@ -177,23 +192,6 @@ public final class ClaimInformation {
     }
 
     /**
-     * Check if the player owns the chunk.
-     *
-     * @param player player
-     * @param chunk chunk
-     * @return true if the player owns the chunk, otherwise false
-     */
-    public static boolean owns(Player player, Chunk chunk) {
-        if (!chunk.getWorld().getName().equals(ClaimPlugin.MAIN_WORLD)) {
-            return false;
-        }
-
-        ClaimInformation information = ClaimInformation.get(player.getUniqueId());
-
-        return information.contains(new ChunkData(chunk));
-    }
-
-    /**
      * Check if the chunk is claimed by another player.
      *
      * @param player player
@@ -208,6 +206,20 @@ public final class ClaimInformation {
         UUID uuid = ClaimInformation.CHUNK_CACHE.get(new ChunkData(chunk));
 
         return uuid != null && (player == null || !uuid.equals(player.getUniqueId()));
+    }
+
+    /**
+     * Check if a chunk is claimed.
+     *
+     * @param chunk chunk
+     * @return true if the chunk is claimed, otherwise false
+     */
+    public static boolean isClaimed(Chunk chunk) {
+        if (!chunk.getWorld().getName().equals(ClaimPlugin.MAIN_WORLD)) {
+            return false;
+        }
+
+        return ClaimInformation.CHUNK_CACHE.containsKey(new ChunkData(chunk));
     }
 
     /**

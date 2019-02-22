@@ -6,9 +6,10 @@ import de.paul2708.claim.database.DatabaseException;
 import de.paul2708.claim.database.impl.JsonDatabase;
 import de.paul2708.claim.listener.PlayerJoinListener;
 import de.paul2708.claim.listener.block.*;
+import de.paul2708.claim.listener.block.hanging.HangingBreakListener;
+import de.paul2708.claim.listener.block.hanging.HangingPlaceListener;
 import de.paul2708.claim.listener.entity.EntityDamageByEntityListener;
 import de.paul2708.claim.listener.entity.EntityExplodeListener;
-import de.paul2708.claim.listener.entity.EntityToggleGlideListener;
 import de.paul2708.claim.listener.inventory.InventoryClickListener;
 import de.paul2708.claim.listener.item.CraftItemListener;
 import de.paul2708.claim.listener.player.*;
@@ -72,10 +73,11 @@ public class ClaimPlugin extends JavaPlugin {
 
         registerListener(new BlockBreakListener(), new BlockPlaceListener(), new BlockDamageListener(),
                 new StructureGrowListener(), new BlockFromToListener(), new BlockPistonListener(),
-                new BlockExplodeListener());
+                new BlockExplodeListener(), new BlockBurnListener(), new BlockIgniteListener());
 
-        registerListener(new EntityDamageByEntityListener(), new EntityExplodeListener(),
-                new EntityToggleGlideListener());
+        registerListener(new HangingPlaceListener(), new HangingBreakListener());
+
+        registerListener(new EntityDamageByEntityListener(), new EntityExplodeListener());
 
         registerListener(new InventoryClickListener());
 
@@ -83,7 +85,8 @@ public class ClaimPlugin extends JavaPlugin {
 
         registerListener(new PlayerInteractListener(), new PlayerArmorStandManipulateListener(),
                 new PlayerDropItemListener(), new PlayerInteractAtEntityListener(), new PlayerMoveListener(),
-                new PlayerDeathListener());
+                new PlayerDeathListener(), new PlayerBucketEmptyListener(), new PlayerBucketFillListener(),
+                new PlayerLeashEntityListener());
 
         // Register command
         getCommand("chunk").setExecutor(new ChunkCommand());
