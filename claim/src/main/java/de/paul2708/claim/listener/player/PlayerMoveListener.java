@@ -3,7 +3,7 @@ package de.paul2708.claim.listener.player;
 import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.model.ChunkData;
 import de.paul2708.claim.model.ClaimInformation;
-import de.paul2708.claim.util.ItemManager;
+import de.paul2708.claim.item.ItemManager;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
@@ -12,8 +12,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
 /**
@@ -32,7 +30,6 @@ public class PlayerMoveListener implements Listener {
     public void onMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
 
-        // Chunk stuff
         if (!event.getFrom().getChunk().getWorld().getName().equals(ClaimPlugin.MAIN_WORLD)
                 || !event.getTo().getChunk().getWorld().getName().equals(ClaimPlugin.MAIN_WORLD)) {
             return;

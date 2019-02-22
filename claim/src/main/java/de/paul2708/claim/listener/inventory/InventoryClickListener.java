@@ -3,7 +3,7 @@ package de.paul2708.claim.listener.inventory;
 import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.database.DatabaseException;
 import de.paul2708.claim.model.ClaimInformation;
-import de.paul2708.claim.util.ItemManager;
+import de.paul2708.claim.item.ItemManager;
 import de.paul2708.claim.util.Utility;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

@@ -9,6 +9,7 @@ import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.model.ChunkData;
 import de.paul2708.claim.model.ClaimInformation;
+import de.paul2708.claim.model.ClaimResponse;
 import org.bukkit.*;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;

@@ -1,7 +1,7 @@
 package de.paul2708.claim.listener.player;
 
 import de.paul2708.claim.ClaimPlugin;
-import de.paul2708.claim.util.ItemManager;
+import de.paul2708.claim.item.ItemManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

@@ -1,6 +1,6 @@
 package de.paul2708.claim.listener.player;
 
-import de.paul2708.claim.util.ItemManager;
+import de.paul2708.claim.item.ItemManager;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -19,27 +19,12 @@ import java.util.List;
 public class PlayerDeathListener implements Listener {
 
     /**
-     * Remove the elytra and keep the claimer.
+     * Keep the claimer.
      *
      * @param event player death event
      */
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
-        if (event.getEntity().hasMetadata("elytra")) {
-            ItemStack elytra = null;
-            for (ItemStack drop : event.getDrops()) {
-                if (drop.getType() == Material.ELYTRA) {
-                    elytra = drop;
-                    break;
-                }
-            }
-
-            if (elytra != null) {
-                event.getDrops().remove(elytra);
-            }
-        }
-
-        // Keep claimer
         List<ItemStack> list = new LinkedList<>();
         Inventory inventory = event.getEntity().getInventory();
         for (ItemStack itemStack : inventory) {

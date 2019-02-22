@@ -1,22 +1,15 @@
 package de.paul2708.claim.listener.player;
 
-import de.paul2708.claim.ClaimPlugin;
-import de.paul2708.claim.database.DatabaseException;
-import de.paul2708.claim.model.ChunkData;
 import de.paul2708.claim.model.ClaimInformation;
-import de.paul2708.claim.util.ClaimResponse;
-import de.paul2708.claim.util.ItemManager;
+import de.paul2708.claim.item.ItemManager;
 import de.paul2708.claim.util.Utility;
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemStack;
 
 /**
  * This listener is called, if a player interacts.
@@ -55,6 +48,13 @@ public class PlayerInteractListener implements Listener {
             if (ClaimInformation.isClaimedByOthers(player, chunk) && !Utility.hasBypass(player)) {
                 if (block != null && block.getType().isInteractable()) {
                     event.setCancelled(true);
+                } else if (event.getItem() != null) {
+                    switch (event.getItem().getType()) {
+                        case BONE_MEAL:
+                            event.setCancelled(true);
+                        default:
+                            break;
+                    }
                 }
             }
 

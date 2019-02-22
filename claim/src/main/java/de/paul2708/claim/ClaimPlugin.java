@@ -71,7 +71,7 @@ public class ClaimPlugin extends JavaPlugin {
 
         registerListener(new BlockBreakListener(), new BlockPlaceListener(), new BlockDamageListener(),
                 new StructureGrowListener(), new BlockFromToListener(), new BlockPistonListener(),
-                new BlockExplodeListener());
+                new BlockExplodeListener(), new BlockBurnListener(), new BlockIgniteListener());
 
         registerListener(new EntityDamageByEntityListener(), new EntityExplodeListener());
 
@@ -81,7 +81,7 @@ public class ClaimPlugin extends JavaPlugin {
 
         registerListener(new PlayerInteractListener(), new PlayerArmorStandManipulateListener(),
                 new PlayerDropItemListener(), new PlayerInteractAtEntityListener(), new PlayerMoveListener(),
-                new PlayerDeathListener());
+                new PlayerDeathListener(), new PlayerBucketEmptyListener(), new PlayerBucketFillListener());
 
         // Register command
         getCommand("chunk").setExecutor(new ChunkCommand());
