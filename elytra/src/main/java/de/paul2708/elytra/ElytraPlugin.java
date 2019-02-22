@@ -34,7 +34,8 @@ public class ElytraPlugin extends JavaPlugin {
         // Register listener
         registerListener(new PlayerMoveListener(itemManager), new EntityToggleGlideListener(itemManager),
                 new PlayerDeathListener(itemManager), new PlayerQuitListener(itemManager),
-                new InventoryClickListener(itemManager));
+                new InventoryClickListener(itemManager), new EntityPickupItemListener(itemManager),
+                new ItemSpawnListener(itemManager));
     }
 
     /**
