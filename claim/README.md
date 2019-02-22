@@ -55,7 +55,7 @@ This table shows the prices for the chunks.
 ## Protection
 ### Global protection
 - canceled any explosion
-- fire spreading
+- canceled fire spreading and burning blocks
 
 ### Claimed chunk protection
 - cancel building and breaking blocks
@@ -65,6 +65,7 @@ This table shows the prices for the chunks.
 - cancel damage to entities (expect players) in other claimed chunks
 - cancel armor stand manipulation in other claimed chunks
 - cancel interacting on other chunks
+- and more...
 
 ## Contact
 If you find any issues, please let me know!

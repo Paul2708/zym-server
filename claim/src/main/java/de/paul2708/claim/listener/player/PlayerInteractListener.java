@@ -4,6 +4,7 @@ import de.paul2708.claim.model.ClaimInformation;
 import de.paul2708.claim.item.ItemManager;
 import de.paul2708.claim.util.Utility;
 import org.bukkit.Chunk;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -46,7 +47,7 @@ public class PlayerInteractListener implements Listener {
             Chunk chunk = block == null ? player.getLocation().getChunk() : block.getChunk();
 
             if (ClaimInformation.isClaimedByOthers(player, chunk) && !Utility.hasBypass(player)) {
-                if (block != null && block.getType().isInteractable()) {
+                if (block != null && block.getType().isInteractable() && block.getType() != Material.ENDER_CHEST) {
                     event.setCancelled(true);
                 } else if (event.getItem() != null) {
                     switch (event.getItem().getType()) {
