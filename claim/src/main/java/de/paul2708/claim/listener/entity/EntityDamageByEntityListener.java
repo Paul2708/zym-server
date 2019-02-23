@@ -3,8 +3,7 @@ package de.paul2708.claim.listener.entity;
 import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.model.ClaimInformation;
 import de.paul2708.claim.util.Utility;
-import org.bukkit.entity.Monster;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -23,9 +22,9 @@ public class EntityDamageByEntityListener implements Listener {
      */
     @EventHandler
     public void onDamage(EntityDamageByEntityEvent event) {
-        if (event.getDamager() instanceof Player) {
-            Player player = (Player) event.getDamager();
+        Player player = getDamager(event.getDamager());
 
+        if (player != null) {
             if (Utility.hasBypass(player)) {
                 return;
             }
@@ -40,5 +39,25 @@ public class EntityDamageByEntityListener implements Listener {
                 player.sendMessage(ClaimPlugin.PREFIX + "§CDu kannst hier keine Mobs töten.");
             }
         }
+    }
+
+    /**
+     * Get the damager by entity.
+     *
+     * @param entity entity damager
+     * @return player damager or <code>null</code> if it isn't a player
+     */
+    private Player getDamager(Entity entity) {
+        if (entity instanceof Player) {
+            return (Player) entity;
+        } else if (entity instanceof Projectile) {
+            Projectile projectile = (Projectile) entity;
+
+            if (projectile.getShooter() instanceof Player) {
+                return (Player) projectile.getShooter();
+            }
+        }
+
+        return null;
     }
 }
