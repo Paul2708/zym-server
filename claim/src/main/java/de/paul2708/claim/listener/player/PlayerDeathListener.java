@@ -1,15 +1,15 @@
 package de.paul2708.claim.listener.player;
 
+import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.item.ItemManager;
-import org.bukkit.Material;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This listener is called, if a player dies.
@@ -25,21 +25,22 @@ public class PlayerDeathListener implements Listener {
      */
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
-        List<ItemStack> list = new LinkedList<>();
-        Inventory inventory = event.getEntity().getInventory();
-        for (ItemStack itemStack : inventory) {
-            if (itemStack != null && !ItemManager.getInstance().isClaimer(itemStack)) {
-                list.add(itemStack);
+        Set<ItemStack> claimer = new HashSet<>();
+        for (ItemStack drop : event.getDrops()) {
+            if (ItemManager.getInstance().isClaimer(drop)) {
+                claimer.add(drop);
             }
         }
 
-        for (ItemStack itemStack : list) {
-            event.getEntity().getLocation().getWorld().dropItemNaturally(event.getEntity().getLocation(), itemStack);
-            inventory.remove(itemStack);
-        }
-        event.getEntity().getInventory().setArmorContents(new ItemStack[4]);
-        event.getEntity().getInventory().setItemInOffHand(new ItemStack(Material.AIR));
+        event.getDrops().removeAll(claimer);
 
-        event.setKeepInventory(true);
+        // Give claimer back
+        Bukkit.getScheduler().scheduleSyncDelayedTask(ClaimPlugin.getInstance(), () -> {
+            for (ItemStack itemStack : claimer) {
+                event.getEntity().getInventory().addItem(itemStack);
+            }
+
+            event.getEntity().updateInventory();
+        }, 10);
     }
 }
