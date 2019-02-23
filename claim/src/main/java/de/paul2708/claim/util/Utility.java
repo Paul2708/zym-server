@@ -179,7 +179,7 @@ public final class Utility {
      * @return true if the player has the bypass, otherwise false
      */
     public static boolean hasBypass(Player player) {
-        return player.isOp();
+        return player.hasMetadata("bypass");
     }
 
     /**
