@@ -3,8 +3,6 @@ package de.paul2708.claim.listener.player;
 import de.paul2708.claim.item.ItemManager;
 import de.paul2708.claim.model.ClaimInformation;
 import de.paul2708.claim.util.Utility;
-import org.bukkit.entity.ItemFrame;
-import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -26,23 +24,20 @@ public class PlayerInteractAtEntityListener implements Listener {
     public void onInteract(PlayerInteractEntityEvent event) {
         Player player = event.getPlayer();
 
-        // Handle frame
-        if (event.getRightClicked() instanceof Painting || event.getRightClicked() instanceof ItemFrame) {
+        if (ItemManager.getInstance().isClaimer(player.getInventory().getItemInMainHand())) {
+            event.setCancelled(true);
+
+            player.updateInventory();
+        } else {
             if (Utility.hasBypass(player)) {
                 return;
             }
 
             if (ClaimInformation.isClaimedByOthers(player, event.getRightClicked().getLocation().getChunk())) {
                 event.setCancelled(true);
+
+                player.updateInventory();
             }
-        }
-
-
-        // Handle claimer
-        if (ItemManager.getInstance().isClaimer(player.getInventory().getItemInMainHand())) {
-            event.setCancelled(true);
-
-            player.updateInventory();
         }
     }
 }
