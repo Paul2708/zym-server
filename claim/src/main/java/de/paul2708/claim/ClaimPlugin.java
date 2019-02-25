@@ -4,7 +4,7 @@ import de.paul2708.claim.command.ChunkCommand;
 import de.paul2708.claim.database.Database;
 import de.paul2708.claim.database.DatabaseException;
 import de.paul2708.claim.database.impl.JsonDatabase;
-import de.paul2708.claim.listener.PlayerJoinListener;
+import de.paul2708.claim.listener.player.PlayerJoinListener;
 import de.paul2708.claim.listener.block.*;
 import de.paul2708.claim.listener.block.hanging.HangingBreakListener;
 import de.paul2708.claim.listener.block.hanging.HangingPlaceListener;
@@ -13,6 +13,7 @@ import de.paul2708.claim.listener.entity.EntityExplodeListener;
 import de.paul2708.claim.listener.inventory.InventoryClickListener;
 import de.paul2708.claim.listener.item.CraftItemListener;
 import de.paul2708.claim.listener.player.*;
+import de.paul2708.claim.scoreboard.ScoreboardManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -87,6 +88,9 @@ public class ClaimPlugin extends JavaPlugin {
                 new PlayerDropItemListener(), new PlayerInteractAtEntityListener(), new PlayerMoveListener(),
                 new PlayerDeathListener(), new PlayerBucketEmptyListener(), new PlayerBucketFillListener(),
                 new PlayerLeashEntityListener());
+
+        // Create scoreboard
+        ScoreboardManager.getInstance().createScoreboard();
 
         // Register command
         getCommand("chunk").setExecutor(new ChunkCommand());

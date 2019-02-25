@@ -5,6 +5,7 @@ import de.paul2708.claim.command.SubCommand;
 import de.paul2708.claim.database.DatabaseException;
 import de.paul2708.claim.model.ChunkData;
 import de.paul2708.claim.model.ClaimInformation;
+import de.paul2708.claim.scoreboard.ScoreboardManager;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -48,6 +49,8 @@ public class UnClaimCommand extends SubCommand {
                     try {
                         information.updateChunk(chunkData, false);
                         ClaimPlugin.getInstance().getDatabase().updateClaimInformation(information.getUuid(), chunkData, false);
+
+                        ScoreboardManager.getInstance().update(player);
 
                         player.sendMessage(ClaimPlugin.PREFIX + "§6Der Chunk wurde entfernt.");
                     } catch (DatabaseException e) {

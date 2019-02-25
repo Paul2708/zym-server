@@ -7,6 +7,7 @@ import de.paul2708.claim.model.ChunkData;
 import de.paul2708.claim.model.ClaimInformation;
 import de.paul2708.claim.model.ClaimResponse;
 import de.paul2708.claim.item.ItemManager;
+import de.paul2708.claim.scoreboard.ScoreboardManager;
 import de.paul2708.claim.util.Utility;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -113,6 +114,8 @@ public class ClaimCommand extends SubCommand {
                     player.getInventory().setItem(index, replaced);
 
                     Utility.playEffect(player);
+
+                    ScoreboardManager.getInstance().update(player);
 
                     player.sendMessage(ClaimPlugin.PREFIX + "Du hast den Chunk §6erfolgreich §7geclaimed.");
 
