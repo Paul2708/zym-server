@@ -5,6 +5,8 @@ import de.paul2708.claim.command.SubCommand;
 import de.paul2708.claim.database.DatabaseException;
 import de.paul2708.claim.model.ChunkData;
 import de.paul2708.claim.model.ClaimInformation;
+import de.paul2708.claim.scoreboard.ScoreboardManager;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 /**
@@ -42,6 +44,12 @@ public class RemoveCommand extends SubCommand {
             try {
                 marked.updateChunk(chunkData, false);
                 ClaimPlugin.getInstance().getDatabase().updateClaimInformation(marked.getUuid(), chunkData, false);
+
+                // Update scoreboard
+                Player target = Bukkit.getPlayer(marked.getUuid());
+                if (target != null && target.isOnline()) {
+                    ScoreboardManager.getInstance().update(target);
+                }
 
                 player.sendMessage(ClaimPlugin.PREFIX + "§6Der Chunk wurde entfernt.");
             } catch (DatabaseException e) {
