@@ -1,10 +1,10 @@
 package de.paul2708.claim;
 
 import de.paul2708.claim.command.ChunkCommand;
+import de.paul2708.claim.command.LiveCommand;
 import de.paul2708.claim.database.Database;
 import de.paul2708.claim.database.DatabaseException;
 import de.paul2708.claim.database.impl.JsonDatabase;
-import de.paul2708.claim.listener.player.PlayerJoinListener;
 import de.paul2708.claim.listener.block.*;
 import de.paul2708.claim.listener.block.hanging.HangingBreakListener;
 import de.paul2708.claim.listener.block.hanging.HangingPlaceListener;
@@ -87,13 +87,14 @@ public class ClaimPlugin extends JavaPlugin {
         registerListener(new PlayerInteractListener(), new PlayerArmorStandManipulateListener(),
                 new PlayerDropItemListener(), new PlayerInteractAtEntityListener(), new PlayerMoveListener(),
                 new PlayerDeathListener(), new PlayerBucketEmptyListener(), new PlayerBucketFillListener(),
-                new PlayerLeashEntityListener());
+                new PlayerLeashEntityListener(), new PlayerQuitListener());
 
         // Create scoreboard
         ScoreboardManager.getInstance().createScoreboard();
 
         // Register command
         getCommand("chunk").setExecutor(new ChunkCommand());
+        getCommand("live").setExecutor(new LiveCommand());
     }
 
     /**

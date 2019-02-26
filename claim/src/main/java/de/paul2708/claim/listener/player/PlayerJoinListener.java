@@ -3,6 +3,7 @@ package de.paul2708.claim.listener.player;
 import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.database.DatabaseException;
 import de.paul2708.claim.scoreboard.ScoreboardManager;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -27,7 +28,12 @@ public class PlayerJoinListener implements Listener {
         try {
             ClaimPlugin.getInstance().getDatabase().create(player.getUniqueId());
 
-            ScoreboardManager.getInstance().update(player);
+            player.sendTitle("§cCommunity Attack", "", 20, 60, 20);
+
+            ScoreboardManager.getInstance().updateChunkCounter(player);
+            ScoreboardManager.getInstance().updateColors(player, false);
+
+            ScoreboardManager.getInstance().updateHeaderAndFooter(Bukkit.getOnlinePlayers().size());
         } catch (DatabaseException e) {
             e.printStackTrace();
 
