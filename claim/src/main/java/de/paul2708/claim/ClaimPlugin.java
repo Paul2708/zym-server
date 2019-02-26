@@ -10,6 +10,7 @@ import de.paul2708.claim.listener.block.hanging.HangingBreakListener;
 import de.paul2708.claim.listener.block.hanging.HangingPlaceListener;
 import de.paul2708.claim.listener.entity.EntityDamageByEntityListener;
 import de.paul2708.claim.listener.entity.EntityExplodeListener;
+import de.paul2708.claim.listener.entity.vehicle.VehicleDestroyListener;
 import de.paul2708.claim.listener.inventory.InventoryClickListener;
 import de.paul2708.claim.listener.item.CraftItemListener;
 import de.paul2708.claim.listener.player.*;
@@ -79,6 +80,8 @@ public class ClaimPlugin extends JavaPlugin {
         registerListener(new HangingPlaceListener(), new HangingBreakListener());
 
         registerListener(new EntityDamageByEntityListener(), new EntityExplodeListener());
+
+        registerListener(new VehicleDestroyListener());
 
         registerListener(new InventoryClickListener());
 
