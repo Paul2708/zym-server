@@ -23,13 +23,19 @@ public class BlockPistonListener implements Listener {
      */
     @EventHandler
     public void onExtend(BlockPistonExtendEvent event) {
+        ClaimInformation originInformation = ClaimInformation.get(event.getBlock().getChunk());
+
         for (Block block : event.getBlocks()) {
             BlockFace direction = event.getDirection();
             Location movedLocation = block.getLocation().clone().add(direction.getModX(), direction.getModY(),
                     direction.getModZ());
 
-            if (!ClaimInformation.hasSameOwner(event.getBlock().getChunk(), movedLocation.getChunk())) {
-                event.setCancelled(true);
+            if (ClaimInformation.isClaimed(movedLocation.getChunk())) {
+                ClaimInformation information = ClaimInformation.get(movedLocation.getChunk());
+
+                if (originInformation == null || !originInformation.getUuid().equals(information.getUuid())) {
+                    event.setCancelled(true);
+                }
             }
         }
     }
@@ -41,9 +47,15 @@ public class BlockPistonListener implements Listener {
      */
     @EventHandler
     public void onRetract(BlockPistonRetractEvent event) {
+        ClaimInformation originInformation = ClaimInformation.get(event.getBlock().getChunk());
+
         for (Block block : event.getBlocks()) {
-            if (!ClaimInformation.hasSameOwner(event.getBlock().getChunk(), block.getChunk())) {
-                event.setCancelled(true);
+            if (ClaimInformation.isClaimed(block.getChunk())) {
+                ClaimInformation information = ClaimInformation.get(block.getChunk());
+
+                if (originInformation == null || !originInformation.getUuid().equals(information.getUuid())) {
+                    event.setCancelled(true);
+                }
             }
         }
     }
