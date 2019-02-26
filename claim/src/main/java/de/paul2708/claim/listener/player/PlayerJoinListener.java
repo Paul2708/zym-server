@@ -3,6 +3,7 @@ package de.paul2708.claim.listener.player;
 import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.database.DatabaseException;
 import de.paul2708.claim.scoreboard.ScoreboardManager;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -28,6 +29,7 @@ public class PlayerJoinListener implements Listener {
             ClaimPlugin.getInstance().getDatabase().create(player.getUniqueId());
 
             ScoreboardManager.getInstance().update(player);
+            ScoreboardManager.getInstance().updateHeaderAndFooter(Bukkit.getOnlinePlayers().size());
         } catch (DatabaseException e) {
             e.printStackTrace();
 
