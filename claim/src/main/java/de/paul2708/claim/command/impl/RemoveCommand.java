@@ -48,7 +48,7 @@ public class RemoveCommand extends SubCommand {
                 // Update scoreboard
                 Player target = Bukkit.getPlayer(marked.getUuid());
                 if (target != null && target.isOnline()) {
-                    ScoreboardManager.getInstance().update(target);
+                    ScoreboardManager.getInstance().updateChunkCounter(target);
                 }
 
                 player.sendMessage(ClaimPlugin.PREFIX + "§6Der Chunk wurde entfernt.");

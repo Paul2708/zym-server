@@ -1,6 +1,7 @@
 package de.paul2708.claim;
 
 import de.paul2708.claim.command.ChunkCommand;
+import de.paul2708.claim.command.LiveCommand;
 import de.paul2708.claim.database.Database;
 import de.paul2708.claim.database.DatabaseException;
 import de.paul2708.claim.database.impl.JsonDatabase;
@@ -93,6 +94,7 @@ public class ClaimPlugin extends JavaPlugin {
 
         // Register command
         getCommand("chunk").setExecutor(new ChunkCommand());
+        getCommand("live").setExecutor(new LiveCommand());
     }
 
     /**

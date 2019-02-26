@@ -9,3 +9,5 @@ depend: [WorldGuard, WorldEdit]
 commands:
   chunk:
     description: Claim den aktuellen Chunk
+  live:
+    description: Setzte deinen Status auf Live

@@ -28,7 +28,11 @@ public class PlayerJoinListener implements Listener {
         try {
             ClaimPlugin.getInstance().getDatabase().create(player.getUniqueId());
 
-            ScoreboardManager.getInstance().update(player);
+            player.sendTitle("§cCommunity Attack", "", 20, 60, 20);
+
+            ScoreboardManager.getInstance().updateChunkCounter(player);
+            ScoreboardManager.getInstance().updateColors(player, false);
+
             ScoreboardManager.getInstance().updateHeaderAndFooter(Bukkit.getOnlinePlayers().size());
         } catch (DatabaseException e) {
             e.printStackTrace();

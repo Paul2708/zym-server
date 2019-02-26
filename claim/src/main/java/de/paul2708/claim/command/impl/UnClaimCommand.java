@@ -50,7 +50,7 @@ public class UnClaimCommand extends SubCommand {
                         information.updateChunk(chunkData, false);
                         ClaimPlugin.getInstance().getDatabase().updateClaimInformation(information.getUuid(), chunkData, false);
 
-                        ScoreboardManager.getInstance().update(player);
+                        ScoreboardManager.getInstance().updateChunkCounter(player);
 
                         player.sendMessage(ClaimPlugin.PREFIX + "§6Der Chunk wurde entfernt.");
                     } catch (DatabaseException e) {

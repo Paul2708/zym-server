@@ -115,7 +115,7 @@ public class ClaimCommand extends SubCommand {
 
                     Utility.playEffect(player);
 
-                    ScoreboardManager.getInstance().update(player);
+                    ScoreboardManager.getInstance().updateChunkCounter(player);
 
                     player.sendMessage(ClaimPlugin.PREFIX + "Du hast den Chunk §6erfolgreich §7geclaimed.");
 

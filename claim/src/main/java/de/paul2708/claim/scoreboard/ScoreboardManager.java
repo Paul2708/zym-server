@@ -26,6 +26,10 @@ public final class ScoreboardManager {
     private Objective objective;
 
     private Team adminTeam;
+    private Team userTeam;
+
+    private Team liveTeam;
+    private Team adminLiveTeam;
 
     /**
      * Create the scoreboard.
@@ -39,10 +43,10 @@ public final class ScoreboardManager {
             objective.unregister();
         }
 
-        this.adminTeam = scoreboard.getTeam("0-admin");
-        if (adminTeam != null) {
-            adminTeam.unregister();
-        }
+        this.unregisterTeam("0-admin");
+        this.unregisterTeam("1-admin_live");
+        this.unregisterTeam("2-live");
+        this.unregisterTeam("3-user");
 
         // Create object and teams
         this.objective = scoreboard.registerNewObjective("chunks", "dummy", "Chunks", RenderType.INTEGER);
@@ -50,6 +54,15 @@ public final class ScoreboardManager {
 
         this.adminTeam = scoreboard.registerNewTeam("0-admin");
         adminTeam.setColor(ChatColor.DARK_RED);
+
+        this.adminLiveTeam = scoreboard.registerNewTeam("1-admin_live");
+        adminLiveTeam.setColor(ChatColor.DARK_RED);
+        adminLiveTeam.setPrefix("§5[Live] ");
+
+        this.liveTeam = scoreboard.registerNewTeam("2-live");
+        liveTeam.setPrefix("§5[Live] ");
+
+        this.userTeam = scoreboard.registerNewTeam("3-user");
     }
 
     /**
@@ -74,24 +87,79 @@ public final class ScoreboardManager {
     }
 
     /**
-     * Update the scoreboard for a player. It will be set for everyone.
+     * Update the claimed chunks counter for a player.
      *
      * @param player player
      */
-    public void update(Player player) {
-        // Chunks in tab
+    public void updateChunkCounter(Player player) {
         objective.getScore(player.getName()).setScore(ClaimInformation.get(player.getUniqueId()).getChunks().size());
 
-        // Admin color
-        if (player.isOp()) {
-            if (adminTeam.hasEntry(player.getName())) {
-                adminTeam.removeEntry(player.getName());
-            }
+        player.setScoreboard(scoreboard);
+    }
 
-            adminTeam.addEntry(player.getName());
+    /**
+     * Update the tablist colors.
+     *
+     * @param player player
+     * @param liveStatus true if the player is live, otherwise false
+     */
+    public void updateColors(Player player, boolean liveStatus) {
+        removeEntry(adminLiveTeam, player.getName());
+        removeEntry(liveTeam, player.getName());
+
+        removeEntry(adminTeam, player.getName());
+        removeEntry(userTeam, player.getName());
+
+        if (liveStatus) {
+            if (player.isOp()) {
+                adminLiveTeam.addEntry(player.getName());
+            } else {
+                liveTeam.addEntry(player.getName());
+            }
+        } else {
+            if (player.isOp()) {
+                adminTeam.addEntry(player.getName());
+            } else {
+                userTeam.addEntry(player.getName());
+            }
         }
 
-        Bukkit.getOnlinePlayers().forEach(p -> p.setScoreboard(scoreboard));
+        player.setScoreboard(scoreboard);
+    }
+
+    /**
+     * Check if a player is already live.
+     *
+     * @param player player
+     * @return true if the player is live, otherwise false
+     */
+    public boolean isLive(Player player) {
+        return adminLiveTeam.hasEntry(player.getName()) || liveTeam.hasEntry(player.getName());
+    }
+
+    /**
+     * Remove the entry from the team, if the team contains the entry.
+     *
+     * @param team team
+     * @param entry entry to remove
+     */
+    private void removeEntry(Team team, String entry) {
+        if (team.hasEntry(entry)) {
+            team.removeEntry(entry);
+        }
+    }
+
+    /**
+     * Unregister the team.
+     *
+     * @param name team name
+     */
+    private void unregisterTeam(String name) {
+        Team team = scoreboard.getTeam(name);
+
+        if (team != null) {
+            team.unregister();
+        }
     }
 
     /**
