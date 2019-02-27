@@ -6,6 +6,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.metadata.FixedMetadataValue;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * This command is called, if a player wants to be teleported to a near player.
@@ -44,14 +47,28 @@ public class TeleportHelpCommand implements CommandExecutor {
                     return true;
                 }
 
-                double distance = player.getLocation().distance(target.getLocation());
-                if (distance > TeleportHelpCommand.DISTANCE) {
-                    player.sendMessage(ClaimPlugin.PREFIX + "§6" + target.getName() + " §7ist zu weit entfernt.");
-                    player.sendMessage(ClaimPlugin.PREFIX + "Der Spieler muss innerhalb 20 Blöcke sein.");
-                } else {
-                    player.teleport(target);
+                long lastTeleport = player.hasMetadata("teleport") ? player.getMetadata("teleport").get(0).asLong()
+                        : -1;
 
-                    player.sendMessage(ClaimPlugin.PREFIX + "Du wurdest teleportiert.");
+                if (lastTeleport == -1 || lastTeleport + TimeUnit.HOURS.toMillis(1) <= System.currentTimeMillis()) {
+                    double distance = player.getLocation().distance(target.getLocation());
+
+                    if (distance > TeleportHelpCommand.DISTANCE) {
+                        player.sendMessage(ClaimPlugin.PREFIX + "§6" + target.getName() + " §7ist zu weit entfernt.");
+                        player.sendMessage(ClaimPlugin.PREFIX + "Der Spieler muss innerhalb 20 Blöcke sein.");
+                    } else {
+                        player.teleport(target);
+
+                        player.removeMetadata("teleport", ClaimPlugin.getInstance());
+                        player.setMetadata("teleport", new FixedMetadataValue(ClaimPlugin.getInstance(),
+                                System.currentTimeMillis()));
+
+                        player.sendMessage(ClaimPlugin.PREFIX + "Du wurdest teleportiert.");
+                    }
+                } else {
+                    player.sendMessage(ClaimPlugin.PREFIX + "§cDu kannst dich erst wieder in "
+                            + (60 - TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - lastTeleport))
+                            + " Minuten teleportieren.");
                 }
             }
         } else {
