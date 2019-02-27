@@ -51,6 +51,11 @@ public class TeleportHelpCommand implements CommandExecutor {
                         : -1;
 
                 if (lastTeleport == -1 || lastTeleport + TimeUnit.HOURS.toMillis(1) <= System.currentTimeMillis()) {
+                    if (target.getWorld().getName().equals(player.getWorld().getName())) {
+                        player.sendMessage(ClaimPlugin.PREFIX + "Der Spieler befindet sich nicht in der gleichen Welt.");
+                        return true;
+                    }
+
                     double distance = player.getLocation().distance(target.getLocation());
 
                     if (distance > TeleportHelpCommand.DISTANCE) {
