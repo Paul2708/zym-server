@@ -100,14 +100,18 @@ public class ChunkCommand implements CommandExecutor, TabCompleter {
 
             if (args.length == 1) {
                 for (SubCommand subCommand : subCommands) {
-                    if (subCommand.getPermission().equals(SubCommand.NONE_PERMISSION) || player.isOp()
-                            || player.hasPermission(subCommand.getPermission())) {
-                        suggestions.add(subCommand.getName());
+                    if (subCommand.getName().startsWith(args[0])) {
+                        if (subCommand.getPermission().equals(SubCommand.NONE_PERMISSION) || player.isOp()
+                                || player.hasPermission(subCommand.getPermission())) {
+                            suggestions.add(subCommand.getName());
+                        }
                     }
                 }
             } else if (args.length > 1) {
                 for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                    suggestions.add(onlinePlayer.getName());
+                    if (onlinePlayer.getName().startsWith(args[args.length - 1])) {
+                        suggestions.add(onlinePlayer.getName());
+                    }
                 }
             }
 
