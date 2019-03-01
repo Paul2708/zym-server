@@ -9,6 +9,7 @@ Note: As the plugin has to be fast developed, the code is not as clean as it sho
 - griefing protection
 - claiming chunks in a freebuild world
 - higher prices for more chunks
+- custom tab list
 
 ## Usage
 ### Installation
@@ -51,6 +52,9 @@ This table shows the prices for the chunks.
 | /chunk unclaim    | Unclaim the current chunk.                        | /chunk unclaim             | none             |
 | /chunk remove     | Unclaim the current chunk even if it's not yours. | /chunk remove              | chunk.remove     |
 | /chunk giveclaimer| Give a claimer to a player.                       | /chunk giveclaimer [player]| chunk.giveclaimer|
+| /chunk version    | Print the current plugin version.                 | /chunk version             | chunk.version    |
+| /live             | Trigger the live status in the tab list.          | /live                      | none             |
+| /tphelp           | Teleport to a near player, if you are stucked.    | /tphelp                    | none             |
 
 ## Protection
 ### Global protection
