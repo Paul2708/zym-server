@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class RestartTimer {
 
-    private static final LocalTime RESTART_TIME = LocalTime.of(15, 30);
+    private static final LocalTime RESTART_TIME = LocalTime.MIDNIGHT;
 
     private ScheduledExecutorService executor;
 
