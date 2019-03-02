@@ -1,5 +1,6 @@
 package de.paul2708.restart;
 
+import de.paul2708.restart.timer.RestartTimer;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -10,6 +11,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class RestartPlugin extends JavaPlugin {
 
     private static RestartPlugin instance;
+
+    private RestartTimer timer;
 
     /**
      * Called, if the plugin is loaded.
@@ -24,7 +27,9 @@ public class RestartPlugin extends JavaPlugin {
      */
     @Override
     public void onEnable() {
+        this.timer = new RestartTimer();
 
+        this.timer.start();
     }
 
     /**
@@ -32,7 +37,7 @@ public class RestartPlugin extends JavaPlugin {
      */
     @Override
     public void onDisable() {
-
+        this.timer.stop();
     }
 
     /**
