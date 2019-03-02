@@ -30,7 +30,7 @@ public class EntityDamageByEntityListener implements Listener {
             }
 
             if (ClaimInformation.isClaimedByOthers(player, event.getEntity().getLocation().getChunk())) {
-                if (event.getEntity() instanceof Monster) {
+                if (event.getEntity() instanceof Monster || event.getEntity() instanceof Phantom) {
                     return;
                 }
 

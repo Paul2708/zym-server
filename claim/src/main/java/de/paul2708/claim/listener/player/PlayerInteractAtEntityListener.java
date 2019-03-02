@@ -4,6 +4,7 @@ import de.paul2708.claim.item.ItemManager;
 import de.paul2708.claim.model.ClaimInformation;
 import de.paul2708.claim.util.Utility;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -30,6 +31,11 @@ public class PlayerInteractAtEntityListener implements Listener {
             player.updateInventory();
         } else {
             if (Utility.hasBypass(player)) {
+                return;
+            }
+
+            // Bypass entities
+            if (event.getRightClicked() instanceof Vehicle) {
                 return;
             }
 

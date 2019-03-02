@@ -2,21 +2,21 @@ package de.paul2708.claim.command;
 
 import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.command.impl.*;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * This command executor handles the <code>chunk</code> command.
  *
  * @author Paul2708
  */
-public class ChunkCommand implements CommandExecutor {
+public class ChunkCommand implements CommandExecutor, TabCompleter {
 
     private List<SubCommand> subCommands;
 
@@ -80,5 +80,44 @@ public class ChunkCommand implements CommandExecutor {
         }
 
         return true;
+    }
+
+    /**
+     * Added sub command suggestion.
+     *
+     * @param sender command sender
+     * @param command command
+     * @param alias alias
+     * @param args arguments
+     * @return list of command suggestions
+     */
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+
+            List<String> suggestions = new LinkedList<>();
+
+            if (args.length == 1) {
+                for (SubCommand subCommand : subCommands) {
+                    if (subCommand.getName().startsWith(args[0])) {
+                        if (subCommand.getPermission().equals(SubCommand.NONE_PERMISSION) || player.isOp()
+                                || player.hasPermission(subCommand.getPermission())) {
+                            suggestions.add(subCommand.getName());
+                        }
+                    }
+                }
+            } else if (args.length > 1) {
+                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                    if (onlinePlayer.getName().startsWith(args[args.length - 1])) {
+                        suggestions.add(onlinePlayer.getName());
+                    }
+                }
+            }
+
+            return suggestions;
+        } else {
+            return Collections.emptyList();
+        }
     }
 }

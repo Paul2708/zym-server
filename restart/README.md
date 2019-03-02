@@ -1,19 +1,15 @@
-# Spawn - Elytra
-This spigot plugin provides an elytra at the spawn.
+# Restart
+This spigot plugin provides a timer, that will restart the server.
 
 ## Features
-- "one-time usable" elytra at the spawn
-- removing on death, landing and leaving
+- restart the server at midnight
+- no additional config files required
+- announcing restart and saving worlds
 
 ## Usage
 ### Installation
 1. Put the jar into your plugin folder and reload the server.
 2. Enjoy!
-
-### Locations
-- lower spawn: `NewWorld: 123.5, 69, 78.5`
-- upper spawn: `NewWorld: 126.5, 232, 75.5`
-- spawn area: from `NewWorld: 108, 220, 95` to `NewWorld: 141, 248, 61`
 
 ## Changelog
 The changelog can be found [here](CHANGELOG.md).

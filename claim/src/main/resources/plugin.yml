@@ -1,6 +1,6 @@
 name: Chunk-Claim
 author: Paul2708
-version: 0.2.1
+version: 1.0
 main: de.paul2708.claim.ClaimPlugin
 api-version: 1.13
 
@@ -11,3 +11,6 @@ commands:
     description: Claim den aktuellen Chunk
   live:
     description: Setzte deinen Status auf Live
+  tphelp:
+    description: Teleportiere dich zu einem Spieler in deiner Umgebung
+    aliases: [tphilfe, teleporthelp, teleporthilfe]

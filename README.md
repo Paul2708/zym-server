@@ -11,6 +11,7 @@ A detailed description of upcoming features can be found [here](https://docs.goo
 ## Plugins
 - [Claim-Plugin](/claim/): Protect chunks from griefing
 - [Elytra-Plugin](/elytra/): Get an elytra at the spawn
+- [Restart-Plugin](/elytra/): Restart the server at midnight
 
 ### Video
 Explanation by Clym: https://www.youtube.com/watch?v=fHIRHCWPx1Y

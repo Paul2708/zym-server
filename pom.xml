@@ -11,6 +11,7 @@
     <modules>
         <module>claim</module>
         <module>elytra</module>
+        <module>restart</module>
     </modules>
 
     <properties>

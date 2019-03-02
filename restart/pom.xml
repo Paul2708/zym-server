@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>zym-server-elytra</artifactId>
+    <artifactId>zym-server-restart</artifactId>
 
     <dependencies>
         <!-- Spigot API-->
@@ -30,7 +30,7 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
-                    <finalName>spawn-elytra</finalName>
+                    <finalName>restart</finalName>
                     <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
                 <executions>

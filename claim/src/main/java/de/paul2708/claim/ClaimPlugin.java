@@ -2,6 +2,7 @@ package de.paul2708.claim;
 
 import de.paul2708.claim.command.ChunkCommand;
 import de.paul2708.claim.command.LiveCommand;
+import de.paul2708.claim.command.TeleportHelpCommand;
 import de.paul2708.claim.database.Database;
 import de.paul2708.claim.database.DatabaseException;
 import de.paul2708.claim.database.impl.JsonDatabase;
@@ -10,6 +11,7 @@ import de.paul2708.claim.listener.block.hanging.HangingBreakListener;
 import de.paul2708.claim.listener.block.hanging.HangingPlaceListener;
 import de.paul2708.claim.listener.entity.EntityDamageByEntityListener;
 import de.paul2708.claim.listener.entity.EntityExplodeListener;
+import de.paul2708.claim.listener.entity.vehicle.VehicleDestroyListener;
 import de.paul2708.claim.listener.inventory.InventoryClickListener;
 import de.paul2708.claim.listener.item.CraftItemListener;
 import de.paul2708.claim.listener.player.*;
@@ -80,6 +82,8 @@ public class ClaimPlugin extends JavaPlugin {
 
         registerListener(new EntityDamageByEntityListener(), new EntityExplodeListener());
 
+        registerListener(new VehicleDestroyListener());
+
         registerListener(new InventoryClickListener());
 
         registerListener(new CraftItemListener());
@@ -95,6 +99,7 @@ public class ClaimPlugin extends JavaPlugin {
         // Register command
         getCommand("chunk").setExecutor(new ChunkCommand());
         getCommand("live").setExecutor(new LiveCommand());
+        getCommand("tphelp").setExecutor(new TeleportHelpCommand());
     }
 
     /**

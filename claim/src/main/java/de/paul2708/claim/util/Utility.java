@@ -194,11 +194,8 @@ public final class Utility {
 
 
         for (int i = 0; i < 3; i++) {
-            Bukkit.getScheduler().scheduleSyncDelayedTask(ClaimPlugin.getInstance(), new Runnable() {
-                @Override
-                public void run() {
-                    randomFirework(player);
-                }
+            Bukkit.getScheduler().scheduleSyncDelayedTask(ClaimPlugin.getInstance(), () -> {
+                randomFirework(player);
             }, i * 5L);
         }
     }
@@ -227,7 +224,7 @@ public final class Utility {
         Firework firework = player.getLocation().getWorld().spawn(player.getLocation(), Firework.class);
         FireworkMeta meta = firework.getFireworkMeta();
         meta.addEffect(builder.build());
-        meta.setPower(random.nextBoolean() ? 0 : 1);
+        meta.setPower(2);
         firework.setFireworkMeta(meta);
 
         return firework;
