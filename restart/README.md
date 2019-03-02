@@ -11,6 +11,9 @@ This spigot plugin provides a timer, that will restart the server.
 1. Put the jar into your plugin folder and reload the server.
 2. Enjoy!
 
+## Changelog
+The changelog can be found [here](CHANGELOG.md).
+
 ## Contact
 If you find any issues, please let me know!
 

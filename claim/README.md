@@ -71,6 +71,9 @@ This table shows the prices for the chunks.
 - cancel interacting on other chunks
 - and more...
 
+## Changelog
+The changelog can be found [here](CHANGELOG.md).
+
 ## Contact
 If you find any issues, please let me know!
 

@@ -15,6 +15,9 @@ This spigot plugin provides an elytra at the spawn.
 - upper spawn: `NewWorld: 126.5, 232, 75.5`
 - spawn area: from `NewWorld: 108, 220, 95` to `NewWorld: 141, 248, 61`
 
+## Changelog
+The changelog can be found [here](CHANGELOG.md).
+
 ## Contact
 If you find any issues, please let me know!
 

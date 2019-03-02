@@ -1,5 +1,5 @@
 name: Restart
 author: Paul2708
-version: 0.1
+version: 1.0
 main: de.paul2708.restart.RestartPlugin
 api-version: 1.13
