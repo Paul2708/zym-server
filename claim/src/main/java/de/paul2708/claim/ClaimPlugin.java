@@ -9,6 +9,7 @@ import de.paul2708.claim.database.impl.JsonDatabase;
 import de.paul2708.claim.listener.block.*;
 import de.paul2708.claim.listener.block.hanging.HangingBreakListener;
 import de.paul2708.claim.listener.block.hanging.HangingPlaceListener;
+import de.paul2708.claim.listener.entity.EntityBlockFormListener;
 import de.paul2708.claim.listener.entity.EntityDamageByEntityListener;
 import de.paul2708.claim.listener.entity.EntityExplodeListener;
 import de.paul2708.claim.listener.entity.vehicle.VehicleDestroyListener;
@@ -80,7 +81,7 @@ public class ClaimPlugin extends JavaPlugin {
 
         registerListener(new HangingPlaceListener(), new HangingBreakListener());
 
-        registerListener(new EntityDamageByEntityListener(), new EntityExplodeListener());
+        registerListener(new EntityDamageByEntityListener(), new EntityExplodeListener(), new EntityBlockFormListener());
 
         registerListener(new VehicleDestroyListener());
 
