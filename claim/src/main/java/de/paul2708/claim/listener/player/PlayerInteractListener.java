@@ -52,6 +52,7 @@ public class PlayerInteractListener implements Listener {
                 } else if (event.getItem() != null) {
                     switch (event.getItem().getType()) {
                         case BONE_MEAL:
+                        case ARMOR_STAND:
                             event.setCancelled(true);
                         default:
                             break;
