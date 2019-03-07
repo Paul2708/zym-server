@@ -12,6 +12,7 @@ import de.paul2708.claim.listener.block.hanging.HangingPlaceListener;
 import de.paul2708.claim.listener.entity.EntityBlockFormListener;
 import de.paul2708.claim.listener.entity.EntityDamageByEntityListener;
 import de.paul2708.claim.listener.entity.EntityExplodeListener;
+import de.paul2708.claim.listener.entity.creature.CreatureSpawnListener;
 import de.paul2708.claim.listener.entity.vehicle.VehicleDestroyListener;
 import de.paul2708.claim.listener.inventory.InventoryClickListener;
 import de.paul2708.claim.listener.item.CraftItemListener;
@@ -72,24 +73,26 @@ public class ClaimPlugin extends JavaPlugin {
             e.printStackTrace();
         }
 
-        // Register listener
-        registerListener(new PlayerJoinListener());
-
+        // Register all listener
+        // Block listener
         registerListener(new BlockBreakListener(), new BlockPlaceListener(), new BlockDamageListener(),
                 new StructureGrowListener(), new BlockFromToListener(), new BlockPistonListener(),
                 new BlockExplodeListener(), new BlockBurnListener(), new BlockIgniteListener());
 
+        // Entities listener
         registerListener(new HangingPlaceListener(), new HangingBreakListener());
 
         registerListener(new EntityDamageByEntityListener(), new EntityExplodeListener(), new EntityBlockFormListener());
 
-        registerListener(new VehicleDestroyListener());
+        registerListener(new VehicleDestroyListener(), new CreatureSpawnListener());
 
+        // Inventors listener
         registerListener(new InventoryClickListener());
 
         registerListener(new CraftItemListener());
 
-        registerListener(new PlayerInteractListener(), new PlayerArmorStandManipulateListener(),
+        // Player listener
+        registerListener(new PlayerJoinListener(), new PlayerInteractListener(), new PlayerArmorStandManipulateListener(),
                 new PlayerDropItemListener(), new PlayerInteractAtEntityListener(), new PlayerMoveListener(),
                 new PlayerDeathListener(), new PlayerBucketEmptyListener(), new PlayerBucketFillListener(),
                 new PlayerLeashEntityListener(), new PlayerQuitListener());
