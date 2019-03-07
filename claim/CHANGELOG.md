@@ -1,6 +1,8 @@
 # Changelog
 ### v1.3
 - Canceled to spawn wither
+- added whitelisted and blacklisted interactable items and blocks
+- added whitelisted items: birch button, birch pressure plate
 
 ### v1.2
 - Canceled frost walker on claimed chunks
