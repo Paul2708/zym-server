@@ -16,8 +16,9 @@ public class RestartRunnable implements Runnable {
     @Override
     public void run() {
         Bukkit.getScheduler().scheduleSyncDelayedTask(RestartPlugin.getInstance(), () -> {
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-                    "chat announce &c&lDer Server wird in einer Minute neu gestartet!");
+            Bukkit.broadcastMessage(" ");
+            Bukkit.broadcastMessage("§7[§6Community Attack§7] §c§lDer Server wird in einer Minute neu gestartet");
+            Bukkit.broadcastMessage(" ");
         });
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(RestartPlugin.getInstance(), () -> {

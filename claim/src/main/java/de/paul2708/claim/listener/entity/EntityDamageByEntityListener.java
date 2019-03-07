@@ -35,6 +35,7 @@ public class EntityDamageByEntityListener implements Listener {
                 }
 
                 event.setCancelled(true);
+                event.getEntity().setFireTicks(0);
 
                 player.sendMessage(ClaimPlugin.PREFIX + "§CDu kannst hier keine Mobs töten.");
             }
