@@ -20,7 +20,13 @@ import org.bukkit.event.player.PlayerInteractEvent;
 public class PlayerInteractListener implements Listener {
 
     private static final Material[] WHITELIST = new Material[] {
-            Material.ENDER_CHEST, Material.BIRCH_BUTTON, Material.BIRCH_PRESSURE_PLATE, Material.ENDER_PEARL
+            Material.ENDER_CHEST, Material.BIRCH_BUTTON, Material.BIRCH_PRESSURE_PLATE, Material.ENDER_PEARL,
+            Material.ENCHANTING_TABLE,
+            // Beds
+            Material.WHITE_BED, Material.ORANGE_BED, Material.MAGENTA_BED, Material.LIGHT_BLUE_BED, Material.YELLOW_BED,
+            Material.LIME_BED, Material.PINK_BED, Material.GRAY_BED, Material.LIGHT_GRAY_BED, Material.CYAN_BED,
+            Material.PURPLE_BED, Material.BLUE_BED, Material.BROWN_BED, Material.GREEN_BED, Material.RED_BED,
+            Material.BLACK_BED
     };
 
     private static final Material[] BLACKLIST = new Material[] {
@@ -57,17 +63,15 @@ public class PlayerInteractListener implements Listener {
 
         if (event.getAction() == Action.PHYSICAL) {
             if (ClaimInformation.isClaimedByOthers(player, chunk)) {
-                if (block == null || (!isWhitelisted(block.getType()) || isBlacklisted(block.getType()))) {
+                if (block == null || !isWhitelisted(block.getType())) {
                     event.setCancelled(true);
                 }
             }
         } else if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR) {
             if (ClaimInformation.isClaimedByOthers(player, chunk)) {
-
-                if (block != null && (!isWhitelisted(block.getType()) || isBlacklisted(block.getType()))) {
+                if (block != null && block.getType().isInteractable() && !isWhitelisted(block.getType())) {
                     event.setCancelled(true);
-                } else if (event.getItem() != null
-                        && (!isWhitelisted(event.getItem().getType()) || isBlacklisted(event.getItem().getType()))) {
+                } else if (event.getItem() != null && isBlacklisted(event.getItem().getType())) {
                     event.setCancelled(true);
                 }
             }
