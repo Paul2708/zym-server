@@ -12,6 +12,7 @@
         <module>claim</module>
         <module>elytra</module>
         <module>restart</module>
+        <module>database-transfer</module>
     </modules>
 
     <properties>
