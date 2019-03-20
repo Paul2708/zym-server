@@ -26,11 +26,19 @@ public interface Database {
     void setUp() throws DatabaseException;
 
     /**
-     * Get a list of all claim information.
+     * Resolve all relevant information from the database.
      *
      * @throws DatabaseException if an exception is thrown
      */
-    void resolveClaimInformation() throws DatabaseException;
+    void resolve() throws DatabaseException;
+
+    /**
+     * Create a new entry for the uuid.
+     *
+     * @param uuid player uuid
+     * @param result database result
+     */
+    void create(UUID uuid, DatabaseResult<Void> result);
 
     /**
      * Update the claim information for a player.
@@ -38,25 +46,49 @@ public interface Database {
      * @param uuid player uuid
      * @param chunk updated chunk
      * @param add true if the chunk will be added, otherwise false to remove it
-     * @throws DatabaseException if an exception is thrown
+     * @param result database result
      */
-    void updateClaimInformation(UUID uuid, ChunkData chunk, boolean add) throws DatabaseException;
+    void updateClaimedChunk(UUID uuid, ChunkData chunk, boolean add, DatabaseResult<Void> result);
 
     /**
-     * Save the player data.
+     * Update the amount of bought claimers.
      *
      * @param uuid player uuid
-     * @throws DatabaseException if an exception is thrown
+     * @param amount new amount of bought claimers
+     * @param result database result
      */
-    void save(UUID uuid) throws DatabaseException;
+    void updateClaimer(UUID uuid, int amount, DatabaseResult<Void> result);
 
     /**
-     * Create a new entry for the uuid.
+     * Update the group chunk by either claiming or removing.
      *
      * @param uuid player uuid
-     * @throws DatabaseException if an exception is thrown
+     * @param chunk updated chunk
+     * @param add true if the chunk will be added, otherwise false to remove it
+     * @param result database result
      */
-    void create(UUID uuid) throws DatabaseException;
+    void updateGroupChunk(UUID uuid, ChunkData chunk, boolean add, DatabaseResult<Void> result);
+
+    /**
+     * Update the city chunk by either claiming or removing.
+     *
+     * @param uuid player uuid
+     * @param chunk updated chunk
+     * @param add true if the chunk will be added, otherwise false to remove it
+     * @param interactable true if all players will be able to interact in it, otherwise false
+     * @param result database result
+     */
+    void updateCityChunk(UUID uuid, ChunkData chunk, boolean add, boolean interactable, DatabaseResult<Void> result);
+
+    /**
+     * Permit or remove permission for a target to interact on your group chunk.
+     *
+     * @param uuid player uuid
+     * @param chunk updated chunk
+     * @param target target uuid
+     * @param result database result
+     */
+    void updateAccess(UUID uuid, ChunkData chunk, UUID target, DatabaseResult<Void> result);
 
     /**
      * Disconnect from the database.
