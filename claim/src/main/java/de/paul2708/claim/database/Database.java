@@ -1,6 +1,6 @@
 package de.paul2708.claim.database;
 
-import de.paul2708.claim.model.ChunkData;
+import de.paul2708.claim.model.chunk.ChunkData;
 
 import java.util.UUID;
 
@@ -36,59 +36,72 @@ public interface Database {
      * Create a new entry for the uuid.
      *
      * @param uuid player uuid
-     * @param result database result
+     * @param result database result (inserted player id)
      */
-    void create(UUID uuid, DatabaseResult<Void> result);
+    void create(UUID uuid, DatabaseResult<Integer> result);
 
     /**
-     * Update the claim information for a player.
+     * Add a claimed chunk.
      *
-     * @param uuid player uuid
-     * @param chunk updated chunk
-     * @param add true if the chunk will be added, otherwise false to remove it
-     * @param result database result
+     * @param playerId player id
+     * @param chunk claimed chunk
+     * @param groupChunk true if the chunk is a group chunk, otherwise false
+     * @param result database result (inserted chunk id)
      */
-    void updateClaimedChunk(UUID uuid, ChunkData chunk, boolean add, DatabaseResult<Void> result);
+    void addClaimedChunk(int playerId, ChunkData chunk, boolean groupChunk, DatabaseResult<Integer> result);
 
     /**
-     * Update the amount of bought claimers.
+     * Remove a claimed chunk by its id.
      *
-     * @param uuid player uuid
+     * @param id chunk id
+     * @param result database result
+     */
+    void removeChunk(int id, DatabaseResult<Void> result);
+
+    /**
+     * Set the amount of bought claimers.
+     *
+     * @param playerId player uuid
      * @param amount new amount of bought claimers
      * @param result database result
      */
-    void updateClaimer(UUID uuid, int amount, DatabaseResult<Void> result);
+    void setClaimer(int playerId, int amount, DatabaseResult<Void> result);
 
     /**
-     * Update the group chunk by either claiming or removing.
+     * Add a city chunk.
      *
-     * @param uuid player uuid
+     * @param playerId player id
      * @param chunk updated chunk
-     * @param add true if the chunk will be added, otherwise false to remove it
-     * @param result database result
+     * @param interactable true if all players will be able to interact in it, otherwise false
+     * @param result database result (inserted city chunk id)
      */
-    void updateGroupChunk(UUID uuid, ChunkData chunk, boolean add, DatabaseResult<Void> result);
+    void addCityChunk(int playerId, ChunkData chunk, boolean interactable, DatabaseResult<Integer> result);
 
     /**
-     * Update the city chunk by either claiming or removing.
+     * Update a city chunk.
      *
-     * @param uuid player uuid
-     * @param chunk updated chunk
-     * @param add true if the chunk will be added, otherwise false to remove it
+     * @param id city chunk id
      * @param interactable true if all players will be able to interact in it, otherwise false
      * @param result database result
      */
-    void updateCityChunk(UUID uuid, ChunkData chunk, boolean add, boolean interactable, DatabaseResult<Void> result);
+    void updateCityChunk(int id, boolean interactable, DatabaseResult<Void> result);
 
     /**
-     * Permit or remove permission for a target to interact on your group chunk.
+     * Permit a target to interact on your group chunk.
      *
-     * @param uuid player uuid
-     * @param chunk updated chunk
-     * @param target target uuid
+     * @param playerId target id
+     * @param chunkId chunk id
      * @param result database result
      */
-    void updateAccess(UUID uuid, ChunkData chunk, UUID target, DatabaseResult<Void> result);
+    void addAccess(int playerId, int chunkId, DatabaseResult<Integer> result);
+
+    /**
+     * Remove an access.
+     *
+     * @param id access id
+     * @param result database result
+     */
+    void removeAccess(int id, DatabaseResult<Void> result);
 
     /**
      * Disconnect from the database.

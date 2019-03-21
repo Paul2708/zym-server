@@ -2,14 +2,10 @@ package de.paul2708.claim.command.impl;
 
 import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.command.SubCommand;
-import de.paul2708.claim.model.ChunkData;
-import de.paul2708.claim.model.ClaimInformation;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
+import de.paul2708.claim.model.chunk.ChunkData;
 import org.bukkit.entity.Player;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * This sub command is called, if a player wants more information about the current chunk.
@@ -37,7 +33,9 @@ public class OpInfoCommand extends SubCommand {
     public void execute(Player player, String[] args) {
         ChunkData chunkData = new ChunkData(player.getLocation().getChunk());
 
-        for (ClaimInformation information : ClaimInformation.getAll()) {
+        // TODO: Fix me
+
+        /*for (ClaimInformation information : ClaimInformation.getAll()) {
             if (information.contains(chunkData)) {
                 OfflinePlayer owner = Bukkit.getOfflinePlayer(information.getUuid());
                 String name = (owner == null || owner.getName() == null) ? "jemandem" : owner.getName();
@@ -70,7 +68,7 @@ public class OpInfoCommand extends SubCommand {
                     }
                 }
             }
-        }
+        }*/
 
         player.sendMessage(ClaimPlugin.PREFIX + "Der Chunk (§6" + chunkData.getX() + "§7, §6" + chunkData.getZ()
                 + "§7) ist frei.");

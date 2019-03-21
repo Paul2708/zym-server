@@ -1,7 +1,6 @@
 package de.paul2708.claim.listener.player;
 
-import de.paul2708.claim.model.ClaimInformation;
-import de.paul2708.claim.util.Utility;
+import de.paul2708.claim.model.ProfileManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,11 +22,7 @@ public class PlayerArmorStandManipulateListener implements Listener {
     public void onManipulate(PlayerArmorStandManipulateEvent event) {
         Player player = event.getPlayer();
 
-        if (Utility.hasBypass(player)) {
-            return;
-        }
-
-        if (ClaimInformation.isClaimedByOthers(player, event.getRightClicked().getLocation().getChunk())) {
+        if (!ProfileManager.getInstance().hasAccess(player, event.getRightClicked().getLocation().getChunk())) {
             event.setCancelled(true);
         }
     }

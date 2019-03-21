@@ -1,7 +1,6 @@
 package de.paul2708.claim.listener.block;
 
-import de.paul2708.claim.model.ClaimInformation;
-import de.paul2708.claim.util.Utility;
+import de.paul2708.claim.model.ProfileManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockDamageEvent;
@@ -20,11 +19,7 @@ public class BlockDamageListener implements Listener {
      */
     @EventHandler
     public void onDamage(BlockDamageEvent event) {
-        if (Utility.hasBypass(event.getPlayer())) {
-            return;
-        }
-
-        if (ClaimInformation.isClaimedByOthers(event.getPlayer(), event.getBlock().getChunk())) {
+        if (!ProfileManager.getInstance().hasAccess(event.getPlayer(), event.getBlock().getChunk())) {
             event.setCancelled(true);
         }
     }

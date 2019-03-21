@@ -1,7 +1,6 @@
 package de.paul2708.claim.listener.entity.vehicle;
 
-import de.paul2708.claim.model.ClaimInformation;
-import de.paul2708.claim.util.Utility;
+import de.paul2708.claim.model.ProfileManager;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -26,11 +25,7 @@ public class VehicleDestroyListener implements Listener {
         Player attacker = getAttacker(event.getAttacker());
 
         if (attacker != null) {
-            if (Utility.hasBypass(attacker)) {
-                return;
-            }
-
-            if (ClaimInformation.isClaimedByOthers(attacker, event.getVehicle().getLocation().getChunk())) {
+            if (!ProfileManager.getInstance().hasAccess(attacker, event.getVehicle().getLocation().getChunk())) {
                 event.setCancelled(true);
             }
         }

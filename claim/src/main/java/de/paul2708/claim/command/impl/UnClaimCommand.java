@@ -3,8 +3,10 @@ package de.paul2708.claim.command.impl;
 import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.command.SubCommand;
 import de.paul2708.claim.database.DatabaseException;
-import de.paul2708.claim.model.ChunkData;
-import de.paul2708.claim.model.ClaimInformation;
+import de.paul2708.claim.database.DatabaseResult;
+import de.paul2708.claim.model.ClaimProfile;
+import de.paul2708.claim.model.ProfileManager;
+import de.paul2708.claim.model.chunk.ChunkData;
 import de.paul2708.claim.scoreboard.ScoreboardManager;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -35,56 +37,66 @@ public class UnClaimCommand extends SubCommand {
      */
     @Override
     public void execute(Player player, String[] args) {
-        ClaimInformation information = ClaimInformation.get(player.getUniqueId());
-        ChunkData chunkData = new ChunkData(player.getLocation().getChunk());
+        ProfileManager manager = ProfileManager.getInstance();
+        ClaimProfile profile = manager.getProfile(player);
 
-        if (information != null && information.contains(chunkData)) {
-            if (args.length == 1) {
-                if (!player.hasMetadata("unclaim")) {
-                    return;
-                }
+        if (!profile.getClaimedChunks().contains(new ChunkData(player.getLocation().getChunk()))) {
+            player.sendMessage(ClaimPlugin.PREFIX + "§cDir gehört der Chunk nicht.");
+            return;
+        }
 
-                if (args[0].equals("confirm")) {
-                    // Unclaim the chunk
-                    try {
-                        information.updateChunk(chunkData, false);
-                        ClaimPlugin.getInstance().getDatabase().updateClaimInformation(information.getUuid(), chunkData, false);
+        if (args.length == 1) {
+            if (!player.hasMetadata("unclaim")) {
+                return;
+            }
+
+            if (args[0].equals("confirm")) {
+                // Unclaim the chunk
+                ChunkData chunkData = manager.getChunkData(player.getLocation().getChunk());
+
+                ClaimPlugin.getInstance().getDatabase().removeChunk(chunkData.getId(), new DatabaseResult<Void>() {
+
+                    @Override
+                    public void success(Void result) {
+                        profile.removeClaimedChunk(chunkData);
+                        manager.update(profile);
 
                         ScoreboardManager.getInstance().updateChunkCounter(player);
 
                         player.sendMessage(ClaimPlugin.PREFIX + "§6Der Chunk wurde entfernt.");
-                    } catch (DatabaseException e) {
-                        e.printStackTrace();
-
-                        player.sendMessage(ClaimPlugin.PREFIX + "§cDer Chunk konnte nicht entfernt werden.");
                     }
-                } else if (args[0].equals("cancel")) {
-                    player.sendMessage(ClaimPlugin.PREFIX + "Du hast den Vorgang abgebrochen.");
-                }
 
-                player.removeMetadata("unclaim", ClaimPlugin.getInstance());
-            } else {
-                player.sendMessage(ClaimPlugin.PREFIX + "§7Bist du dir §6sicher§7, dass du §6diesen Chunk §7unclaimen "
-                        + "willst?");
-                player.sendMessage(ClaimPlugin.PREFIX + "Hinweis: Du bekommst §c§lkeinen §7Claimer zurück.");
+                    @Override
+                    public void exception(DatabaseException exception) {
+                        player.sendMessage(ClaimPlugin.PREFIX + "§cEin Datenbank-Fehler ist aufgetreten.");
 
-                TextComponent yesMessage = new TextComponent("§a[Ja, ich will unclaimen]");
-                yesMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/chunk unclaim confirm"));
-                yesMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                        new ComponentBuilder("§7Unclaime den Chunk ohne Rückersttattung").create()));
-
-                TextComponent noMessage = new TextComponent("§c[Nein, ich breche ab]");
-                noMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/chunk unclaim cancel"));
-                noMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                        new ComponentBuilder("§7Breche den Vorgang ab").create()));
-
-                player.spigot().sendMessage(new ComponentBuilder(ClaimPlugin.PREFIX)
-                        .append(yesMessage).append("   ").append(noMessage).create());
-
-                player.setMetadata("unclaim", new FixedMetadataValue(ClaimPlugin.getInstance(), true));
+                        exception.printStackTrace();
+                    }
+                });
+            } else if (args[0].equals("cancel")) {
+                player.sendMessage(ClaimPlugin.PREFIX + "Du hast den Vorgang abgebrochen.");
             }
+
+            player.removeMetadata("unclaim", ClaimPlugin.getInstance());
         } else {
-            player.sendMessage(ClaimPlugin.PREFIX + "§cDir gehört der Chunk nicht.");
+            player.sendMessage(ClaimPlugin.PREFIX + "§7Bist du dir §6sicher§7, dass du §6diesen Chunk §7unclaimen "
+                    + "willst?");
+            player.sendMessage(ClaimPlugin.PREFIX + "Hinweis: Du bekommst §c§lkeinen §7Claimer zurück.");
+
+            TextComponent yesMessage = new TextComponent("§a[Ja, ich will unclaimen]");
+            yesMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/chunk unclaim confirm"));
+            yesMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                    new ComponentBuilder("§7Unclaime den Chunk ohne Rückersttattung").create()));
+
+            TextComponent noMessage = new TextComponent("§c[Nein, ich breche ab]");
+            noMessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/chunk unclaim cancel"));
+            noMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                    new ComponentBuilder("§7Breche den Vorgang ab").create()));
+
+            player.spigot().sendMessage(new ComponentBuilder(ClaimPlugin.PREFIX)
+                    .append(yesMessage).append("   ").append(noMessage).create());
+
+            player.setMetadata("unclaim", new FixedMetadataValue(ClaimPlugin.getInstance(), true));
         }
     }
 }

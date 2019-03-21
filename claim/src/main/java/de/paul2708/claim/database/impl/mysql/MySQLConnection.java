@@ -1,14 +1,9 @@
-package de.paul2708.claim.database.mysql;
+package de.paul2708.claim.database.impl.mysql;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.sql.*;
 import java.util.function.Consumer;
 
 /**
@@ -25,7 +20,6 @@ public class MySQLConnection {
     private final String database;
 
     private HikariDataSource dataSource;
-    private ExecutorService executor;
 
     /**
      * Create a new mysql database with host, port, username password and database.
@@ -42,8 +36,6 @@ public class MySQLConnection {
         this.userName = userName;
         this.password = password;
         this.database = database;
-
-        this.executor = Executors.newCachedThreadPool();
     }
 
     /**
@@ -80,7 +72,7 @@ public class MySQLConnection {
      */
     public void execute(String query, Object... objects) throws SQLException {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             setParameters(preparedStatement, objects);
 
             preparedStatement.executeUpdate();
@@ -88,57 +80,45 @@ public class MySQLConnection {
     }
 
     /**
-     * Execute a sql statement with <code>?</code> parameters asynchronous.
+     * Execute an update sql statement with <code>?</code> parameters and consume the generated id.
      *
-     * @param result handler that handles result and exception
+     * @param consumer consumer that consumes the generated id
      * @param query sql query
      * @param objects objects
+     * @throws SQLException if the execution produces any error (e.g. syntax errors)
      */
-    public void executeAsync(ConnectionResult<Void> result, String query, Object... objects) {
-        this.executor.execute(() -> {
-            try {
-                this.execute(query, objects);
-                result.success(null);
-            } catch (SQLException e) {
-                result.exception(e);
-            }
-        });
-    }
-
-    /**
-     * Query a sql statement with <code>?</code> parameters.
-     *
-     * @param resultSetConsumer consumer, that accepts the result set
-     * @param query sql query
-     * @param objects objects
-     * @throws SQLException if the query produces any error (e.g. syntax errors)
-     */
-    public void query(Consumer<ResultSet> resultSetConsumer, String query, Object... objects) throws SQLException {
+    public void execute(Consumer<Integer> consumer, String query, Object... objects) throws SQLException {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             setParameters(preparedStatement, objects);
 
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                resultSetConsumer.accept(resultSet);
+            preparedStatement.executeUpdate();
+
+            try (ResultSet keys = preparedStatement.getGeneratedKeys()) {
+                if (keys.next()) {
+                    consumer.accept(keys.getInt(1));
+                }
             }
         }
     }
 
     /**
-     * Query a sql statement with <code>?</code> parameters asynchronous.
+     * Query a sql statement with <code>?</code> parameters.
      *
-     * @param result handler that handles result and exception
+     * @param callback callback, that accepts the result set
      * @param query sql query
      * @param objects objects
+     * @throws SQLException if the query produces any error (e.g. syntax errors)
      */
-    public void queryAsync(ConnectionResult<ResultSet> result, String query, Object... objects) {
-        executor.execute(() -> {
-            try {
-                this.query(result::success, query, objects);
-            } catch (SQLException e) {
-                result.exception(e);
+    public void query(Callback callback, String query, Object... objects) throws SQLException {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            setParameters(preparedStatement, objects);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                callback.call(resultSet);
             }
-        });
+        }
     }
 
     /**

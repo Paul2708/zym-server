@@ -1,15 +1,6 @@
 package de.paul2708.claim.util;
 
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.protection.ApplicableRegionSet;
-import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import de.paul2708.claim.ClaimPlugin;
-import de.paul2708.claim.model.ChunkData;
-import de.paul2708.claim.model.ClaimInformation;
-import de.paul2708.claim.model.ClaimResponse;
 import org.bukkit.*;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
@@ -48,85 +39,6 @@ public final class Utility {
         }
 
         return Utility.PRICES.get(level);
-    }
-
-    /**
-     * Check if a player can claim a chunk.<br>
-     * A chunk can be claimed, if the chunk isn't claimed yet, if the chunks next to it is not claimed and there is
-     * no region.
-     *
-     * @param player player
-     * @param chunkData chunk to claim
-     * @return claim response
-     */
-    public static ClaimResponse canClaim(Player player, ChunkData chunkData) {
-        // Check chunk
-        for (ClaimInformation information : ClaimInformation.getAll()) {
-            if (information.contains(chunkData)) {
-                return ClaimResponse.ALREADY_CLAIMED;
-            }
-        }
-
-        // Check other chunks
-        for (ClaimInformation information : ClaimInformation.getAll()) {
-            if (information.getUuid().equals(player.getUniqueId())) {
-                continue;
-            }
-
-            for (ChunkData chunk : information.getChunks()) {
-                for (int x = -1; x <= 1; x++) {
-                    for (int z = -1; z <= 1; z++) {
-                        ChunkData nextChunk = new ChunkData(chunk.getX() + x, chunk.getZ() + z);
-
-                        if (chunkData.equals(nextChunk) && !hasChunkNextTo(player, chunkData)) {
-                            return ClaimResponse.BORDER;
-                        }
-                    }
-                }
-            }
-        }
-
-        // Check existing regions
-        RegionManager regionManager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(
-                BukkitAdapter.adapt(player.getWorld()));
-
-        Chunk chunk = player.getLocation().getChunk();
-        int bx = chunk.getX() << 4;
-        int bz = chunk.getZ() << 4;
-        BlockVector pt1 = new BlockVector(bx, 0, bz);
-        BlockVector pt2 = new BlockVector(bx + 15, 256, bz + 15);
-
-        ProtectedCuboidRegion region = new ProtectedCuboidRegion("ThisIsAnId", pt1, pt2);
-        ApplicableRegionSet regions = regionManager.getApplicableRegions(region);
-
-        if (regions.size() > 0) {
-            return ClaimResponse.REGION;
-        }
-
-        return ClaimResponse.CLAIMABLE;
-    }
-
-    /**
-     * Check if a player has the chunk next to it.
-     *
-     * @param player player
-     * @param chunkData chunk to check
-     * @return true if player owns it, otherwise false
-     */
-    private static boolean hasChunkNextTo(Player player, ChunkData chunkData) {
-        for (ChunkData chunk : ClaimInformation.get(player.getUniqueId()).getChunks()) {
-            for (int x = -1; x <= 1; x++) {
-                for (int z = -1; z <= 1; z++) {
-                    ChunkData nextChunk = new ChunkData(chunk.getX() + x, chunk.getZ() + z);
-
-                    if (chunkData.equals(nextChunk)) {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -173,16 +85,6 @@ public final class Utility {
     }
 
     /**
-     * Check if the player has a bypass.
-     *
-     * @param player player
-     * @return true if the player has the bypass, otherwise false
-     */
-    public static boolean hasBypass(Player player) {
-        return player.hasMetadata("bypass");
-    }
-
-    /**
      * Play an effect.
      *
      * @param player player
@@ -191,7 +93,6 @@ public final class Utility {
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
 
         player.sendTitle("§aChunk geclaimed.", "§7Viel Spaß beim Bauen!", 10, 100, 20);
-
 
         for (int i = 0; i < 3; i++) {
             Bukkit.getScheduler().scheduleSyncDelayedTask(ClaimPlugin.getInstance(), () -> {

@@ -1,8 +1,7 @@
 package de.paul2708.claim.listener.block;
 
 import de.paul2708.claim.ClaimPlugin;
-import de.paul2708.claim.model.ClaimInformation;
-import de.paul2708.claim.util.Utility;
+import de.paul2708.claim.model.ProfileManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -24,11 +23,7 @@ public class BlockPlaceListener implements Listener {
     public void onPlace(BlockPlaceEvent event) {
         Player player = event.getPlayer();
 
-        if (Utility.hasBypass(player)) {
-            return;
-        }
-
-        if (ClaimInformation.isClaimedByOthers(player, event.getBlock().getChunk())) {
+        if (!ProfileManager.getInstance().hasAccess(player, event.getBlock().getChunk())) {
             event.setCancelled(true);
 
             player.sendMessage(ClaimPlugin.PREFIX + "§CDu kannst nur auf deinen eigenen Chunks bauen.");

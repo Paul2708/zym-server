@@ -3,10 +3,12 @@ package de.paul2708.claim.command.impl;
 import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.command.SubCommand;
 import de.paul2708.claim.database.DatabaseException;
-import de.paul2708.claim.model.ChunkData;
-import de.paul2708.claim.model.ClaimInformation;
-import de.paul2708.claim.model.ClaimResponse;
+import de.paul2708.claim.database.DatabaseResult;
 import de.paul2708.claim.item.ItemManager;
+import de.paul2708.claim.model.ClaimProfile;
+import de.paul2708.claim.model.ClaimResponse;
+import de.paul2708.claim.model.ProfileManager;
+import de.paul2708.claim.model.chunk.ChunkData;
 import de.paul2708.claim.scoreboard.ScoreboardManager;
 import de.paul2708.claim.util.Utility;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -62,7 +64,9 @@ public class ClaimCommand extends SubCommand {
         }
 
         // Check chunk
-        ClaimResponse response = Utility.canClaim(player, new ChunkData(player.getLocation().getChunk()));
+        ChunkData chunkData = new ChunkData(player.getLocation().getChunk());
+
+        ClaimResponse response = ProfileManager.getInstance().canClaim(player, chunkData);
         switch (response) {
             case ALREADY_CLAIMED:
                 player.sendMessage(ClaimPlugin.PREFIX + "§cDer Chunk wurde bereits geclaimed.");
@@ -87,46 +91,58 @@ public class ClaimCommand extends SubCommand {
 
             if (args[0].equals("confirm")) {
                 // Claim the chunk
-                try {
-                    ClaimPlugin.getInstance().getDatabase().updateClaimInformation(player.getUniqueId(),
-                            new ChunkData(player.getLocation().getChunk()), true);
+                ClaimProfile profile = ProfileManager.getInstance().getProfile(player);
 
-                    int index = -1;
-                    ItemStack replaced = null;
+                ClaimPlugin.getInstance().getDatabase().addClaimedChunk(profile.getId(), chunkData, false,
+                        new DatabaseResult<Integer>() {
 
-                    for (int i = 0; i < player.getInventory().getSize(); i++) {
-                        ItemStack itemStack = player.getInventory().getItem(i);
+                            @Override
+                            public void success(Integer result) {
+                                // Set id
+                                chunkData.setId(result);
+                                profile.addClaimedChunk(chunkData);
 
-                        if (ItemManager.getInstance().ownsClaimer(player.getUniqueId(), itemStack)) {
-                            index = i;
+                                // Remove items
+                                int index = -1;
+                                ItemStack replaced = null;
 
-                            if (itemStack.getAmount() == 1) {
-                                replaced = new ItemStack(Material.AIR);
-                            } else {
-                                replaced = itemStack.clone();
-                                replaced.setAmount(itemStack.getAmount() - 1);
+                                for (int i = 0; i < player.getInventory().getSize(); i++) {
+                                    ItemStack itemStack = player.getInventory().getItem(i);
+
+                                    if (ItemManager.getInstance().ownsClaimer(player.getUniqueId(), itemStack)) {
+                                        index = i;
+
+                                        if (itemStack.getAmount() == 1) {
+                                            replaced = new ItemStack(Material.AIR);
+                                        } else {
+                                            replaced = itemStack.clone();
+                                            replaced.setAmount(itemStack.getAmount() - 1);
+                                        }
+
+                                        break;
+                                    }
+                                }
+
+                                player.getInventory().setItem(index, replaced);
+
+                                // Effects and announcement
+                                Utility.playEffect(player);
+
+                                ScoreboardManager.getInstance().updateChunkCounter(player);
+
+                                player.sendMessage(ClaimPlugin.PREFIX + "Du hast den Chunk §6erfolgreich §7geclaimed.");
+
+                                Bukkit.broadcastMessage(ClaimPlugin.PREFIX + "§a§l" + player.getName()
+                                        + " §7hat seinen §e" + profile.getClaimedChunks().size()
+                                        + ". Chunk §7geclaimed!");
                             }
 
-                            break;
+                            @Override
+                            public void exception(DatabaseException exception) {
+                                player.sendMessage(ClaimPlugin.PREFIX + "§cEin Datenbank-Fehler ist aufgetreten.");
+                            }
                         }
-                    }
-
-                    player.getInventory().setItem(index, replaced);
-
-                    Utility.playEffect(player);
-
-                    ScoreboardManager.getInstance().updateChunkCounter(player);
-
-                    player.sendMessage(ClaimPlugin.PREFIX + "Du hast den Chunk §6erfolgreich §7geclaimed.");
-
-                    Bukkit.broadcastMessage(ClaimPlugin.PREFIX + "§a§l" + player.getName()
-                            + " §7hat seinen §e" + ClaimInformation.get(player.getUniqueId()).getChunks().size()
-                            + ". Chunk §7geclaimed!");
-                } catch (DatabaseException e) {
-                    e.printStackTrace();
-
-                    player.sendMessage(ClaimPlugin.PREFIX + "§cEin Datenbank-Fehler ist aufgetreten...");
-                }
+                );
             } else if (args[0].equals("cancel")) {
                 player.sendMessage(ClaimPlugin.PREFIX + "Du hast den Vorgang abgebrochen.");
             }

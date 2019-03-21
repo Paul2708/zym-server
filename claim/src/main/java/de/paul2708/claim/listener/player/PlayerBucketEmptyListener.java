@@ -1,11 +1,9 @@
 package de.paul2708.claim.listener.player;
 
-import de.paul2708.claim.model.ClaimInformation;
-import de.paul2708.claim.util.Utility;
+import de.paul2708.claim.model.ProfileManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 
 /**
@@ -24,11 +22,7 @@ public class PlayerBucketEmptyListener implements Listener {
     public void onEmpty(PlayerBucketEmptyEvent event) {
         Player player = event.getPlayer();
 
-        if (Utility.hasBypass(player)) {
-            return;
-        }
-
-        if (ClaimInformation.isClaimedByOthers(player, event.getBlockClicked().getChunk())) {
+        if (!ProfileManager.getInstance().hasAccess(player, event.getBlockClicked().getChunk())) {
             event.setCancelled(true);
         }
     }

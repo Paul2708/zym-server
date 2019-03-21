@@ -2,8 +2,10 @@ package de.paul2708.claim.listener.inventory;
 
 import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.database.DatabaseException;
-import de.paul2708.claim.model.ClaimInformation;
+import de.paul2708.claim.database.DatabaseResult;
 import de.paul2708.claim.item.ItemManager;
+import de.paul2708.claim.model.ClaimProfile;
+import de.paul2708.claim.model.ProfileManager;
 import de.paul2708.claim.util.Utility;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -38,8 +40,9 @@ public class InventoryClickListener implements Listener {
                 event.setCancelled(true);
 
                 if (ItemManager.getInstance().isClaimer(event.getCurrentItem())) {
-                    ClaimInformation information = ClaimInformation.get(player.getUniqueId());
-                    int price = Utility.getPrice(information.getBuyLevel());
+                    ClaimProfile profile = ProfileManager.getInstance().getProfile(player);
+
+                    int price = Utility.getPrice(profile.getClaimer());
                     int count = Utility.count(player, Material.DIAMOND);
 
                     if (count < price) {
@@ -50,29 +53,36 @@ public class InventoryClickListener implements Listener {
                     }
 
                     // Remove items and buy the claimer
-                    information.addLevel();
+                    ClaimPlugin.getInstance().getDatabase().setClaimer(profile.getId(), profile.getClaimer() + 1,
+                            new DatabaseResult<Void>() {
 
-                    try {
-                        ClaimPlugin.getInstance().getDatabase().save(player.getUniqueId());
-                    } catch (DatabaseException e) {
-                        player.sendMessage(ClaimPlugin.PREFIX + "§cEin Fehler ist aufgetreten...");
-                        player.closeInventory();
+                        @Override
+                        public void success(Void result) {
+                            // Update claimer
+                            profile.setClaimer(profile.getClaimer() + 1);
 
-                        e.printStackTrace();
-                        return;
-                    }
+                            // Remove items and give claimer
+                            Utility.removeItems(player, Material.DIAMOND, price);
 
-                    Utility.removeItems(player, Material.DIAMOND, price);
+                            ItemStack claimer = ItemManager.getInstance().buildClaimer(player);
+                            if (player.getInventory().firstEmpty() == -1) {
+                                player.getWorld().dropItemNaturally(player.getLocation(), claimer);
+                            } else {
+                                player.getInventory().addItem(claimer);
+                            }
 
-                    ItemStack claimer = ItemManager.getInstance().buildClaimer(player);
-                    if (player.getInventory().firstEmpty() == -1) {
-                        player.getWorld().dropItemNaturally(player.getLocation(), claimer);
-                    } else {
-                        player.getInventory().addItem(claimer);
-                    }
+                            player.sendMessage(ClaimPlugin.PREFIX + "Du hast dir einen §6Claimer §7gekauft.");
+                            player.closeInventory();
+                        }
 
-                    player.sendMessage(ClaimPlugin.PREFIX + "Du hast dir einen §6Claimer §7gekauft.");
-                    player.closeInventory();
+                        @Override
+                        public void exception(DatabaseException exception) {
+                            player.sendMessage(ClaimPlugin.PREFIX + "§cEin Datenbank-Fehler ist aufgetreten.");
+                            player.closeInventory();
+
+                            exception.printStackTrace();
+                        }
+                    });
                 }
             }
         }

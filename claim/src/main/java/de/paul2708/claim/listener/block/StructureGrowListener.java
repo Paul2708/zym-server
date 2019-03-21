@@ -1,7 +1,6 @@
 package de.paul2708.claim.listener.block;
 
-import de.paul2708.claim.model.ClaimInformation;
-import org.bukkit.Bukkit;
+import de.paul2708.claim.model.ProfileManager;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 import org.bukkit.event.EventHandler;
@@ -53,13 +52,10 @@ public class StructureGrowListener implements Listener {
         }
 
         if (origin != null) {
-            ClaimInformation originInformation = ClaimInformation.get(origin.getChunk());
-
             for (BlockState block : event.getBlocks()) {
-                if (ClaimInformation.isClaimed(block.getChunk())) {
-                    ClaimInformation information = ClaimInformation.get(block.getChunk());
-
-                    if (originInformation == null || !originInformation.getUuid().equals(information.getUuid())) {
+                if (ProfileManager.getInstance().isClaimed(block.getChunk())) {
+                    if (!ProfileManager.getInstance().isClaimed(origin.getChunk())
+                            || ProfileManager.getInstance().hasSameOwner(origin.getChunk(), block.getChunk())) {
                         block.setType(Material.AIR);
                     }
                 }

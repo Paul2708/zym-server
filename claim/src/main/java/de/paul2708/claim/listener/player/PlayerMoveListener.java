@@ -1,9 +1,9 @@
 package de.paul2708.claim.listener.player;
 
-import de.paul2708.claim.ClaimPlugin;
-import de.paul2708.claim.model.ChunkData;
-import de.paul2708.claim.model.ClaimInformation;
 import de.paul2708.claim.item.ItemManager;
+import de.paul2708.claim.model.ProfileManager;
+import de.paul2708.claim.model.chunk.ChunkData;
+import de.paul2708.claim.model.chunk.CityChunk;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
@@ -13,6 +13,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.util.Vector;
+
+import java.util.UUID;
 
 /**
  * This listener is called, if a player moves.
@@ -30,11 +32,6 @@ public class PlayerMoveListener implements Listener {
     public void onMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
 
-        if (!event.getFrom().getChunk().getWorld().getName().equals(ClaimPlugin.MAIN_WORLD)
-                || !event.getTo().getChunk().getWorld().getName().equals(ClaimPlugin.MAIN_WORLD)) {
-            return;
-        }
-
         ChunkData fromChunk = new ChunkData(event.getFrom().getChunk());
         ChunkData toChunk = new ChunkData(event.getTo().getChunk());
 
@@ -42,28 +39,29 @@ public class PlayerMoveListener implements Listener {
             this.drawBorder(event.getPlayer());
         }
 
-        if (fromChunk.equals(toChunk) || sameType(fromChunk, toChunk)) {
+        if (fromChunk.equals(toChunk) || sameType(event.getFrom().getChunk(), event.getTo().getChunk())) {
             return;
         }
 
-        for (ClaimInformation information : ClaimInformation.getAll()) {
-            if (information.getChunks().contains(toChunk)) {
-                OfflinePlayer owner = Bukkit.getOfflinePlayer(information.getUuid());
-                String name;
-                if (owner == null || owner.getName() == null || owner.getName().equals("null")) {
-                    name = "jemandem";
-                } else {
-                    name = owner.getName();
-                }
+        UUID uuid = ProfileManager.getInstance().getOwner(event.getTo().getChunk());
+        String message;
 
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                        TextComponent.fromLegacyText("§7Chunk von §6" + name));
-                return;
+        if (uuid == null) {
+            message = "§7Unclaimed Chunk";
+        } else {
+            if (uuid.equals(CityChunk.OWNER)) {
+                message = "§6Stadt-Chunk";
+            } else {
+                OfflinePlayer owner = Bukkit.getOfflinePlayer(uuid);
+                if (owner == null || owner.getName() == null || owner.getName().equals("null")) {
+                    message = "§7Chunk von §6jemandem";
+                } else {
+                    message = "§7Chunk von §6" + owner.getName();
+                }
             }
         }
 
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                TextComponent.fromLegacyText("§7Unclaimed Chunk"));
+        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
     }
 
     /**
@@ -73,25 +71,20 @@ public class PlayerMoveListener implements Listener {
      * @param to to chunk
      * @return true if the types are the same, otherwise false
      */
-    private boolean sameType(ChunkData from, ChunkData to) {
-        boolean fromFree = true;
-        boolean toFree = true;
+    private boolean sameType(Chunk from, Chunk to) {
+        ProfileManager manager = ProfileManager.getInstance();
 
-        for (ClaimInformation information : ClaimInformation.getAll()) {
-            if (information.contains(from)) {
-                fromFree = false;
-            }
-            if (information.contains(to)) {
-                toFree = false;
-            }
-
-            if (information.contains(from) && information.contains(to)) {
-                return true;
-            }
+        // Both chunks unclaimed
+        if (!manager.isClaimed(from) && !manager.isClaimed(to)) {
+            return true;
         }
 
-        return fromFree && toFree;
+        // Same owner
+        if (manager.hasSameOwner(from, to)) {
+            return true;
+        }
 
+        return false;
     }
 
     /**
@@ -109,23 +102,24 @@ public class PlayerMoveListener implements Listener {
                 Block corner = playerChunk.getBlock(i, y - 3, j);
                 Block upper = playerChunk.getBlock(i, y + 10, j);
 
-                this.drawLine(corner, upper);
+                this.drawLine(player, corner, upper);
             }
         }
 
-        this.drawLine(playerChunk.getBlock(0, y + 10, 0), playerChunk.getBlock(0, y + 10, 15));
-        this.drawLine(playerChunk.getBlock(0, y + 10, 0), playerChunk.getBlock(15, y + 10, 0));
-        this.drawLine(playerChunk.getBlock(15, y + 10, 15), playerChunk.getBlock(0, y + 10, 15));
-        this.drawLine(playerChunk.getBlock(15, y + 10, 15), playerChunk.getBlock(15, y + 10, 0));
+        this.drawLine(player, playerChunk.getBlock(0, y + 10, 0), playerChunk.getBlock(0, y + 10, 15));
+        this.drawLine(player, playerChunk.getBlock(0, y + 10, 0), playerChunk.getBlock(15, y + 10, 0));
+        this.drawLine(player, playerChunk.getBlock(15, y + 10, 15), playerChunk.getBlock(0, y + 10, 15));
+        this.drawLine(player, playerChunk.getBlock(15, y + 10, 15), playerChunk.getBlock(15, y + 10, 0));
     }
 
     /**
      * Draw a line from a block to another.
      *
+     * @param player player
      * @param first first block
      * @param second second block
      */
-    private void drawLine(Block first, Block second) {
+    private void drawLine(Player player, Block first, Block second) {
         Location firstLocation = first.getLocation().clone();
 
         Vector vector = second.getLocation().toVector().subtract(firstLocation.toVector());
@@ -136,7 +130,7 @@ public class PlayerMoveListener implements Listener {
             firstLocation.add(vector);
 
             Particle.DustOptions options = new Particle.DustOptions(Color.BLUE, 0.75f);
-            first.getLocation().getWorld().spawnParticle(Particle.REDSTONE, firstLocation, 1, options);
+            player.spawnParticle(Particle.REDSTONE, firstLocation, 1, options);
             firstLocation.subtract(vector);
             vector.normalize();
         }

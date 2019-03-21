@@ -5,7 +5,11 @@ import de.paul2708.claim.command.LiveCommand;
 import de.paul2708.claim.command.TeleportHelpCommand;
 import de.paul2708.claim.database.Database;
 import de.paul2708.claim.database.DatabaseException;
-import de.paul2708.claim.database.impl.JsonDatabase;
+import de.paul2708.claim.database.impl.MySQLDatabase;
+import de.paul2708.claim.database.impl.mysql.MySQLConnection;
+import de.paul2708.claim.file.AbstractConfiguration;
+import de.paul2708.claim.file.InvalidValueException;
+import de.paul2708.claim.file.impl.MySQLConfiguration;
 import de.paul2708.claim.listener.block.*;
 import de.paul2708.claim.listener.block.hanging.HangingBreakListener;
 import de.paul2708.claim.listener.block.hanging.HangingPlaceListener;
@@ -19,7 +23,6 @@ import de.paul2708.claim.listener.item.CraftItemListener;
 import de.paul2708.claim.listener.player.*;
 import de.paul2708.claim.scoreboard.ScoreboardManager;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -57,20 +60,29 @@ public class ClaimPlugin extends JavaPlugin {
      */
     @Override
     public void onEnable() {
+        // Load files
+        AbstractConfiguration configuration = new MySQLConfiguration();
+
+        try {
+            configuration.load();
+        } catch (InvalidValueException e) {
+            e.printStackTrace();
+            return;
+        }
+
         // Setup the database
-        this.database = new JsonDatabase();
+        this.database = new MySQLDatabase(new MySQLConnection(configuration.get("host"),
+                configuration.get("port"), configuration.get("user"), configuration.get("password"),
+                configuration.get("database")));
 
         try {
             this.database.connect();
             this.database.setUp();
 
-            this.database.resolveClaimInformation();
-
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                this.database.create(player.getUniqueId());
-            }
+            this.database.resolve();
         } catch (DatabaseException e) {
             e.printStackTrace();
+            return;
         }
 
         // Register all listener

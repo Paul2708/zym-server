@@ -1,8 +1,9 @@
 package de.paul2708.claim.command.impl;
 
 import de.paul2708.claim.command.SubCommand;
-import de.paul2708.claim.model.ClaimInformation;
 import de.paul2708.claim.item.ItemManager;
+import de.paul2708.claim.model.ClaimProfile;
+import de.paul2708.claim.model.ProfileManager;
 import de.paul2708.claim.util.Utility;
 import org.bukkit.entity.Player;
 
@@ -28,8 +29,8 @@ public class BuyCommand extends SubCommand {
      */
     @Override
     public void execute(Player player, String[] args) {
-        ClaimInformation information = ClaimInformation.get(player.getUniqueId());
-        int price = Utility.getPrice(information.getBuyLevel());
+        ClaimProfile profile = ProfileManager.getInstance().getProfile(player);
+        int price = Utility.getPrice(profile.getClaimer());
 
         ItemManager.getInstance().openInventory(player, price);
     }

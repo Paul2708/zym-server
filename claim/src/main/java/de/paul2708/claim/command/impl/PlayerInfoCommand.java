@@ -2,14 +2,11 @@ package de.paul2708.claim.command.impl;
 
 import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.command.SubCommand;
-import de.paul2708.claim.model.ChunkData;
-import de.paul2708.claim.model.ClaimInformation;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * This sub command is called, if a player wants information about a player.
@@ -41,9 +38,11 @@ public class PlayerInfoCommand extends SubCommand {
             return;
         }
 
+        // TODO: Fix me
+
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(args[0]);
 
-        if (offlinePlayer == null || offlinePlayer.getUniqueId() == null
+        /*if (offlinePlayer == null || offlinePlayer.getUniqueId() == null
                 || ClaimInformation.get(offlinePlayer.getUniqueId()) == null) {
             player.sendMessage(ClaimPlugin.PREFIX + "Es konnten keine Informationen über §6" + args[0]
                     + " §7gefunden werden.");
@@ -55,6 +54,6 @@ public class PlayerInfoCommand extends SubCommand {
             for (ChunkData chunk : ClaimInformation.get(offlinePlayer.getUniqueId()).getChunks()) {
                 player.sendMessage(ClaimPlugin.PREFIX + "  - §6X = " + chunk.getX() + ", Z = " + chunk.getZ());
             }
-        }
+        }*/
     }
 }

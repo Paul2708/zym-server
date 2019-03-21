@@ -1,6 +1,6 @@
 package de.paul2708.claim.listener.entity;
 
-import de.paul2708.claim.model.ClaimInformation;
+import de.paul2708.claim.model.ProfileManager;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -23,7 +23,7 @@ public class EntityBlockFormListener implements Listener {
     public void onForm(EntityBlockFormEvent event) {
         if (event.getEntity() instanceof Player) {
             if (event.getNewState() != null && event.getNewState().getType() == Material.FROSTED_ICE) {
-                if (ClaimInformation.isClaimedByOthers((Player) event.getEntity(), event.getNewState().getChunk())) {
+                if (!ProfileManager.getInstance().hasAccess((Player) event.getEntity(), event.getNewState().getChunk())) {
                     event.setCancelled(true);
                 }
             }
