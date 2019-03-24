@@ -1,6 +1,6 @@
 package de.paul2708.claim.database;
 
-import de.paul2708.claim.model.chunk.ChunkData;
+import de.paul2708.claim.model.chunk.ChunkWrapper;
 
 import java.util.UUID;
 
@@ -48,7 +48,7 @@ public interface Database {
      * @param groupChunk true if the chunk is a group chunk, otherwise false
      * @param result database result (inserted chunk id)
      */
-    void addClaimedChunk(int playerId, ChunkData chunk, boolean groupChunk, DatabaseResult<Integer> result);
+    void addClaimedChunk(int playerId, ChunkWrapper chunk, boolean groupChunk, DatabaseResult<Integer> result);
 
     /**
      * Remove a claimed chunk by its id.
@@ -75,7 +75,7 @@ public interface Database {
      * @param interactable true if all players will be able to interact in it, otherwise false
      * @param result database result (inserted city chunk id)
      */
-    void addCityChunk(int playerId, ChunkData chunk, boolean interactable, DatabaseResult<Integer> result);
+    void addCityChunk(int playerId, ChunkWrapper chunk, boolean interactable, DatabaseResult<Integer> result);
 
     /**
      * Update a city chunk.

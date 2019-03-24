@@ -2,7 +2,7 @@ package de.paul2708.claim.listener.player;
 
 import de.paul2708.claim.item.ItemManager;
 import de.paul2708.claim.model.ProfileManager;
-import de.paul2708.claim.model.chunk.ChunkData;
+import de.paul2708.claim.model.chunk.ChunkWrapper;
 import de.paul2708.claim.model.chunk.CityChunk;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -24,7 +24,7 @@ import java.util.UUID;
 public class PlayerMoveListener implements Listener {
 
     /**
-     * Send information about the chunk and handle elytra stuff.
+     * Send information about the chunk.
      *
      * @param event player move event
      */
@@ -32,8 +32,8 @@ public class PlayerMoveListener implements Listener {
     public void onMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
 
-        ChunkData fromChunk = new ChunkData(event.getFrom().getChunk());
-        ChunkData toChunk = new ChunkData(event.getTo().getChunk());
+        ChunkWrapper fromChunk = new ChunkWrapper(event.getFrom().getChunk());
+        ChunkWrapper toChunk = new ChunkWrapper(event.getTo().getChunk());
 
         if (ItemManager.getInstance().isClaimer(event.getPlayer().getInventory().getItemInMainHand())) {
             this.drawBorder(event.getPlayer());
@@ -43,14 +43,14 @@ public class PlayerMoveListener implements Listener {
             return;
         }
 
-        UUID uuid = ProfileManager.getInstance().getOwner(event.getTo().getChunk());
+        UUID uuid = getOwner(event.getTo().getChunk());
         String message;
 
         if (uuid == null) {
             message = "§7Unclaimed Chunk";
         } else {
             if (uuid.equals(CityChunk.OWNER)) {
-                message = "§6Stadt-Chunk";
+                message = "§7Chunk von §6Stadt";
             } else {
                 OfflinePlayer owner = Bukkit.getOfflinePlayer(uuid);
                 if (owner == null || owner.getName() == null || owner.getName().equals("null")) {
@@ -62,6 +62,25 @@ public class PlayerMoveListener implements Listener {
         }
 
         player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
+    }
+
+    /**
+     * Get the owner by chunk.
+     *
+     * @param chunk chunk
+     * @return player uuid, city owner uuid, or null if the chunk is unclaimed
+     */
+    private UUID getOwner(Chunk chunk) {
+        switch (ProfileManager.getInstance().getClaimType(chunk)) {
+            case PLAYER:
+                return ProfileManager.getInstance().getProfile(chunk).getUuid();
+            case CITY:
+                return CityChunk.OWNER;
+            case UNCLAIMED:
+                return null;
+            default:
+                throw new IllegalStateException("Unsupported enum type");
+        }
     }
 
     /**

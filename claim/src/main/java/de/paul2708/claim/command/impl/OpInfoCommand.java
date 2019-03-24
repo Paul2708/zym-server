@@ -1,8 +1,6 @@
 package de.paul2708.claim.command.impl;
 
-import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.command.SubCommand;
-import de.paul2708.claim.model.chunk.ChunkData;
 import org.bukkit.entity.Player;
 
 import java.text.SimpleDateFormat;
@@ -31,10 +29,7 @@ public class OpInfoCommand extends SubCommand {
      */
     @Override
     public void execute(Player player, String[] args) {
-        ChunkData chunkData = new ChunkData(player.getLocation().getChunk());
-
         // TODO: Fix me
-
         /*for (ClaimInformation information : ClaimInformation.getAll()) {
             if (information.contains(chunkData)) {
                 OfflinePlayer owner = Bukkit.getOfflinePlayer(information.getUuid());
@@ -70,8 +65,8 @@ public class OpInfoCommand extends SubCommand {
             }
         }*/
 
-        player.sendMessage(ClaimPlugin.PREFIX + "Der Chunk (§6" + chunkData.getX() + "§7, §6" + chunkData.getZ()
-                + "§7) ist frei.");
+        //player.sendMessage(ClaimPlugin.PREFIX + "Der Chunk (§6" + chunkData.getX() + "§7, §6" + chunkData.getZ()
+        //        + "§7) ist frei.");
     }
 
 }

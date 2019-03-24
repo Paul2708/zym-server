@@ -9,6 +9,7 @@ import de.paul2708.claim.model.ClaimProfile;
 import de.paul2708.claim.model.ClaimResponse;
 import de.paul2708.claim.model.ProfileManager;
 import de.paul2708.claim.model.chunk.ChunkData;
+import de.paul2708.claim.model.chunk.ChunkWrapper;
 import de.paul2708.claim.scoreboard.ScoreboardManager;
 import de.paul2708.claim.util.Utility;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -59,14 +60,14 @@ public class ClaimCommand extends SubCommand {
 
         // Check world
         if (!player.getLocation().getChunk().getWorld().getName().equals(ClaimPlugin.MAIN_WORLD)) {
-            player.sendMessage(ClaimPlugin.PREFIX + "§cDerzeit kann man im Nether nicht claimen.");
+            player.sendMessage(ClaimPlugin.PREFIX + "§cMan kann im Nether nicht claimen.");
             return;
         }
 
         // Check chunk
-        ChunkData chunkData = new ChunkData(player.getLocation().getChunk());
+        ChunkWrapper chunkWrapper = new ChunkWrapper(player.getLocation().getChunk());
 
-        ClaimResponse response = ProfileManager.getInstance().canClaim(player, chunkData);
+        ClaimResponse response = ProfileManager.getInstance().canClaim(player, player.getLocation().getChunk());
         switch (response) {
             case ALREADY_CLAIMED:
                 player.sendMessage(ClaimPlugin.PREFIX + "§cDer Chunk wurde bereits geclaimed.");
@@ -93,12 +94,13 @@ public class ClaimCommand extends SubCommand {
                 // Claim the chunk
                 ClaimProfile profile = ProfileManager.getInstance().getProfile(player);
 
-                ClaimPlugin.getInstance().getDatabase().addClaimedChunk(profile.getId(), chunkData, false,
+                ClaimPlugin.getInstance().getDatabase().addClaimedChunk(profile.getId(), chunkWrapper, false,
                         new DatabaseResult<Integer>() {
 
                             @Override
                             public void success(Integer result) {
                                 // Set id
+                                ChunkData chunkData = new ChunkData(chunkWrapper, false);
                                 chunkData.setId(result);
                                 profile.addClaimedChunk(chunkData);
 

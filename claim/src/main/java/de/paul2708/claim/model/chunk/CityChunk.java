@@ -12,6 +12,11 @@ import java.util.UUID;
 public class CityChunk extends Identifier {
 
     /**
+     * Owner id.
+     */
+    public static final int OWNER_ID = 0;
+
+    /**
      * Owner uuid of city chunks.
      */
     public static final UUID OWNER = new UUID(0, 0);
@@ -27,6 +32,15 @@ public class CityChunk extends Identifier {
      */
     public CityChunk(ChunkData chunkData, boolean interactable) {
         this.chunkData = chunkData;
+        this.interactable = interactable;
+    }
+
+    /**
+     * Change the interactable state.
+     *
+     * @param interactable new state
+     */
+    public void setInteractable(boolean interactable) {
         this.interactable = interactable;
     }
 
@@ -49,7 +63,7 @@ public class CityChunk extends Identifier {
     }
 
     /**
-     * Check if two city chunks are equal.
+     * Two city chunks are equal, if their chunk data is equal.
      *
      * @param o object
      * @return true if the object is equal to the city chunk, otherwise false
@@ -65,10 +79,6 @@ public class CityChunk extends Identifier {
 
         CityChunk cityChunk = (CityChunk) o;
 
-        if (interactable != cityChunk.interactable) {
-            return false;
-        }
-
         return chunkData != null ? chunkData.equals(cityChunk.chunkData) : cityChunk.chunkData == null;
     }
 
@@ -79,8 +89,6 @@ public class CityChunk extends Identifier {
      */
     @Override
     public int hashCode() {
-        int result = chunkData != null ? chunkData.hashCode() : 0;
-        result = 31 * result + (interactable ? 1 : 0);
-        return result;
+        return chunkData != null ? chunkData.hashCode() : 0;
     }
 }

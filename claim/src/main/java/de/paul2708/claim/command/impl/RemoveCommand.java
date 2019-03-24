@@ -2,11 +2,13 @@ package de.paul2708.claim.command.impl;
 
 import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.command.SubCommand;
+import de.paul2708.claim.database.Database;
 import de.paul2708.claim.database.DatabaseException;
 import de.paul2708.claim.database.DatabaseResult;
 import de.paul2708.claim.model.ClaimProfile;
 import de.paul2708.claim.model.ProfileManager;
 import de.paul2708.claim.model.chunk.ChunkData;
+import de.paul2708.claim.model.chunk.CityChunk;
 import de.paul2708.claim.scoreboard.ScoreboardManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -35,42 +37,62 @@ public class RemoveCommand extends SubCommand {
     @Override
     public void execute(Player player, String[] args) {
         ProfileManager manager = ProfileManager.getInstance();
+        Database database = ClaimPlugin.getInstance().getDatabase();
         Chunk chunk = player.getLocation().getChunk();
 
-        if (!manager.isClaimed(chunk)) {
-            player.sendMessage(ClaimPlugin.PREFIX + "§cDer Chunk ist nicht geclaimed.");
-            return;
-        }
-
-        ChunkData chunkData = manager.getChunkData(chunk);
-
-        ClaimPlugin.getInstance().getDatabase().removeChunk(chunkData.getId(), new DatabaseResult<Void>() {
-
-            @Override
-            public void success(Void result) {
+        switch (manager.getClaimType(chunk)) {
+            case PLAYER:
                 ClaimProfile profile = manager.getProfile(chunk);
-                if (profile == null) {
-                    manager.removeCityChunk(chunkData.getId());
-                } else {
-                    profile.removeClaimedChunk(chunkData);
-                    manager.update(profile);
+                ChunkData chunkData = manager.getChunkData(chunk);
 
-                    // Update scoreboard
-                    Player target = Bukkit.getPlayer(profile.getUuid());
-                    if (target != null && target.isOnline()) {
-                        ScoreboardManager.getInstance().updateChunkCounter(target);
+                database.removeChunk(chunkData.getId(), new DatabaseResult<Void>() {
+
+                    @Override
+                    public void success(Void result) {
+                        profile.removeClaimedChunk(chunkData);
+
+                        // Update scoreboard
+                        Player target = Bukkit.getPlayer(profile.getUuid());
+                        if (target != null && target.isOnline()) {
+                            ScoreboardManager.getInstance().updateChunkCounter(target);
+                        }
+
+                        player.sendMessage(ClaimPlugin.PREFIX + "§6Der Chunk wurde entfernt.");
                     }
-                }
 
-                player.sendMessage(ClaimPlugin.PREFIX + "§6Der Chunk wurde entfernt.");
-            }
+                    @Override
+                    public void exception(DatabaseException exception) {
+                        player.sendMessage(ClaimPlugin.PREFIX + "§cEin Datenbank-Fehler ist aufgetreten.");
 
-            @Override
-            public void exception(DatabaseException exception) {
-                player.sendMessage(ClaimPlugin.PREFIX + "§cEin Datenbank-Fehler ist aufgetreten.");
+                        exception.printStackTrace();
+                    }
+                });
+                break;
+            case CITY:
+                CityChunk cityChunk = manager.getCityChunk(chunk);
 
-                exception.printStackTrace();
-            }
-        });
+                database.removeChunk(cityChunk.getChunkData().getId(), new DatabaseResult<Void>() {
+
+                    @Override
+                    public void success(Void result) {
+                        manager.removeCityChunk(cityChunk);
+
+                        player.sendMessage(ClaimPlugin.PREFIX + "§6Der Chunk wurde entfernt.");
+                    }
+
+                    @Override
+                    public void exception(DatabaseException exception) {
+                        player.sendMessage(ClaimPlugin.PREFIX + "§cEin Datenbank-Fehler ist aufgetreten.");
+
+                        exception.printStackTrace();
+                    }
+                });
+                break;
+            case UNCLAIMED:
+                player.sendMessage(ClaimPlugin.PREFIX + "§cDer Chunk ist nicht geclaimed.");
+                return;
+            default:
+                throw new IllegalStateException("Enum type not handled.");
+        }
     }
 }

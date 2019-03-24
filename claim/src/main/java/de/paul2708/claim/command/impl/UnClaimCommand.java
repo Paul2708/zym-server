@@ -7,6 +7,7 @@ import de.paul2708.claim.database.DatabaseResult;
 import de.paul2708.claim.model.ClaimProfile;
 import de.paul2708.claim.model.ProfileManager;
 import de.paul2708.claim.model.chunk.ChunkData;
+import de.paul2708.claim.model.chunk.ChunkWrapper;
 import de.paul2708.claim.scoreboard.ScoreboardManager;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -40,7 +41,16 @@ public class UnClaimCommand extends SubCommand {
         ProfileManager manager = ProfileManager.getInstance();
         ClaimProfile profile = manager.getProfile(player);
 
-        if (!profile.getClaimedChunks().contains(new ChunkData(player.getLocation().getChunk()))) {
+        ChunkWrapper wrapper = new ChunkWrapper(player.getLocation().getChunk());
+
+        boolean found = false;
+        for (ChunkData claimedChunk : profile.getClaimedChunks()) {
+            if (claimedChunk.getWrapper().equals(wrapper)) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
             player.sendMessage(ClaimPlugin.PREFIX + "§cDir gehört der Chunk nicht.");
             return;
         }
@@ -59,7 +69,6 @@ public class UnClaimCommand extends SubCommand {
                     @Override
                     public void success(Void result) {
                         profile.removeClaimedChunk(chunkData);
-                        manager.update(profile);
 
                         ScoreboardManager.getInstance().updateChunkCounter(player);
 

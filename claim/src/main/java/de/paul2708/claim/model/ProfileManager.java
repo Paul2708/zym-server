@@ -7,12 +7,14 @@ import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import de.paul2708.claim.model.chunk.ChunkData;
+import de.paul2708.claim.model.chunk.ChunkWrapper;
 import de.paul2708.claim.model.chunk.CityChunk;
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * This singleton holds information about every claimed chunk and its owner.
@@ -26,20 +28,12 @@ public final class ProfileManager {
     private Set<ClaimProfile> profiles;
     private Set<CityChunk> cityChunks;
 
-    private Map<UUID, ClaimProfile> profileMap;
-    private Map<ChunkData, ClaimProfile> chunkMap;
-    private Map<Chunk, ChunkData> chunkDataMap;
-
     /**
      * Create a new profile manager with empty sets.
      */
     private ProfileManager() {
         this.profiles = new HashSet<>();
         this.cityChunks = new HashSet<>();
-
-        this.profileMap = new HashMap<>();
-        this.chunkMap = new HashMap<>();
-        this.chunkDataMap = new HashMap<>();
     }
 
     /**
@@ -49,24 +43,6 @@ public final class ProfileManager {
      */
     public void addProfile(ClaimProfile profile) {
         profiles.add(profile);
-
-        this.profileMap.put(profile.getUuid(), profile);
-    }
-
-    /**
-     * Update the claim profile by updating hash maps.
-     *
-     * @param profile profile to update
-     */
-    public void update(ClaimProfile profile) {
-        for (ChunkData claimedChunk : profile.getClaimedChunks()) {
-            this.chunkMap.put(claimedChunk, profile);
-
-            Chunk chunk = Bukkit.getWorld(claimedChunk.getWorld()).getChunkAt(claimedChunk.getX(), claimedChunk.getZ());
-            this.chunkDataMap.put(chunk, claimedChunk);
-        }
-
-        this.profileMap.put(profile.getUuid(), profile);
     }
 
     /**
@@ -81,20 +57,10 @@ public final class ProfileManager {
     /**
      * Remove a city chunk.
      *
-     * @param chunkId chunk id
+     * @param cityChunk city chunk
      */
-    public void removeCityChunk(int chunkId) {
-        CityChunk marked = null;
-        for (CityChunk cityChunk : cityChunks) {
-            if (cityChunk.getChunkData().getId() == chunkId) {
-                marked = cityChunk;
-                break;
-            }
-        }
-
-        if (marked != null) {
-            cityChunks.remove(marked);
-        }
+    public void removeCityChunk(CityChunk cityChunk) {
+        cityChunks.remove(cityChunk);
     }
 
     /**
@@ -116,22 +82,20 @@ public final class ProfileManager {
             return true;
         }
 
-        ChunkData data = new ChunkData(chunk);
+        ChunkWrapper chunkWrapper = new ChunkWrapper(chunk);
 
         // Check claim profiles
         for (ClaimProfile profile : profiles) {
-            if (profile.getClaimedChunks().contains(data)) {
-                return profile.getUuid().equals(player.getUniqueId());
+            for (ChunkData claimedChunk : profile.getClaimedChunks()) {
+                if (claimedChunk.getWrapper().equals(chunkWrapper)) {
+                    return profile.getUuid().equals(player.getUniqueId());
+                }
             }
-        }
-        // Has access
-        if (getProfile(player).getAccess().contains(data)) {
-            return true;
         }
 
         // Check city chunk
         for (CityChunk cityChunk : cityChunks) {
-            if (cityChunk.getChunkData().equals(data)) {
+            if (cityChunk.getChunkData().getWrapper().equals(chunkWrapper)) {
                 return cityChunk.isInteractable();
             }
         }
@@ -145,18 +109,24 @@ public final class ProfileManager {
      * no region.
      *
      * @param player player
-     * @param chunkData chunk to claim
+     * @param chunk chunk to claim
      * @return claim response
      */
-    public ClaimResponse canClaim(Player player, ChunkData chunkData) {
+    public ClaimResponse canClaim(Player player, Chunk chunk) {
+        ChunkWrapper chunkWrapper = new ChunkWrapper(chunk);
+
         // Check chunk
         for (ClaimProfile profile : profiles) {
-            if (profile.getClaimedChunks().contains(chunkData)) {
-                return ClaimResponse.ALREADY_CLAIMED;
+            for (ChunkData claimedChunk : profile.getClaimedChunks()) {
+                if (claimedChunk.getWrapper().equals(chunkWrapper)) {
+                    return ClaimResponse.ALREADY_CLAIMED;
+                }
             }
         }
-        if (cityChunks.contains(chunkData)) {
-            return ClaimResponse.ALREADY_CLAIMED;
+        for (CityChunk cityChunk : cityChunks) {
+            if (cityChunk.getChunkData().getWrapper().equals(chunkWrapper)) {
+                return ClaimResponse.ALREADY_CLAIMED;
+            }
         }
 
         // Check other chunks
@@ -165,12 +135,14 @@ public final class ProfileManager {
                 continue;
             }
 
-            for (ChunkData chunk : profile.getClaimedChunks()) {
+            for (ChunkData chunkData : profile.getClaimedChunks()) {
                 for (int x = -1; x <= 1; x++) {
                     for (int z = -1; z <= 1; z++) {
-                        ChunkData nextChunk = new ChunkData(chunk.getWorld(), chunk.getX() + x, chunk.getZ() + z);
+                        ChunkWrapper chunkDataWrapper = chunkData.getWrapper();
+                        ChunkWrapper nextChunk = new ChunkWrapper(chunkDataWrapper.getWorld(),
+                                chunkDataWrapper.getX() + x, chunkDataWrapper.getZ() + z);
 
-                        if (chunkData.equals(nextChunk) && !hasChunkNextTo(player, chunkData)) {
+                        if (chunkWrapper.equals(nextChunk) && !hasChunkNextTo(player, chunk)) {
                             return ClaimResponse.BORDER;
                         }
                     }
@@ -182,7 +154,6 @@ public final class ProfileManager {
         RegionManager regionManager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(
                 BukkitAdapter.adapt(player.getWorld()));
 
-        Chunk chunk = player.getLocation().getChunk();
         int bx = chunk.getX() << 4;
         int bz = chunk.getZ() << 4;
         BlockVector pt1 = new BlockVector(bx, 0, bz);
@@ -202,16 +173,20 @@ public final class ProfileManager {
      * Check if a player has the chunk next to it.
      *
      * @param player player
-     * @param chunkData chunk to check
+     * @param chunk chunk to check
      * @return true if player owns it, otherwise false
      */
-    private boolean hasChunkNextTo(Player player, ChunkData chunkData) {
-        for (ChunkData chunk : getProfile(player).getClaimedChunks()) {
+    private boolean hasChunkNextTo(Player player, Chunk chunk) {
+        ChunkWrapper chunkWrapper = new ChunkWrapper(chunk);
+
+        for (ChunkData chunkData : getProfile(player).getClaimedChunks()) {
             for (int x = -1; x <= 1; x++) {
                 for (int z = -1; z <= 1; z++) {
-                    ChunkData nextChunk = new ChunkData(chunk.getWorld(), chunk.getX() + x, chunk.getZ() + z);
+                    ChunkWrapper chunkDataWrapper = chunkData.getWrapper();
+                    ChunkWrapper nextChunk = new ChunkWrapper(chunkDataWrapper.getWorld(), chunkDataWrapper.getX() + x,
+                            chunkDataWrapper.getZ() + z);
 
-                    if (chunkData.equals(nextChunk)) {
+                    if (chunkWrapper.equals(nextChunk)) {
                         return true;
                     }
                 }
@@ -229,59 +204,43 @@ public final class ProfileManager {
      * @return true if the chunks have the same owners, otherwise false
      */
     public boolean hasSameOwner(Chunk first, Chunk second) {
-        ChunkData firstChunkData = new ChunkData(first);
-        ChunkData secondChunkData = new ChunkData(second);
+        ChunkWrapper firstChunkWrapper = new ChunkWrapper(first);
+        ChunkWrapper secondChunkWrapper = new ChunkWrapper(second);
 
+        boolean firstChunk = false;
+        boolean secondChunk = false;
+
+        // Check same owner
         for (ClaimProfile profile : profiles) {
-            if (profile.getClaimedChunks().contains(firstChunkData) && profile.getClaimedChunks().contains(secondChunkData)) {
-                return true;
+            for (ChunkData claimedChunk : profile.getClaimedChunks()) {
+                if (claimedChunk.getWrapper().equals(firstChunkWrapper)) {
+                    firstChunk = true;
+                }
+                if (claimedChunk.getWrapper().equals(secondChunkWrapper)) {
+                    secondChunk = true;
+                }
             }
         }
-        if (cityChunks.contains(firstChunkData) && cityChunks.contains(secondChunkData)) {
+
+        if (firstChunk && secondChunk) {
+            return true;
+        }
+
+        // Check city chunks
+        for (CityChunk cityChunk : cityChunks) {
+            if (cityChunk.getChunkData().getWrapper().equals(firstChunkWrapper)) {
+                firstChunk = true;
+            }
+            if (cityChunk.getChunkData().getWrapper().equals(secondChunkWrapper)) {
+                secondChunk = true;
+            }
+        }
+
+        if (firstChunk && secondChunk) {
             return true;
         }
 
         return false;
-    }
-
-    /**
-     * Get the chunk data by chunk.
-     *
-     * @param chunk chunk
-     * @return chunk data
-     */
-    public ChunkData getChunkData(Chunk chunk) {
-        return chunkDataMap.get(chunk);
-    }
-
-    /**
-     * Check if a chunk is claimed - weather by player or city.
-     *
-     * @param chunk chunk
-     * @return true if the chunk is claimed, otherwise false
-     */
-    public boolean isClaimed(Chunk chunk) {
-        ChunkData chunkData = new ChunkData(chunk);
-
-        return chunkMap.containsKey(chunkData);
-    }
-
-    /**
-     * Get the owner as uuid from a chunk.
-     *
-     * @param chunk chunk
-     * @return owner uuid or null if there isn't an owner
-     */
-    public UUID getOwner(Chunk chunk) {
-        ChunkData chunkData = new ChunkData(chunk);
-
-        if (chunkMap.containsKey(chunkData)) {
-            return chunkMap.get(chunkData).getUuid();
-        } else if (cityChunks.contains(chunkData)) {
-            return CityChunk.OWNER;
-        }
-
-        return null;
     }
 
     /**
@@ -295,29 +254,97 @@ public final class ProfileManager {
     }
 
     /**
+     * Check if the chunk is claimed or not.
+     *
+     * @param chunk chunk
+     * @return true if the chunk is claimed, otherwise false
+     */
+    public boolean isClaimed(Chunk chunk) {
+        return getClaimType(chunk) != ClaimType.UNCLAIMED;
+    }
+
+    /**
+     * Get the claim type by chunk.
+     *
+     * @param chunk chunk
+     * @return claim type
+     */
+    public ClaimType getClaimType(Chunk chunk) {
+        ChunkWrapper chunkWrapper = new ChunkWrapper(chunk);
+
+        for (ClaimProfile profile : profiles) {
+            for (ChunkData claimedChunk : profile.getClaimedChunks()) {
+                if (claimedChunk.getWrapper().equals(chunkWrapper)) {
+                    return ClaimType.PLAYER;
+                }
+            }
+        }
+
+        for (CityChunk cityChunk : cityChunks) {
+            if (cityChunk.getChunkData().getWrapper().equals(chunkWrapper)) {
+                return ClaimType.CITY;
+            }
+        }
+
+        return ClaimType.UNCLAIMED;
+    }
+
+    /**
+     * Get chunk data by chunk.
+     *
+     * @param chunk chunk
+     * @return chunk data
+     */
+    public ChunkData getChunkData(Chunk chunk) {
+        ChunkWrapper chunkWrapper = new ChunkWrapper(chunk);
+
+        for (ClaimProfile profile : profiles) {
+            for (ChunkData claimedChunk : profile.getClaimedChunks()) {
+                if (claimedChunk.getWrapper().equals(chunkWrapper)) {
+                    return claimedChunk;
+                }
+            }
+        }
+
+        throw new IllegalStateException("This method shouldn't return null. Did you use #getClaimType?");
+    }
+
+    /**
      * Get the city chunk data by chunk.
      *
      * @param chunk chunk
      * @return chunk data
      */
     public CityChunk getCityChunk(Chunk chunk) {
+        ChunkWrapper chunkWrapper = new ChunkWrapper(chunk);
+
         for (CityChunk cityChunk : cityChunks) {
-            if (cityChunk.getChunkData().equals(new ChunkData(chunk))) {
+            if (cityChunk.getChunkData().getWrapper().equals(chunkWrapper)) {
                 return cityChunk;
             }
         }
 
-        return null;
+        throw new IllegalStateException("This method shouldn't return null. Did you use #getClaimType?");
     }
 
     /**
      * Get the claim profile by chunk.
      *
      * @param chunk chunk
-     * @return claim profile or null if none was found
+     * @return claim profile
      */
     public ClaimProfile getProfile(Chunk chunk) {
-        return chunkMap.get(new ChunkData(chunk));
+        ChunkWrapper chunkWrapper = new ChunkWrapper(chunk);
+
+        for (ClaimProfile profile : profiles) {
+            for (ChunkData claimedChunk : profile.getClaimedChunks()) {
+                if (claimedChunk.getWrapper().equals(chunkWrapper)) {
+                    return profile;
+                }
+            }
+        }
+
+        throw new IllegalStateException("This method shouldn't return null. Did you use #getClaimType?");
     }
 
     /**
@@ -337,16 +364,13 @@ public final class ProfileManager {
      * @return claim profile or null if none was found
      */
     public ClaimProfile getProfile(UUID uuid) {
-        return profileMap.getOrDefault(uuid, null);
-    }
+        for (ClaimProfile profile : profiles) {
+            if (profile.getUuid().equals(uuid)) {
+                return profile;
+            }
+        }
 
-    /**
-     * Get a set of all claim profiles.
-     *
-     * @return set of profiles
-     */
-    public Set<ClaimProfile> getProfiles() {
-        return profiles;
+        return null;
     }
 
     /**

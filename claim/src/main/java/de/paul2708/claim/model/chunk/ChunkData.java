@@ -1,7 +1,6 @@
 package de.paul2708.claim.model.chunk;
 
 import de.paul2708.claim.model.identifier.Identifier;
-import org.bukkit.Chunk;
 
 /**
  * This class holds data about a chunk.
@@ -10,42 +9,29 @@ import org.bukkit.Chunk;
  */
 public class ChunkData extends Identifier {
 
-    private final String world;
-    private final int x;
-    private final int z;
-
+    private ChunkWrapper wrapper;
     private boolean groupChunk;
 
     /**
-     * Create a new chunk data.
+     * Create a new chunk data based world, x, z and group chunk value.
      *
-     * @param chunk chunk
+     * @param world world
+     * @param x chunk x coordinate
+     * @param z chunk z coordinate
+     * @param groupChunk true if the chunk is a group chunk, otherwise false
      */
-    public ChunkData(Chunk chunk) {
-        this(chunk.getWorld().getName(), chunk.getX(), chunk.getZ());
+    public ChunkData(String world, int x, int z, boolean groupChunk) {
+        this(new ChunkWrapper(world, x, z), groupChunk);
     }
 
     /**
      * Create a new chunk data.
      *
-     * @param world world name
-     * @param x x coordinate
-     * @param z y coordinate
+     * @param wrapper chunk wrapper
+     * @param groupChunk true if the chunk is a group chunk, otherwise false
      */
-    public ChunkData(String world, int x, int z) {
-        this.world = world;
-        this.x = x;
-        this.z = z;
-
-        this.groupChunk = false;
-    }
-
-    /**
-     * Mark the chunk as group chunk.
-     *
-     * @param groupChunk group chunk
-     */
-    public void setGroupChunk(boolean groupChunk) {
+    public ChunkData(ChunkWrapper wrapper, boolean groupChunk) {
+        this.wrapper = wrapper;
         this.groupChunk = groupChunk;
     }
 
@@ -59,37 +45,19 @@ public class ChunkData extends Identifier {
     }
 
     /**
-     * Get the world name.
+     * Get the chunk wrapper.
      *
-     * @return world
+     * @return chunk wrapper
      */
-    public String getWorld() {
-        return world;
+    public ChunkWrapper getWrapper() {
+        return wrapper;
     }
 
     /**
-     * Get the x coordinate.
-     *
-     * @return x coordinate
-     */
-    public int getX() {
-        return x;
-    }
-
-    /**
-     * Get the z coordinate
-     *
-     * @return z coordinate
-     */
-    public int getZ() {
-        return z;
-    }
-
-    /**
-     * Check if two chunk data are equal. They are equal, if the coordinates and the world are the same.
+     * Two chunk data are equal, if the wrapper is the same.
      *
      * @param o object
-     * @return true if the objects are equal, otherwise false
+     * @return true if they are equal, otherwise false
      */
     @Override
     public boolean equals(Object o) {
@@ -102,7 +70,7 @@ public class ChunkData extends Identifier {
 
         ChunkData chunkData = (ChunkData) o;
 
-        return world.equalsIgnoreCase(chunkData.world) && x == chunkData.x && z == chunkData.z;
+        return wrapper != null ? wrapper.equals(chunkData.wrapper) : chunkData.wrapper == null;
     }
 
     /**
@@ -112,9 +80,6 @@ public class ChunkData extends Identifier {
      */
     @Override
     public int hashCode() {
-        int result = world != null ? world.hashCode() : 0;
-        result = 31 * result + x;
-        result = 31 * result + z;
-        return result;
+        return wrapper != null ? wrapper.hashCode() : 0;
     }
 }

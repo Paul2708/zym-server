@@ -6,6 +6,7 @@ import de.paul2708.claim.database.DatabaseException;
 import de.paul2708.claim.database.DatabaseResult;
 import de.paul2708.claim.database.impl.mysql.MySQLConnection;
 import de.paul2708.claim.model.chunk.ChunkData;
+import de.paul2708.claim.model.chunk.ChunkWrapper;
 import de.paul2708.claim.model.chunk.CityChunk;
 import de.paul2708.claim.model.ClaimProfile;
 import de.paul2708.claim.model.ProfileManager;
@@ -96,8 +97,8 @@ public class MySQLDatabase implements Database {
                     ClaimProfile profile = ProfileManager.getInstance().getProfile(uuid);
 
                     ChunkData chunkData = new ChunkData(resultSet.getString("world"), resultSet.getInt("x"),
-                            resultSet.getInt("z"));
-                    chunkData.setGroupChunk(resultSet.getBoolean("group_chunk"));
+                            resultSet.getInt("z"), resultSet.getBoolean("group_chunk"));
+                    chunkData.setId(resultSet.getInt("id"));
 
                     profile.addClaimedChunk(chunkData);
                 }
@@ -109,20 +110,18 @@ public class MySQLDatabase implements Database {
             connection.query(resultSet -> {
                 try {
                     while (resultSet.next()) {
-                        CityChunk cityChunk = new CityChunk(new ChunkData(resultSet.getString("world"),
-                                resultSet.getInt("x"), resultSet.getInt("z")), resultSet.getBoolean("public"));
+                        ChunkData chunkData = new ChunkData(resultSet.getString("world"),
+                                resultSet.getInt("x"), resultSet.getInt("z"), false);
+                        chunkData.setId(resultSet.getInt("chunks.id"));
+                        CityChunk cityChunk = new CityChunk(chunkData, resultSet.getBoolean("public"));
+                        cityChunk.setId(resultSet.getInt("city_chunks.id"));
 
                         ProfileManager.getInstance().addCityChunk(cityChunk);
                     }
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-            }, "SELECT * FROM city_chunks, chunks WHERE city_chunks.id = chunks.id");
-
-            // Update profiles
-            for (ClaimProfile profile : ProfileManager.getInstance().getProfiles()) {
-                ProfileManager.getInstance().update(profile);
-            }
+            }, "SELECT * FROM city_chunks, chunks WHERE city_chunks.chunk = chunks.id");
         } catch (SQLException e) {
             throw new DatabaseException("Couldn't resolve chunk information.", e);
         }
@@ -155,7 +154,7 @@ public class MySQLDatabase implements Database {
      * @param result     database result (inserted chunk id)
      */
     @Override
-    public void addClaimedChunk(int playerId, ChunkData chunk, boolean groupChunk, DatabaseResult<Integer> result) {
+    public void addClaimedChunk(int playerId, ChunkWrapper chunk, boolean groupChunk, DatabaseResult<Integer> result) {
         runAsync(() -> {
             try {
                 connection.execute(result::success,
@@ -216,14 +215,14 @@ public class MySQLDatabase implements Database {
      * @param result       database result (inserted city chunk id)
      */
     @Override
-    public void addCityChunk(int playerId, ChunkData chunk, boolean interactable, DatabaseResult<Integer> result) {
+    public void addCityChunk(int playerId, ChunkWrapper chunk, boolean interactable, DatabaseResult<Integer> result) {
         addClaimedChunk(playerId, chunk, false, new DatabaseResult<Integer>() {
 
             @Override
             public void success(Integer id) {
                 runAsync(() -> {
                     try {
-                        connection.execute(result::success, "INSERT INTO city_chunk (`chunk`, `public`) VALUES (?, ?)",
+                        connection.execute(result::success, "INSERT INTO city_chunks (`chunk`, `public`) VALUES (?, ?)",
                                 id, interactable ? 1 : 0);
                     } catch (SQLException e) {
                         result.exception(new DatabaseException("Couldn't add city chunk.", e));
@@ -250,7 +249,7 @@ public class MySQLDatabase implements Database {
         runAsync(() -> {
             try {
                 connection.execute("UPDATE city_chunks SET public = ? WHERE id = ?",
-                        interactable, id);
+                        interactable ? 1 : 0, id);
                 result.success(null);
             } catch (SQLException e) {
                 result.exception(new DatabaseException("Couldn't update city chunk.", e));
