@@ -98,13 +98,11 @@ public class MySQLDatabase implements Database {
 
                     ChunkData chunkData = new ChunkData(resultSet.getString("world"), resultSet.getInt("x"),
                             resultSet.getInt("z"), resultSet.getBoolean("group_chunk"));
-                    chunkData.setId(resultSet.getInt("id"));
+                    chunkData.setId(resultSet.getInt("chunks.id"));
 
                     profile.addClaimedChunk(chunkData);
                 }
             }, "SELECT * FROM players, chunks WHERE chunks.owner = players.id");
-
-            // TODO: Add access
 
             // Get city chunks
             connection.query(resultSet -> {
@@ -122,6 +120,20 @@ public class MySQLDatabase implements Database {
                     e.printStackTrace();
                 }
             }, "SELECT * FROM city_chunks, chunks WHERE city_chunks.chunk = chunks.id");
+
+            // Get access
+            connection.query(resultSet -> {
+                try {
+                    while (resultSet.next()) {
+                        ClaimProfile profile = ProfileManager.getInstance().getProfile(fromBytes(resultSet.getBytes("uuid")));
+                        ChunkData chunkData = getChunkData(resultSet.getInt("chunks.id"));
+
+                        profile.getAccess().add(chunkData);
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }, "SELECT players.uuid, chunks.id FROM access, chunks, players WHERE players.id = access.player AND chunks.id = access.chunk");
         } catch (SQLException e) {
             throw new DatabaseException("Couldn't resolve chunk information.", e);
         }
@@ -311,6 +323,24 @@ public class MySQLDatabase implements Database {
      */
     private void runAsync(Runnable runnable) {
         Bukkit.getScheduler().runTaskAsynchronously(ClaimPlugin.getInstance(), runnable);
+    }
+
+    /**
+     * Get the chunk data by its id.
+     *
+     * @param id chunk data id
+     * @return chunk data
+     */
+    private ChunkData getChunkData(int id) {
+        for (ClaimProfile profile : ProfileManager.getInstance().getProfiles()) {
+            for (ChunkData claimedChunk : profile.getClaimedChunks()) {
+                if (claimedChunk.isGroupChunk() && claimedChunk.getId() == id) {
+                    return claimedChunk;
+                }
+            }
+        }
+
+        throw new IllegalStateException("This method shouldn't return null");
     }
 
     /**

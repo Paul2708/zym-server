@@ -18,6 +18,11 @@ import java.util.Random;
  */
 public final class Utility {
 
+    /**
+     * Price of one group chunk claimer.
+     */
+    public static final int GROUP_PRICE = 5;
+
     private static final List<Integer> PRICES = Arrays.asList(0, 8, 16, 32, 64, 64, 128, 128, 192);
 
     /**

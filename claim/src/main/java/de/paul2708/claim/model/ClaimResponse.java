@@ -23,6 +23,11 @@ public enum ClaimResponse {
     BORDER,
 
     /**
+     * The chunk is next to a group chunk.
+     */
+    GROUP_CHUNK,
+
+    /**
      * The chunk can be claimed.
      */
     CLAIMABLE

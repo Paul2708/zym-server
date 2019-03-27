@@ -3,7 +3,6 @@ package de.paul2708.claim.listener.player;
 import de.paul2708.claim.item.ItemManager;
 import de.paul2708.claim.model.ProfileManager;
 import de.paul2708.claim.model.chunk.ChunkWrapper;
-import de.paul2708.claim.model.chunk.CityChunk;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
@@ -43,43 +42,35 @@ public class PlayerMoveListener implements Listener {
             return;
         }
 
-        UUID uuid = getOwner(event.getTo().getChunk());
-        String message;
-
-        if (uuid == null) {
-            message = "§7Unclaimed Chunk";
-        } else {
-            if (uuid.equals(CityChunk.OWNER)) {
-                message = "§7Chunk von §6Stadt";
-            } else {
-                OfflinePlayer owner = Bukkit.getOfflinePlayer(uuid);
-                if (owner == null || owner.getName() == null || owner.getName().equals("null")) {
-                    message = "§7Chunk von §6jemandem";
-                } else {
-                    message = "§7Chunk von §6" + owner.getName();
-                }
-            }
-        }
-
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
+        player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
+                TextComponent.fromLegacyText(getMessage(event.getTo().getChunk())));
     }
 
     /**
-     * Get the owner by chunk.
+     * Get the message title by chunk.
      *
      * @param chunk chunk
      * @return player uuid, city owner uuid, or null if the chunk is unclaimed
      */
-    private UUID getOwner(Chunk chunk) {
+    private String getMessage(Chunk chunk) {
         switch (ProfileManager.getInstance().getClaimType(chunk)) {
             case PLAYER:
-                return ProfileManager.getInstance().getProfile(chunk).getUuid();
+                UUID uuid = ProfileManager.getInstance().getProfile(chunk).getUuid();
+                OfflinePlayer owner = Bukkit.getOfflinePlayer(uuid);
+
+                String prefix = ProfileManager.getInstance().getChunkData(chunk).isGroupChunk() ? "§7Gruppenchunk"
+                        : "§7Chunk";
+                if (owner == null || owner.getName() == null || owner.getName().equals("null")) {
+                    return prefix + " von §6jemandem";
+                } else {
+                    return prefix + " von §6" + owner.getName();
+                }
             case CITY:
-                return CityChunk.OWNER;
+                return "§7Chunk von §6Stad";
             case UNCLAIMED:
-                return null;
+                return "§7Unclaimed Chunk";
             default:
-                throw new IllegalStateException("Unsupported enum type");
+                return "§7Unclaimed Chunk";
         }
     }
 

@@ -1,5 +1,6 @@
 package de.paul2708.claim.command.impl;
 
+import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.command.SubCommand;
 import de.paul2708.claim.item.ItemManager;
 import de.paul2708.claim.model.ClaimProfile;
@@ -32,6 +33,11 @@ public class BuyCommand extends SubCommand {
         ClaimProfile profile = ProfileManager.getInstance().getProfile(player);
         int price = Utility.getPrice(profile.getClaimer());
 
-        ItemManager.getInstance().openInventory(player, price);
+        if (args.length != 1 || (!args[0].equalsIgnoreCase("normal") && !args[0].equalsIgnoreCase("group"))) {
+            player.sendMessage(ClaimPlugin.PREFIX + "Nutze §6/chunk buy [normal|group]");
+            return;
+        }
+
+        ItemManager.getInstance().openInventory(player, price, args[0].equalsIgnoreCase("group"));
     }
 }

@@ -2,8 +2,10 @@ package de.paul2708.claim.command.impl;
 
 import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.command.SubCommand;
+import de.paul2708.claim.database.Database;
 import de.paul2708.claim.database.DatabaseException;
 import de.paul2708.claim.database.DatabaseResult;
+import de.paul2708.claim.item.ClaimerType;
 import de.paul2708.claim.item.ItemManager;
 import de.paul2708.claim.model.ClaimProfile;
 import de.paul2708.claim.model.ClaimResponse;
@@ -44,17 +46,11 @@ public class ClaimCommand extends SubCommand {
      */
     @Override
     public void execute(Player player, String[] args) {
-        // Check claimer
-        boolean found = false;
-        for (ItemStack itemStack : player.getInventory()) {
-            if (ItemManager.getInstance().ownsClaimer(player.getUniqueId(), itemStack)) {
-                found = true;
-                break;
-            }
-        }
+        ClaimerType type = ItemManager.getInstance().getClaimerType(player.getUniqueId(), player.getInventory().getItemInMainHand());
 
-        if (!found) {
-            player.sendMessage(ClaimPlugin.PREFIX + "§cDu hast keinen Claimer im Inventar, der dir gehört.");
+        // Check claimer
+        if (type == ClaimerType.NONE) {
+            player.sendMessage(ClaimPlugin.PREFIX + "§cDu hast keinen Claimer in deiner Main-Hand.");
             return;
         }
 
@@ -67,7 +63,7 @@ public class ClaimCommand extends SubCommand {
         // Check chunk
         ChunkWrapper chunkWrapper = new ChunkWrapper(player.getLocation().getChunk());
 
-        ClaimResponse response = ProfileManager.getInstance().canClaim(player, player.getLocation().getChunk());
+        ClaimResponse response = ProfileManager.getInstance().canClaim(player, player.getLocation().getChunk(), type == ClaimerType.GROUP);
         switch (response) {
             case ALREADY_CLAIMED:
                 player.sendMessage(ClaimPlugin.PREFIX + "§cDer Chunk wurde bereits geclaimed.");
@@ -78,6 +74,10 @@ public class ClaimCommand extends SubCommand {
             case BORDER:
                 player.sendMessage(ClaimPlugin.PREFIX
                         + "§cDer Chunk grenzt an einen Chunk, der bereits geclaimed ist.");
+                return;
+            case GROUP_CHUNK:
+                player.sendMessage(ClaimPlugin.PREFIX
+                        + "§cNormale Chunks und Gruppenchunks könnenn nicht direkt aneinander liegen.");
                 return;
             case CLAIMABLE:
                 break;
@@ -93,58 +93,58 @@ public class ClaimCommand extends SubCommand {
             if (args[0].equals("confirm")) {
                 // Claim the chunk
                 ClaimProfile profile = ProfileManager.getInstance().getProfile(player);
+                Database database = ClaimPlugin.getInstance().getDatabase();
 
-                ClaimPlugin.getInstance().getDatabase().addClaimedChunk(profile.getId(), chunkWrapper, false,
-                        new DatabaseResult<Integer>() {
+                database.addClaimedChunk(profile.getId(), chunkWrapper, type == ClaimerType.GROUP, new DatabaseResult<Integer>() {
 
-                            @Override
-                            public void success(Integer result) {
-                                // Set id
-                                ChunkData chunkData = new ChunkData(chunkWrapper, false);
-                                chunkData.setId(result);
-                                profile.addClaimedChunk(chunkData);
+                    @Override
+                    public void success(Integer result) {
+                        // Set id
+                        ChunkData chunkData = new ChunkData(chunkWrapper, type == ClaimerType.GROUP);
+                        chunkData.setId(result);
+                        profile.addClaimedChunk(chunkData);
 
-                                // Remove items
-                                int index = -1;
-                                ItemStack replaced = null;
+                        // Remove items
+                        int index = -1;
+                        ItemStack replaced = null;
 
-                                for (int i = 0; i < player.getInventory().getSize(); i++) {
-                                    ItemStack itemStack = player.getInventory().getItem(i);
+                        for (int i = 0; i < player.getInventory().getSize(); i++) {
+                            ItemStack itemStack = player.getInventory().getItem(i);
 
-                                    if (ItemManager.getInstance().ownsClaimer(player.getUniqueId(), itemStack)) {
-                                        index = i;
+                            if (type == ItemManager.getInstance().getClaimerType(player.getUniqueId(), itemStack)) {
+                                index = i;
 
-                                        if (itemStack.getAmount() == 1) {
-                                            replaced = new ItemStack(Material.AIR);
-                                        } else {
-                                            replaced = itemStack.clone();
-                                            replaced.setAmount(itemStack.getAmount() - 1);
-                                        }
-
-                                        break;
-                                    }
+                                if (itemStack.getAmount() == 1) {
+                                    replaced = new ItemStack(Material.AIR);
+                                } else {
+                                    replaced = itemStack.clone();
+                                    replaced.setAmount(itemStack.getAmount() - 1);
                                 }
 
-                                player.getInventory().setItem(index, replaced);
-
-                                // Effects and announcement
-                                Utility.playEffect(player);
-
-                                ScoreboardManager.getInstance().updateChunkCounter(player);
-
-                                player.sendMessage(ClaimPlugin.PREFIX + "Du hast den Chunk §6erfolgreich §7geclaimed.");
-
-                                Bukkit.broadcastMessage(ClaimPlugin.PREFIX + "§a§l" + player.getName()
-                                        + " §7hat seinen §e" + profile.getClaimedChunks().size()
-                                        + ". Chunk §7geclaimed!");
-                            }
-
-                            @Override
-                            public void exception(DatabaseException exception) {
-                                player.sendMessage(ClaimPlugin.PREFIX + "§cEin Datenbank-Fehler ist aufgetreten.");
+                                break;
                             }
                         }
-                );
+
+                        player.getInventory().setItem(index, replaced);
+
+                        // Effects and announcement
+                        Utility.playEffect(player);
+                        player.sendMessage(ClaimPlugin.PREFIX + "Du hast den Chunk §6erfolgreich §7geclaimed.");
+
+                        if (type != ClaimerType.GROUP) {
+                            ScoreboardManager.getInstance().updateChunkCounter(player);
+
+                            Bukkit.broadcastMessage(ClaimPlugin.PREFIX + "§a§l" + player.getName()
+                                    + " §7hat seinen §e" + profile.getClaimedChunks().size()
+                                    + ". Chunk §7geclaimed!");
+                        }
+                    }
+
+                    @Override
+                    public void exception(DatabaseException exception) {
+                        player.sendMessage(ClaimPlugin.PREFIX + "§cEin Datenbank-Fehler ist aufgetreten.");
+                    }
+                });
             } else if (args[0].equals("cancel")) {
                 player.sendMessage(ClaimPlugin.PREFIX + "Du hast den Vorgang abgebrochen.");
             }

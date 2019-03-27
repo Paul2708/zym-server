@@ -9,12 +9,11 @@ import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import de.paul2708.claim.model.chunk.ChunkData;
 import de.paul2708.claim.model.chunk.ChunkWrapper;
 import de.paul2708.claim.model.chunk.CityChunk;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * This singleton holds information about every claimed chunk and its owner.
@@ -110,40 +109,34 @@ public final class ProfileManager {
      *
      * @param player player
      * @param chunk chunk to claim
+     * @param group group chunk or not
      * @return claim response
      */
-    public ClaimResponse canClaim(Player player, Chunk chunk) {
-        ChunkWrapper chunkWrapper = new ChunkWrapper(chunk);
-
+    public ClaimResponse canClaim(Player player, Chunk chunk, boolean group) {
         // Check chunk
-        for (ClaimProfile profile : profiles) {
-            for (ChunkData claimedChunk : profile.getClaimedChunks()) {
-                if (claimedChunk.getWrapper().equals(chunkWrapper)) {
-                    return ClaimResponse.ALREADY_CLAIMED;
-                }
-            }
-        }
-        for (CityChunk cityChunk : cityChunks) {
-            if (cityChunk.getChunkData().getWrapper().equals(chunkWrapper)) {
-                return ClaimResponse.ALREADY_CLAIMED;
-            }
+        if (isClaimed(chunk)) {
+            return ClaimResponse.ALREADY_CLAIMED;
         }
 
         // Check other chunks
-        for (ClaimProfile profile : profiles) {
-            if (profile.getUuid().equals(player.getUniqueId())) {
-                continue;
-            }
+        for (ChunkData chunkData : getNextChunks(chunk)) {
+            if (getClaimType(fromWrapper(chunkData.getWrapper())) == ClaimType.PLAYER) {
+                ClaimProfile profile = getProfile(fromWrapper(chunkData.getWrapper()));
 
-            for (ChunkData chunkData : profile.getClaimedChunks()) {
-                for (int x = -1; x <= 1; x++) {
-                    for (int z = -1; z <= 1; z++) {
-                        ChunkWrapper chunkDataWrapper = chunkData.getWrapper();
-                        ChunkWrapper nextChunk = new ChunkWrapper(chunkDataWrapper.getWorld(),
-                                chunkDataWrapper.getX() + x, chunkDataWrapper.getZ() + z);
-
-                        if (chunkWrapper.equals(nextChunk) && !hasChunkNextTo(player, chunk)) {
-                            return ClaimResponse.BORDER;
+                if (!profile.getUuid().equals(player.getUniqueId())) {
+                    return ClaimResponse.BORDER;
+                } else {
+                    if (group) {
+                        if (chunkData.isGroupChunk()) {
+                            return ClaimResponse.CLAIMABLE;
+                        } else {
+                            return ClaimResponse.GROUP_CHUNK;
+                        }
+                    } else {
+                        if (!chunkData.isGroupChunk()) {
+                            return ClaimResponse.CLAIMABLE;
+                        } else {
+                            return ClaimResponse.GROUP_CHUNK;
                         }
                     }
                 }
@@ -170,33 +163,6 @@ public final class ProfileManager {
     }
 
     /**
-     * Check if a player has the chunk next to it.
-     *
-     * @param player player
-     * @param chunk chunk to check
-     * @return true if player owns it, otherwise false
-     */
-    private boolean hasChunkNextTo(Player player, Chunk chunk) {
-        ChunkWrapper chunkWrapper = new ChunkWrapper(chunk);
-
-        for (ChunkData chunkData : getProfile(player).getClaimedChunks()) {
-            for (int x = -1; x <= 1; x++) {
-                for (int z = -1; z <= 1; z++) {
-                    ChunkWrapper chunkDataWrapper = chunkData.getWrapper();
-                    ChunkWrapper nextChunk = new ChunkWrapper(chunkDataWrapper.getWorld(), chunkDataWrapper.getX() + x,
-                            chunkDataWrapper.getZ() + z);
-
-                    if (chunkWrapper.equals(nextChunk)) {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Check if the two chunks have the same owner - either player or city.
      *
      * @param first first chunk
@@ -220,10 +186,13 @@ public final class ProfileManager {
                     secondChunk = true;
                 }
             }
-        }
 
-        if (firstChunk && secondChunk) {
-            return true;
+            if (firstChunk && secondChunk) {
+                return true;
+            }
+
+            firstChunk = false;
+            secondChunk = false;
         }
 
         // Check city chunks
@@ -371,6 +340,49 @@ public final class ProfileManager {
         }
 
         return null;
+    }
+
+    /**
+     * Get the set of profiles.
+     *
+     * @return set of profiles
+     */
+    public Set<ClaimProfile> getProfiles() {
+        return profiles;
+    }
+
+    /**
+     * Get a list of all near chunks, that are claimed.
+     *
+     * @param chunk center chunk
+     * @return list of chunks
+     */
+    private List<ChunkData> getNextChunks(Chunk chunk) {
+        ChunkWrapper chunkWrapper = new ChunkWrapper(chunk);
+        List<ChunkData> list = new LinkedList<>();
+
+        for (int x = -1; x <= 1; x++) {
+            for (int z = -1; z <= 1; z++) {
+                ChunkWrapper nextChunk = new ChunkWrapper(chunkWrapper.getWorld(),
+                        chunkWrapper.getX() + x, chunkWrapper.getZ() + z);
+
+                if (isClaimed(fromWrapper(nextChunk))) {
+                    list.add(getChunkData(fromWrapper(nextChunk)));
+                }
+            }
+        }
+
+        return list;
+    }
+
+    /**
+     * Get the Bukkit chunk from the chunk wrapper.
+     *
+     * @param chunkWrapper chunk wrapper
+     * @return bukkit chunk
+     */
+    private Chunk fromWrapper(ChunkWrapper chunkWrapper) {
+        return Bukkit.getWorld(chunkWrapper.getWorld()).getChunkAt(chunkWrapper.getX(), chunkWrapper.getZ());
     }
 
     /**

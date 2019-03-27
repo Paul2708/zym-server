@@ -35,7 +35,7 @@ public class GiveClaimerCommand extends SubCommand {
                 return;
             }
 
-            target.getInventory().addItem(ItemManager.getInstance().buildClaimer(target));
+            target.getInventory().addItem(ItemManager.getInstance().buildClaimer(target, false));
 
             target.sendMessage(ClaimPlugin.PREFIX + "Du hast einen Claimer erhalten.");
             player.sendMessage(ClaimPlugin.PREFIX + "§6" + target.getName() + " §7hat einen Claimer erhalten.");

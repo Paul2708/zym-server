@@ -1,5 +1,6 @@
 package de.paul2708.claim.item;
 
+import de.paul2708.claim.util.Utility;
 import net.minecraft.server.v1_13_R2.NBTTagCompound;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -7,6 +8,7 @@ import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -21,6 +23,8 @@ import java.util.UUID;
  */
 public final class ItemManager {
 
+    private static final String TITLE = "§7Willst du einen §6Claimer §7kaufen?";
+
     private static ItemManager instance;
 
     /**
@@ -31,17 +35,18 @@ public final class ItemManager {
     }
 
     /**
-     * Build the claimer with nbt owner tag.
+     * Build the claimer with nbt owner and group tag.
      *
      * @param player player
      * @return claimer item stack
      */
-    public ItemStack buildClaimer(Player player) {
+    public ItemStack buildClaimer(Player player, boolean groupChunk) {
         // Build item stack
         ItemStack itemStack = new ItemStack(Material.NAME_TAG);
         ItemMeta itemMeta = itemStack.getItemMeta();
 
-        itemMeta.setDisplayName("§6" + player.getName() + "'s §7Claimer");
+        String name = "§6" + player.getName() + "'s §7" + (groupChunk ? "Gruppen-" : "") + "Claimer";
+        itemMeta.setDisplayName(name);
         itemMeta.setLore(Arrays.asList(" ", "§7Nutze §6/chunk claim §7um einen Chunk zu claimen.",
                 "§7Oder §6rechtsklicke §7in einem freien Chunk."));
         itemMeta.setUnbreakable(true);
@@ -54,6 +59,7 @@ public final class ItemManager {
         net.minecraft.server.v1_13_R2.ItemStack nmsCopy = CraftItemStack.asNMSCopy(itemStack);
         NBTTagCompound tag = nmsCopy.getTag() != null ? nmsCopy.getTag() : new NBTTagCompound();
         tag.setString("owner", player.getUniqueId().toString());
+        tag.setBoolean("group", groupChunk);
         nmsCopy.setTag(tag);
 
         return CraftItemStack.asCraftMirror(nmsCopy);
@@ -79,23 +85,32 @@ public final class ItemManager {
     }
 
     /**
-     * Check if the player owns the claimer.
+     * Check if the player owns the claimer and return the claimer type.
      *
      * @param uuid player uuid
      * @param claimer claimer item stack
-     * @return true if the player owns the claimer, otherwise false
+     * @return true claimer type
      */
-    public boolean ownsClaimer(UUID uuid, ItemStack claimer) {
+    public ClaimerType getClaimerType(UUID uuid, ItemStack claimer) {
         if (claimer == null) {
-            return false;
+            return ClaimerType.NONE;
         }
 
         net.minecraft.server.v1_13_R2.ItemStack nmsCopy = CraftItemStack.asNMSCopy(claimer);
-        if (nmsCopy.getTag() == null) {
-            return false;
+        NBTTagCompound tag = nmsCopy.getTag();
+        if (tag == null) {
+            return ClaimerType.NONE;
         }
 
-        return nmsCopy.getTag().hasKey("owner") && nmsCopy.getTag().getString("owner").equals(uuid.toString());
+        if (tag.hasKey("owner") && tag.getString("owner").equals(uuid.toString())) {
+            if (tag.hasKey("group") && tag.getBoolean("group")) {
+                return ClaimerType.GROUP;
+            }
+
+            return ClaimerType.NORMAL;
+        }
+
+        return  ClaimerType.NONE;
     }
 
     /**
@@ -103,9 +118,10 @@ public final class ItemManager {
      *
      * @param player player
      * @param price price
+     * @param groupInventory true if you can buy group chunks, otherwise false
      */
-    public void openInventory(Player player, int price) {
-        Inventory inventory = Bukkit.createInventory(null, 27, "§7Willst du einen §6Claimer §7kaufen?");
+    public void openInventory(Player player, int price, boolean groupInventory) {
+        Inventory inventory = Bukkit.createInventory(null, 27, ItemManager.TITLE);
 
         // Create border
         ItemStack blackBorder = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
@@ -128,15 +144,29 @@ public final class ItemManager {
         inventory.setItem(inventory.getSize() - 1, yellowBorder);
 
         // Set claimer
-        ItemStack itemStack = buildClaimer(player);
+        ItemStack itemStack = buildClaimer(player, groupInventory);
         ItemMeta meta = itemStack.getItemMeta();
-        meta.setLore(Arrays.asList(" ", "§aKlicke um den Claimer zu kaufen.", "§7Kosten: §6" + price
-                + " §7Diamanten"));
+        meta.setLore(Arrays.asList(" ", "§aKlicke um den Claimer zu kaufen.", "§7Kosten: §6"
+                + (groupInventory ? Utility.GROUP_PRICE : price) + " §7Diamanten"));
         itemStack.setItemMeta(meta);
 
         inventory.setItem(13, itemStack);
 
         player.openInventory(inventory);
+    }
+
+    /**
+     * Check if the given inventory view is the buy inventory.
+     *
+     * @param view inventory view
+     * @return true if it's the buy inventory, otherwise false
+     */
+    public boolean isBuyInventory(InventoryView view) {
+        if (view == null) {
+            return false;
+        }
+
+        return view.getTitle().equals(ItemManager.TITLE);
     }
 
     /**
