@@ -98,10 +98,11 @@ public interface Database {
     /**
      * Remove an access.
      *
-     * @param id access id
+     * @param playerId player id
+     * @param chunkId chunk id
      * @param result database result
      */
-    void removeAccess(int id, DatabaseResult<Void> result);
+    void removeAccess(int playerId, int chunkId, DatabaseResult<Void> result);
 
     /**
      * Disconnect from the database.

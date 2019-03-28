@@ -291,17 +291,18 @@ public class MySQLDatabase implements Database {
     /**
      * Remove an access.
      *
-     * @param id     access id
+     * @param playerId player id
+     * @param chunkId chunk id
      * @param result database result
      */
     @Override
-    public void removeAccess(int id, DatabaseResult<Void> result) {
+    public void removeAccess(int playerId, int chunkId, DatabaseResult<Void> result){
         runAsync(() -> {
             try {
-                connection.execute("DELETE FROM access WHERE id = ?", id);
+                connection.execute("DELETE FROM access WHERE player = ? AND chunk = ?", playerId, chunkId);
                 result.success(null);
             } catch (SQLException e) {
-                result.exception(new DatabaseException("Couldn't remove access with ID=" + id + ".", e));
+                result.exception(new DatabaseException("Couldn't remove access with ID=" + playerId + ", " + chunkId, e));
             }
         });
     }

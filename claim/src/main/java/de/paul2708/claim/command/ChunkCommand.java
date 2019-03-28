@@ -39,6 +39,8 @@ public class ChunkCommand implements CommandExecutor, TabCompleter {
         this.subCommands.add(new VersionCommand());
         this.subCommands.add(new PermitCommand());
         this.subCommands.add(new PermitAllCommand());
+        this.subCommands.add(new PermitListCommand());
+        this.subCommands.add(new ForbidCommand());
         this.subCommands.add(new HelpCommand(this.subCommands));
     }
 

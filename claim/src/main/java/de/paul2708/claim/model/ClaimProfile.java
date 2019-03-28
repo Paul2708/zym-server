@@ -62,6 +62,15 @@ public class ClaimProfile extends Identifier {
     }
 
     /**
+     * Remove an accessible chunk from the list.
+     *
+     * @param chunk chunk
+     */
+    public void removeAccess(ChunkData chunk) {
+        this.access.remove(chunk);
+    }
+
+    /**
      * Set the amount of bought claimers.
      *
      * @param claimer new amount of claimer
