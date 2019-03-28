@@ -99,6 +99,13 @@ public final class ProfileManager {
             }
         }
 
+        // Check access
+        for (ChunkData access : getProfile(player).getAccess()) {
+            if (access.getWrapper().equals(chunkWrapper)) {
+                return true;
+            }
+        }
+
         return true;
     }
 
