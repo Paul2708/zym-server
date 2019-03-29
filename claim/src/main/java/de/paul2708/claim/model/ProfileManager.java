@@ -76,6 +76,8 @@ public final class ProfileManager {
      * @return true if the player has access, otherwise false
      */
     public boolean hasAccess(Player player, Chunk chunk) {
+        // TODO: Add access cache and update method
+
         // Check bypass
         if (player.hasMetadata("bypass")) {
             return true;
@@ -107,6 +109,27 @@ public final class ProfileManager {
         }
 
         return true;
+    }
+
+    /**
+     * Remove chunk access from a chunk.
+     *
+     * @param chunk chunk that has been removed
+     */
+    public void removeChunkAccess(Chunk chunk) {
+        ChunkWrapper chunkWrapper = new ChunkWrapper(chunk);
+
+        for (ClaimProfile profile : profiles) {
+            List<ChunkData> list = new ArrayList<>();
+
+            for (ChunkData access : profile.getAccess()) {
+                if (access.getWrapper().equals(chunkWrapper)) {
+                    list.add(access);
+                }
+            }
+
+            profile.getAccess().removeAll(list);
+        }
     }
 
     /**

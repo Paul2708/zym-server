@@ -50,12 +50,14 @@ public class RemoveCommand extends SubCommand {
                     @Override
                     public void success(Void result) {
                         profile.removeClaimedChunk(chunkData);
+                        manager.removeChunkAccess(chunk);
 
                         // Update scoreboard
                         Player target = Bukkit.getPlayer(profile.getUuid());
                         if (target != null && target.isOnline()) {
                             ScoreboardManager.getInstance().updateChunkCounter(target);
                         }
+
 
                         player.sendMessage(ClaimPlugin.PREFIX + "§6Der Chunk wurde entfernt.");
                     }
