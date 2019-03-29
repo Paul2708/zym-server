@@ -33,6 +33,10 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class ClaimPlugin extends JavaPlugin {
 
+    // TODO: Edit readme
+    // TODO: Add changelogs and edit the plugin version
+    // TODO: Optimize #hasAccess
+
     /**
      * Name of the main world.
      */

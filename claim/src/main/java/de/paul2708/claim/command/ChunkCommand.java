@@ -30,8 +30,6 @@ public class ChunkCommand implements CommandExecutor, TabCompleter {
         this.subCommands.add(new BuyCommand());
         this.subCommands.add(new ClaimCommand());
         this.subCommands.add(new UnClaimCommand());
-        this.subCommands.add(new OpInfoCommand());
-        this.subCommands.add(new PlayerInfoCommand());
         this.subCommands.add(new RemoveCommand());
         this.subCommands.add(new GiveClaimerCommand());
         this.subCommands.add(new BypassCommand());
