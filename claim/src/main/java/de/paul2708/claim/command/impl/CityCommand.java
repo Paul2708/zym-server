@@ -46,7 +46,8 @@ public class CityCommand extends SubCommand {
         switch (manager.getClaimType(chunk)) {
             case PLAYER:
                 player.sendMessage(ClaimPlugin.PREFIX + "§cDer Chunk wurde bereits von einem Spieler geclaimt.");
-                player.sendMessage(ClaimPlugin.PREFIX + "Falls du ihn trotzdem claimen möchtest, nutze davor §6/chunk remove§7.");
+                player.sendMessage(ClaimPlugin.PREFIX
+                        + "Falls du ihn trotzdem claimen möchtest, nutze davor §6/chunk remove§7.");
                 break;
             case CITY:
                 if (args.length == 1 && (!args[0].equalsIgnoreCase("true") && !args[0].equalsIgnoreCase("false"))) {
@@ -61,8 +62,10 @@ public class CityCommand extends SubCommand {
                     @Override
                     public void success(Void result) {
                         cityChunk.setInteractable(parseBoolean(args));
+                        manager.clearAccess(chunk);
 
-                        player.sendMessage(ClaimPlugin.PREFIX + "Der Stadt-Chunk wurde bearbeitet: §6"
+                        player.sendMessage(ClaimPlugin.PREFIX + "Der Stadt-Chunk wurde bearbeitet:");
+                        player.sendMessage(ClaimPlugin.PREFIX + "§6"
                                 + (parseBoolean(args) ? "Jeder" : "Keiner (ohne Bypass)") + " §6kann hier bauen.");
                     }
 
@@ -86,10 +89,13 @@ public class CityCommand extends SubCommand {
                     @Override
                     public void success(Integer result) {
                         CityChunk cityChunk = new CityChunk(new ChunkData(chunkWrapper, false), parseBoolean(args));
+                        cityChunk.setId(result);
                         manager.addCityChunk(cityChunk);
+                        manager.clearAccess(chunk);
 
                         player.sendMessage(ClaimPlugin.PREFIX + "Der Chunk wurde von §6Stadt §7geclaimed.");
-                        player.sendMessage(ClaimPlugin.PREFIX + "§6" + (parseBoolean(args) ? "Jeder" : "Keiner (ohne Bypass) §7kann hier bauen."));
+                        player.sendMessage(ClaimPlugin.PREFIX + "§6"
+                                + (parseBoolean(args) ? "Jeder" : "Keiner (ohne Bypass) §7kann hier bauen."));
                     }
 
                     @Override

@@ -26,7 +26,8 @@ public class PermitAllCommand extends SubCommand {
      * Create a new permit all command.
      */
     public PermitAllCommand() {
-        super("permitall", "permitall [Spieler]", "Erlaube einem Spieler auf allen Chunks zu bauen", "chunk.permitall");
+        super("permitall", "permitall [Spieler]", "Erlaube einem Spieler auf allen Chunks zu bauen",
+                SubCommand.NONE_PERMISSION);
     }
 
     /**
@@ -57,14 +58,15 @@ public class PermitAllCommand extends SubCommand {
                 ClaimProfile ownerProfile = manager.getProfile(player);
                 ClaimProfile targetProfile = manager.getProfile(target);
 
-                /*if (target.getUniqueId().equals(player.getUniqueId())) {
+                if (target.getUniqueId().equals(player.getUniqueId())) {
                     player.sendMessage(ClaimPlugin.PREFIX + "§cDu kannst dir nicht selbst Rechte geben.");
                     return;
-                }*/
+                }
                 List<ChunkData> chunks = getMissingChunks(ownerProfile, targetProfile);
 
                 if (chunks.size() == 0) {
-                    player.sendMessage(ClaimPlugin.PREFIX + "§c" + target.getName() + " hat bereits Rechte auf all deinen Chunk.");
+                    player.sendMessage(ClaimPlugin.PREFIX + "§c" + target.getName()
+                            + " hat bereits Rechte auf all deinen Chunks.");
                     return;
                 }
 
@@ -74,6 +76,7 @@ public class PermitAllCommand extends SubCommand {
                         @Override
                         public void success(Integer result) {
                             manager.getProfile(target.getUniqueId()).addAccess(chunkData);
+                            manager.clearAccess(chunk);
                         }
 
                         @Override
@@ -84,8 +87,9 @@ public class PermitAllCommand extends SubCommand {
                         }
                     });
                 }
-                target.sendMessage(ClaimPlugin.PREFIX + "§6" + player.getName() + " §7hat dir Zugriff auf all seinen Gruppen-Chunks gegeben.");
-                player.sendMessage(ClaimPlugin.PREFIX + "Du hast §6" + target.getName() + " §7Zugriff auf all deinen Gruppen-Chunks gegeben.");
+
+                target.sendMessage(ClaimPlugin.PREFIX + "§6" + player.getName() + " §7hat dir Rechte auf all seinen Gruppen-Chunks gegeben.");
+                player.sendMessage(ClaimPlugin.PREFIX + "Du hast §6" + target.getName() + " §7Rechte auf all deinen Gruppen-Chunks gegeben.");
                 break;
             case CITY:
                 player.sendMessage(ClaimPlugin.PREFIX + "§cDir gehört der Chunk nicht.");

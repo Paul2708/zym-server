@@ -70,6 +70,7 @@ public class UnClaimCommand extends SubCommand {
                     public void success(Void result) {
                         profile.removeClaimedChunk(chunkData);
                         manager.removeChunkAccess(player.getLocation().getChunk());
+                        manager.clearAccess(player.getLocation().getChunk());
 
                         ScoreboardManager.getInstance().updateChunkCounter(player);
 

@@ -23,7 +23,7 @@ public class PermitCommand extends SubCommand {
      * Create a new permit command.
      */
     public PermitCommand() {
-        super("permit", "permit [Spieler]", "Erlaube einem Spieler auf deinem Chunk zu bauen", "chunk.permit");
+        super("permit", "permit [Spieler]", "Erlaube einem Spieler auf deinem Chunk zu bauen", SubCommand.NONE_PERMISSION);
     }
 
     /**
@@ -62,10 +62,10 @@ public class PermitCommand extends SubCommand {
                     player.sendMessage(ClaimPlugin.PREFIX + "§c'" + args[0] + "' muss online sein.");
                     return;
                 }
-                /*if (target.getUniqueId().equals(player.getUniqueId())) {
+                if (target.getUniqueId().equals(player.getUniqueId())) {
                     player.sendMessage(ClaimPlugin.PREFIX + "§cDu kannst dir nicht selbst Rechte geben.");
                     return;
-                }*/
+                }
                 if (manager.getProfile(target.getUniqueId()).getAccess().contains(chunkData)) {
                     player.sendMessage(ClaimPlugin.PREFIX + "§c" + target.getName() + " hat bereits Rechte auf deinem Chunk.");
                     return;
@@ -76,9 +76,10 @@ public class PermitCommand extends SubCommand {
                     @Override
                     public void success(Integer result) {
                         manager.getProfile(target.getUniqueId()).addAccess(chunkData);
+                        manager.clearAccess(chunk);
 
-                        target.sendMessage(ClaimPlugin.PREFIX + "§6" + player.getName() + " §7hat dir Zugriff auf seinem Gruppen-Chunk gegeben.");
-                        player.sendMessage(ClaimPlugin.PREFIX + "Du hast §6" + target.getName() + " §7Zugriff auf deinem Gruppen-Chunk gegeben.");
+                        target.sendMessage(ClaimPlugin.PREFIX + "§6" + player.getName() + " §7hat dir Rechte auf seinem Gruppen-Chunk gegeben.");
+                        player.sendMessage(ClaimPlugin.PREFIX + "Du hast §6" + target.getName() + " §7Rechte auf deinem Gruppen-Chunk gegeben.");
                     }
 
                     @Override

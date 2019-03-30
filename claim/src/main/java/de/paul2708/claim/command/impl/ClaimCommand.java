@@ -46,7 +46,8 @@ public class ClaimCommand extends SubCommand {
      */
     @Override
     public void execute(Player player, String[] args) {
-        ClaimerType type = ItemManager.getInstance().getClaimerType(player.getUniqueId(), player.getInventory().getItemInMainHand());
+        ClaimerType type = ItemManager.getInstance().getClaimerType(player.getUniqueId(),
+                player.getInventory().getItemInMainHand());
 
         // Check claimer
         if (type == ClaimerType.NONE) {
@@ -63,7 +64,8 @@ public class ClaimCommand extends SubCommand {
         // Check chunk
         ChunkWrapper chunkWrapper = new ChunkWrapper(player.getLocation().getChunk());
 
-        ClaimResponse response = ProfileManager.getInstance().canClaim(player, player.getLocation().getChunk(), type == ClaimerType.GROUP);
+        ClaimResponse response = ProfileManager.getInstance().canClaim(player, player.getLocation().getChunk(),
+                type == ClaimerType.GROUP);
         switch (response) {
             case ALREADY_CLAIMED:
                 player.sendMessage(ClaimPlugin.PREFIX + "§cDer Chunk wurde bereits geclaimed.");
@@ -103,6 +105,7 @@ public class ClaimCommand extends SubCommand {
                         ChunkData chunkData = new ChunkData(chunkWrapper, type == ClaimerType.GROUP);
                         chunkData.setId(result);
                         profile.addClaimedChunk(chunkData);
+                        ProfileManager.getInstance().clearAccess(player.getLocation().getChunk());
 
                         // Remove items
                         int index = -1;

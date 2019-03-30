@@ -57,7 +57,9 @@ public class InfoCommand extends SubCommand {
                     break;
                 case CITY:
                     player.sendMessage(ClaimPlugin.PREFIX + "Besitzer: §6Stadt");
-                    break;
+                    player.sendMessage(ClaimPlugin.PREFIX + "Bebaubar: §6"
+                            + (manager.getCityChunk(chunk).isInteractable() ? "ja" : "nein"));
+                    return;
                 case UNCLAIMED:
                     for (ClaimProfile single : manager.getProfiles()) {
                         for (ChunkData singleChunk : single.getClaimedChunks()) {
@@ -76,7 +78,7 @@ public class InfoCommand extends SubCommand {
                     }
 
                     player.sendMessage(ClaimPlugin.PREFIX + "Besitzer: §6frei §7(unclaimed)");
-                    break;
+                    return;
                 default:
                     throw new IllegalStateException("Unhandled enum type");
             }

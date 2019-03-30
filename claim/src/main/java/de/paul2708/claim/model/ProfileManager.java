@@ -27,12 +27,16 @@ public final class ProfileManager {
     private Set<ClaimProfile> profiles;
     private Set<CityChunk> cityChunks;
 
+    private Map<UUID, List<ChunkWrapper>> accessMap;
+
     /**
      * Create a new profile manager with empty sets.
      */
     private ProfileManager() {
         this.profiles = new HashSet<>();
         this.cityChunks = new HashSet<>();
+
+        this.accessMap = new HashMap<>();
     }
 
     /**
@@ -76,8 +80,6 @@ public final class ProfileManager {
      * @return true if the player has access, otherwise false
      */
     public boolean hasAccess(Player player, Chunk chunk) {
-        // TODO: Add access cache and update method
-
         // Check bypass
         if (player.hasMetadata("bypass")) {
             return true;
@@ -85,11 +87,36 @@ public final class ProfileManager {
 
         ChunkWrapper chunkWrapper = new ChunkWrapper(chunk);
 
+        // Check cache
+        List<ChunkWrapper> list = accessMap.getOrDefault(player.getUniqueId(), new ArrayList<>());
+
+        if (list.contains(chunkWrapper)) {
+            return true;
+        }
+
         // Check claim profiles
         for (ClaimProfile profile : profiles) {
             for (ChunkData claimedChunk : profile.getClaimedChunks()) {
                 if (claimedChunk.getWrapper().equals(chunkWrapper)) {
-                    return profile.getUuid().equals(player.getUniqueId());
+                    if (profile.getUuid().equals(player.getUniqueId())) {
+                        List<ChunkWrapper> wrappers = accessMap.getOrDefault(player.getUniqueId(), new ArrayList<>());
+                        wrappers.add(claimedChunk.getWrapper());
+
+                        accessMap.put(player.getUniqueId(), wrappers);
+                        return true;
+                    } else {
+                        if (claimedChunk.isGroupChunk()) {
+                            if (getProfile(player).getAccess().contains(claimedChunk)) {
+                                List<ChunkWrapper> wrappers = accessMap.getOrDefault(player.getUniqueId(), new ArrayList<>());
+                                wrappers.add(claimedChunk.getWrapper());
+
+                                accessMap.put(player.getUniqueId(), wrappers);
+                                return true;
+                            }
+                        }
+
+                        return false;
+                    }
                 }
             }
         }
@@ -97,18 +124,56 @@ public final class ProfileManager {
         // Check city chunk
         for (CityChunk cityChunk : cityChunks) {
             if (cityChunk.getChunkData().getWrapper().equals(chunkWrapper)) {
-                return cityChunk.isInteractable();
+                if (cityChunk.isInteractable()) {
+                    List<ChunkWrapper> wrappers = accessMap.getOrDefault(player.getUniqueId(), new ArrayList<>());
+                    wrappers.add(cityChunk.getChunkData().getWrapper());
+
+                    accessMap.put(player.getUniqueId(), wrappers);
+                    return true;
+                } else {
+                    return false;
+                }
             }
         }
 
         // Check access
         for (ChunkData access : getProfile(player).getAccess()) {
             if (access.getWrapper().equals(chunkWrapper)) {
+                List<ChunkWrapper> wrappers = accessMap.getOrDefault(player.getUniqueId(), new ArrayList<>());
+                wrappers.add(access.getWrapper());
+
+                accessMap.put(player.getUniqueId(), wrappers);
                 return true;
             }
         }
 
+        List<ChunkWrapper> wrappers = accessMap.getOrDefault(player.getUniqueId(), new ArrayList<>());
+        wrappers.add(chunkWrapper);
+
+        accessMap.put(player.getUniqueId(), wrappers);
         return true;
+    }
+
+    /**
+     * Clear access.
+     *
+     * @param chunk chunk
+     */
+    public void clearAccess(Chunk chunk) {
+        ChunkWrapper wrapper = new ChunkWrapper(chunk);
+
+        for (ClaimProfile profile : profiles) {
+            List<ChunkWrapper> wrappers = accessMap.getOrDefault(profile.getUuid(), new ArrayList<>());
+
+            if (wrappers.isEmpty()) {
+                continue;
+            }
+
+            if (wrappers.contains(wrapper)) {
+                wrappers.remove(wrapper);
+                accessMap.put(profile.getUuid(), wrappers);
+            }
+        }
     }
 
     /**
@@ -153,21 +218,33 @@ public final class ProfileManager {
             if (getClaimType(fromWrapper(chunkData.getWrapper())) == ClaimType.PLAYER) {
                 ClaimProfile profile = getProfile(fromWrapper(chunkData.getWrapper()));
 
-                if (!profile.getUuid().equals(player.getUniqueId())) {
+                if (!profile.getUuid().equals(player.getUniqueId()) && !chunkData.isGroupChunk()) {
                     return ClaimResponse.BORDER;
-                } else {
-                    if (group) {
-                        if (chunkData.isGroupChunk()) {
+                }
+            }
+        }
+
+        for (ChunkData chunkData : getNextChunks(chunk)) {
+            if (getClaimType(fromWrapper(chunkData.getWrapper())) == ClaimType.PLAYER) {
+                ClaimProfile profile = getProfile(fromWrapper(chunkData.getWrapper()));
+
+                if (profile.getUuid().equals(player.getUniqueId())) {
+                    if (chunkData.isGroupChunk()) {
+                        if (group) {
                             return ClaimResponse.CLAIMABLE;
                         } else {
                             return ClaimResponse.GROUP_CHUNK;
                         }
                     } else {
-                        if (!chunkData.isGroupChunk()) {
-                            return ClaimResponse.CLAIMABLE;
-                        } else {
+                        if (group) {
                             return ClaimResponse.GROUP_CHUNK;
+                        } else {
+                            return ClaimResponse.CLAIMABLE;
                         }
+                    }
+                } else {
+                    if (chunkData.isGroupChunk()) {
+                        return ClaimResponse.CLAIMABLE;
                     }
                 }
             }

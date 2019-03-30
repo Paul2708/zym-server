@@ -53,7 +53,7 @@ public class ForbidCommand extends SubCommand {
                     return;
                 }
                 if (!chunkData.isGroupChunk()) {
-                    player.sendMessage(ClaimPlugin.PREFIX + "§cDu musst einen Gruppen-Chunk haben um Spielern das Bauen zu verbieten.");
+                    player.sendMessage(ClaimPlugin.PREFIX + "§cDu musst auf deinem Gruppen-Chunk stehen um Spielern Rechte zu entziehen.");
                     return;
                 }
 
@@ -62,10 +62,10 @@ public class ForbidCommand extends SubCommand {
                     player.sendMessage(ClaimPlugin.PREFIX + "§c'" + args[0] + "' muss online sein.");
                     return;
                 }
-                /*if (target.getUniqueId().equals(player.getUniqueId())) {
-                    player.sendMessage(ClaimPlugin.PREFIX + "§cDu kannst dir nicht selbst Rechte geben.");
+                if (target.getUniqueId().equals(player.getUniqueId())) {
+                    player.sendMessage(ClaimPlugin.PREFIX + "§cDu kannst dir nicht selbst Rechte wegnehmen.");
                     return;
-                }*/
+                }
                 if (!manager.getProfile(target.getUniqueId()).getAccess().contains(chunkData)) {
                     player.sendMessage(ClaimPlugin.PREFIX + "§c" + target.getName() + " hat keine Rechte auf deinem Chunk.");
                     return;
@@ -76,9 +76,10 @@ public class ForbidCommand extends SubCommand {
                     @Override
                     public void success(Void result) {
                         manager.getProfile(target.getUniqueId()).removeAccess(chunkData);
+                        manager.clearAccess(chunk);
 
-                        target.sendMessage(ClaimPlugin.PREFIX + "§6" + player.getName() + " §7hat dir Zugriff auf seinem Gruppen-Chunk entfernt.");
-                        player.sendMessage(ClaimPlugin.PREFIX + "Du hast §6" + target.getName() + " §7Zugriff auf deinem Gruppen-Chunk entfernt.");
+                        target.sendMessage(ClaimPlugin.PREFIX + "§6" + player.getName() + " §7hat dir Rechte auf seinem Gruppen-Chunk entzogen.");
+                        player.sendMessage(ClaimPlugin.PREFIX + "Du hast §6" + target.getName() + " §7Rechte auf deinem Gruppen-Chunk entzogen.");
                     }
 
                     @Override

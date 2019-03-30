@@ -33,9 +33,9 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class ClaimPlugin extends JavaPlugin {
 
+    // TODO: Fix buttons can be powered by other players
     // TODO: Edit readme
-    // TODO: Add changelogs and edit the plugin version
-    // TODO: Optimize #hasAccess
+    // TODO: Add change log message
 
     /**
      * Name of the main world.
