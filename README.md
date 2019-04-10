@@ -13,6 +13,9 @@ A detailed description of upcoming features can be found [here](https://docs.goo
 - [Elytra-Plugin](/elytra/): Get an elytra at the spawn
 - [Restart-Plugin](/restart/): Restart the server at midnight
 
+### Other tools
+- [Database-Transfer](/database-transfer/): Transfer the old data set to the new one
+
 ### Video
 Explanation by Clym: https://www.youtube.com/watch?v=fHIRHCWPx1Y
 

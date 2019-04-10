@@ -34,6 +34,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class ClaimPlugin extends JavaPlugin {
 
     // TODO: Fix buttons can be powered by other players
+    // TODO: Disable vehicle entering for mobs
     // TODO: Edit readme
     // TODO: Add change log message
 
