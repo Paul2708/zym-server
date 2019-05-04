@@ -1,6 +1,9 @@
 package de.paul2708.claim.util;
 
 import de.paul2708.claim.ClaimPlugin;
+import de.paul2708.claim.model.ClaimProfile;
+import de.paul2708.claim.model.ProfileManager;
+import de.paul2708.claim.model.chunk.ChunkData;
 import org.bukkit.*;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
@@ -21,7 +24,7 @@ public final class Utility {
     /**
      * Price of one group chunk claimer.
      */
-    public static final int GROUP_PRICE = 5;
+    public static final int GROUP_PRICE = 8;
 
     private static final List<Integer> PRICES = Arrays.asList(0, 8, 16, 32, 64, 64, 128, 128, 192);
 
@@ -44,6 +47,29 @@ public final class Utility {
         }
 
         return Utility.PRICES.get(level);
+    }
+
+    /**
+     * Get the available group claims for a player.
+     *
+     * @param player player
+     * @return amount of possible claims
+     */
+    public static boolean canBuyGroupClaimer(Player player) {
+        ClaimProfile profile = ProfileManager.getInstance().getProfile(player);
+
+        int normalChunks = 0;
+        int groupChunks = 0;
+
+        for (ChunkData claimedChunk : profile.getClaimedChunks()) {
+            if (claimedChunk.isGroupChunk()) {
+                groupChunks++;
+            } else {
+                normalChunks++;
+            }
+        }
+
+        return 2 * normalChunks > groupChunks;
     }
 
     /**

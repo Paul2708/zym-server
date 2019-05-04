@@ -82,6 +82,12 @@ public class ClaimCommand extends SubCommand {
                         + "§cNormale Chunks und Gruppenchunks könnenn nicht direkt aneinander liegen.");
                 return;
             case CLAIMABLE:
+                if (type == ClaimerType.GROUP && !Utility.canBuyGroupClaimer(player)) {
+                    player.sendMessage(ClaimPlugin.PREFIX + "§cDu kannst nur doppelt so viele Gruppen-Chunks haben wie "
+                            + "normale Chunks.");
+                    player.closeInventory();
+                    return;
+                }
                 break;
             default:
                 break;
