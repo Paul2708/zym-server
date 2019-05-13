@@ -1,8 +1,7 @@
 package de.paul2708.claim.listener.player;
 
 import de.paul2708.claim.item.ItemManager;
-import de.paul2708.claim.model.ClaimInformation;
-import de.paul2708.claim.util.Utility;
+import de.paul2708.claim.model.ProfileManager;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
@@ -30,16 +29,12 @@ public class PlayerInteractAtEntityListener implements Listener {
 
             player.updateInventory();
         } else {
-            if (Utility.hasBypass(player)) {
-                return;
-            }
-
             // Bypass entities
             if (event.getRightClicked() instanceof Vehicle) {
                 return;
             }
 
-            if (ClaimInformation.isClaimedByOthers(player, event.getRightClicked().getLocation().getChunk())) {
+            if (!ProfileManager.getInstance().hasAccess(player, event.getRightClicked().getLocation().getChunk())) {
                 event.setCancelled(true);
 
                 player.updateInventory();

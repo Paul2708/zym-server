@@ -1,9 +1,8 @@
 package de.paul2708.claim.listener.player;
 
-import de.paul2708.claim.ClaimPlugin;
-import de.paul2708.claim.model.ChunkData;
-import de.paul2708.claim.model.ClaimInformation;
 import de.paul2708.claim.item.ItemManager;
+import de.paul2708.claim.model.ProfileManager;
+import de.paul2708.claim.model.chunk.ChunkWrapper;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
@@ -14,6 +13,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.util.Vector;
 
+import java.util.UUID;
+
 /**
  * This listener is called, if a player moves.
  *
@@ -22,7 +23,7 @@ import org.bukkit.util.Vector;
 public class PlayerMoveListener implements Listener {
 
     /**
-     * Send information about the chunk and handle elytra stuff.
+     * Send information about the chunk.
      *
      * @param event player move event
      */
@@ -30,40 +31,47 @@ public class PlayerMoveListener implements Listener {
     public void onMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
 
-        if (!event.getFrom().getChunk().getWorld().getName().equals(ClaimPlugin.MAIN_WORLD)
-                || !event.getTo().getChunk().getWorld().getName().equals(ClaimPlugin.MAIN_WORLD)) {
-            return;
-        }
-
-        ChunkData fromChunk = new ChunkData(event.getFrom().getChunk());
-        ChunkData toChunk = new ChunkData(event.getTo().getChunk());
+        ChunkWrapper fromChunk = new ChunkWrapper(event.getFrom().getChunk());
+        ChunkWrapper toChunk = new ChunkWrapper(event.getTo().getChunk());
 
         if (ItemManager.getInstance().isClaimer(event.getPlayer().getInventory().getItemInMainHand())) {
             this.drawBorder(event.getPlayer());
         }
 
-        if (fromChunk.equals(toChunk) || sameType(fromChunk, toChunk)) {
+        if (fromChunk.equals(toChunk) || sameType(event.getFrom().getChunk(), event.getTo().getChunk())) {
             return;
         }
 
-        for (ClaimInformation information : ClaimInformation.getAll()) {
-            if (information.getChunks().contains(toChunk)) {
-                OfflinePlayer owner = Bukkit.getOfflinePlayer(information.getUuid());
-                String name;
-                if (owner == null || owner.getName() == null || owner.getName().equals("null")) {
-                    name = "jemandem";
-                } else {
-                    name = owner.getName();
-                }
-
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                        TextComponent.fromLegacyText("§7Chunk von §6" + name));
-                return;
-            }
-        }
-
         player.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                TextComponent.fromLegacyText("§7Unclaimed Chunk"));
+                TextComponent.fromLegacyText(getMessage(event.getTo().getChunk())));
+    }
+
+    /**
+     * Get the message title by chunk.
+     *
+     * @param chunk chunk
+     * @return player uuid, city owner uuid, or null if the chunk is unclaimed
+     */
+    private String getMessage(Chunk chunk) {
+        switch (ProfileManager.getInstance().getClaimType(chunk)) {
+            case PLAYER:
+                UUID uuid = ProfileManager.getInstance().getProfile(chunk).getUuid();
+                OfflinePlayer owner = Bukkit.getOfflinePlayer(uuid);
+
+                String prefix = ProfileManager.getInstance().getChunkData(chunk).isGroupChunk() ? "§7Gruppenchunk"
+                        : "§7Chunk";
+                if (owner == null || owner.getName() == null || owner.getName().equals("null")) {
+                    return prefix + " von §6jemandem";
+                } else {
+                    return prefix + " von §6" + owner.getName();
+                }
+            case CITY:
+                return "§7Chunk von §6Stad";
+            case UNCLAIMED:
+                return "§7Unclaimed Chunk";
+            default:
+                return "§7Unclaimed Chunk";
+        }
     }
 
     /**
@@ -73,25 +81,20 @@ public class PlayerMoveListener implements Listener {
      * @param to to chunk
      * @return true if the types are the same, otherwise false
      */
-    private boolean sameType(ChunkData from, ChunkData to) {
-        boolean fromFree = true;
-        boolean toFree = true;
+    private boolean sameType(Chunk from, Chunk to) {
+        ProfileManager manager = ProfileManager.getInstance();
 
-        for (ClaimInformation information : ClaimInformation.getAll()) {
-            if (information.contains(from)) {
-                fromFree = false;
-            }
-            if (information.contains(to)) {
-                toFree = false;
-            }
-
-            if (information.contains(from) && information.contains(to)) {
-                return true;
-            }
+        // Both chunks unclaimed
+        if (!manager.isClaimed(from) && !manager.isClaimed(to)) {
+            return true;
         }
 
-        return fromFree && toFree;
+        // Same owner
+        if (manager.hasSameOwner(from, to)) {
+            return true;
+        }
 
+        return false;
     }
 
     /**
@@ -109,23 +112,24 @@ public class PlayerMoveListener implements Listener {
                 Block corner = playerChunk.getBlock(i, y - 3, j);
                 Block upper = playerChunk.getBlock(i, y + 10, j);
 
-                this.drawLine(corner, upper);
+                this.drawLine(player, corner, upper);
             }
         }
 
-        this.drawLine(playerChunk.getBlock(0, y + 10, 0), playerChunk.getBlock(0, y + 10, 15));
-        this.drawLine(playerChunk.getBlock(0, y + 10, 0), playerChunk.getBlock(15, y + 10, 0));
-        this.drawLine(playerChunk.getBlock(15, y + 10, 15), playerChunk.getBlock(0, y + 10, 15));
-        this.drawLine(playerChunk.getBlock(15, y + 10, 15), playerChunk.getBlock(15, y + 10, 0));
+        this.drawLine(player, playerChunk.getBlock(0, y + 10, 0), playerChunk.getBlock(0, y + 10, 15));
+        this.drawLine(player, playerChunk.getBlock(0, y + 10, 0), playerChunk.getBlock(15, y + 10, 0));
+        this.drawLine(player, playerChunk.getBlock(15, y + 10, 15), playerChunk.getBlock(0, y + 10, 15));
+        this.drawLine(player, playerChunk.getBlock(15, y + 10, 15), playerChunk.getBlock(15, y + 10, 0));
     }
 
     /**
      * Draw a line from a block to another.
      *
+     * @param player player
      * @param first first block
      * @param second second block
      */
-    private void drawLine(Block first, Block second) {
+    private void drawLine(Player player, Block first, Block second) {
         Location firstLocation = first.getLocation().clone();
 
         Vector vector = second.getLocation().toVector().subtract(firstLocation.toVector());
@@ -136,7 +140,7 @@ public class PlayerMoveListener implements Listener {
             firstLocation.add(vector);
 
             Particle.DustOptions options = new Particle.DustOptions(Color.BLUE, 0.75f);
-            first.getLocation().getWorld().spawnParticle(Particle.REDSTONE, firstLocation, 1, options);
+            player.spawnParticle(Particle.REDSTONE, firstLocation, 1, options);
             firstLocation.subtract(vector);
             vector.normalize();
         }

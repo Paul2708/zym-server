@@ -1,8 +1,10 @@
 package de.paul2708.claim.command.impl;
 
+import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.command.SubCommand;
-import de.paul2708.claim.model.ClaimInformation;
 import de.paul2708.claim.item.ItemManager;
+import de.paul2708.claim.model.ClaimProfile;
+import de.paul2708.claim.model.ProfileManager;
 import de.paul2708.claim.util.Utility;
 import org.bukkit.entity.Player;
 
@@ -28,9 +30,14 @@ public class BuyCommand extends SubCommand {
      */
     @Override
     public void execute(Player player, String[] args) {
-        ClaimInformation information = ClaimInformation.get(player.getUniqueId());
-        int price = Utility.getPrice(information.getBuyLevel());
+        ClaimProfile profile = ProfileManager.getInstance().getProfile(player);
+        int price = Utility.getPrice(profile.getClaimer());
 
-        ItemManager.getInstance().openInventory(player, price);
+        if (args.length != 1 || (!args[0].equalsIgnoreCase("normal") && !args[0].equalsIgnoreCase("group"))) {
+            player.sendMessage(ClaimPlugin.PREFIX + "Nutze §6/chunk buy [normal|group]");
+            return;
+        }
+
+        ItemManager.getInstance().openInventory(player, price, args[0].equalsIgnoreCase("group"));
     }
 }

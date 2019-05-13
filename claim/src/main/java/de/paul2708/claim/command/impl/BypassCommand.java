@@ -2,9 +2,6 @@ package de.paul2708.claim.command.impl;
 
 import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.command.SubCommand;
-import de.paul2708.claim.item.ItemManager;
-import de.paul2708.claim.model.ClaimInformation;
-import de.paul2708.claim.util.Utility;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 

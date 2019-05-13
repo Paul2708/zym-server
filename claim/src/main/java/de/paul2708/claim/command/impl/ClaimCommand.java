@@ -2,11 +2,16 @@ package de.paul2708.claim.command.impl;
 
 import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.command.SubCommand;
+import de.paul2708.claim.database.Database;
 import de.paul2708.claim.database.DatabaseException;
-import de.paul2708.claim.model.ChunkData;
-import de.paul2708.claim.model.ClaimInformation;
-import de.paul2708.claim.model.ClaimResponse;
+import de.paul2708.claim.database.DatabaseResult;
+import de.paul2708.claim.item.ClaimerType;
 import de.paul2708.claim.item.ItemManager;
+import de.paul2708.claim.model.ClaimProfile;
+import de.paul2708.claim.model.ClaimResponse;
+import de.paul2708.claim.model.ProfileManager;
+import de.paul2708.claim.model.chunk.ChunkData;
+import de.paul2708.claim.model.chunk.ChunkWrapper;
 import de.paul2708.claim.scoreboard.ScoreboardManager;
 import de.paul2708.claim.util.Utility;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -41,28 +46,26 @@ public class ClaimCommand extends SubCommand {
      */
     @Override
     public void execute(Player player, String[] args) {
-        // Check claimer
-        boolean found = false;
-        for (ItemStack itemStack : player.getInventory()) {
-            if (ItemManager.getInstance().ownsClaimer(player.getUniqueId(), itemStack)) {
-                found = true;
-                break;
-            }
-        }
+        ClaimerType type = ItemManager.getInstance().getClaimerType(player.getUniqueId(),
+                player.getInventory().getItemInMainHand());
 
-        if (!found) {
-            player.sendMessage(ClaimPlugin.PREFIX + "§cDu hast keinen Claimer im Inventar, der dir gehört.");
+        // Check claimer
+        if (type == ClaimerType.NONE) {
+            player.sendMessage(ClaimPlugin.PREFIX + "§cDu hast keinen Claimer in deiner Main-Hand.");
             return;
         }
 
         // Check world
         if (!player.getLocation().getChunk().getWorld().getName().equals(ClaimPlugin.MAIN_WORLD)) {
-            player.sendMessage(ClaimPlugin.PREFIX + "§cDerzeit kann man im Nether nicht claimen.");
+            player.sendMessage(ClaimPlugin.PREFIX + "§cMan kann im Nether nicht claimen.");
             return;
         }
 
         // Check chunk
-        ClaimResponse response = Utility.canClaim(player, new ChunkData(player.getLocation().getChunk()));
+        ChunkWrapper chunkWrapper = new ChunkWrapper(player.getLocation().getChunk());
+
+        ClaimResponse response = ProfileManager.getInstance().canClaim(player, player.getLocation().getChunk(),
+                type == ClaimerType.GROUP);
         switch (response) {
             case ALREADY_CLAIMED:
                 player.sendMessage(ClaimPlugin.PREFIX + "§cDer Chunk wurde bereits geclaimed.");
@@ -74,7 +77,17 @@ public class ClaimCommand extends SubCommand {
                 player.sendMessage(ClaimPlugin.PREFIX
                         + "§cDer Chunk grenzt an einen Chunk, der bereits geclaimed ist.");
                 return;
+            case GROUP_CHUNK:
+                player.sendMessage(ClaimPlugin.PREFIX
+                        + "§cNormale Chunks und Gruppenchunks könnenn nicht direkt aneinander liegen.");
+                return;
             case CLAIMABLE:
+                if (type == ClaimerType.GROUP && !Utility.canBuyGroupClaimer(player)) {
+                    player.sendMessage(ClaimPlugin.PREFIX + "§cDu kannst nur doppelt so viele Gruppen-Chunks haben wie "
+                            + "normale Chunks.");
+                    player.closeInventory();
+                    return;
+                }
                 break;
             default:
                 break;
@@ -87,46 +100,60 @@ public class ClaimCommand extends SubCommand {
 
             if (args[0].equals("confirm")) {
                 // Claim the chunk
-                try {
-                    ClaimPlugin.getInstance().getDatabase().updateClaimInformation(player.getUniqueId(),
-                            new ChunkData(player.getLocation().getChunk()), true);
+                ClaimProfile profile = ProfileManager.getInstance().getProfile(player);
+                Database database = ClaimPlugin.getInstance().getDatabase();
 
-                    int index = -1;
-                    ItemStack replaced = null;
+                database.addClaimedChunk(profile.getId(), chunkWrapper, type == ClaimerType.GROUP, new DatabaseResult<Integer>() {
 
-                    for (int i = 0; i < player.getInventory().getSize(); i++) {
-                        ItemStack itemStack = player.getInventory().getItem(i);
+                    @Override
+                    public void success(Integer result) {
+                        // Set id
+                        ChunkData chunkData = new ChunkData(chunkWrapper, type == ClaimerType.GROUP);
+                        chunkData.setId(result);
+                        profile.addClaimedChunk(chunkData);
+                        ProfileManager.getInstance().clearAccess(player.getLocation().getChunk());
 
-                        if (ItemManager.getInstance().ownsClaimer(player.getUniqueId(), itemStack)) {
-                            index = i;
+                        // Remove items
+                        int index = -1;
+                        ItemStack replaced = null;
 
-                            if (itemStack.getAmount() == 1) {
-                                replaced = new ItemStack(Material.AIR);
-                            } else {
-                                replaced = itemStack.clone();
-                                replaced.setAmount(itemStack.getAmount() - 1);
+                        for (int i = 0; i < player.getInventory().getSize(); i++) {
+                            ItemStack itemStack = player.getInventory().getItem(i);
+
+                            if (type == ItemManager.getInstance().getClaimerType(player.getUniqueId(), itemStack)) {
+                                index = i;
+
+                                if (itemStack.getAmount() == 1) {
+                                    replaced = new ItemStack(Material.AIR);
+                                } else {
+                                    replaced = itemStack.clone();
+                                    replaced.setAmount(itemStack.getAmount() - 1);
+                                }
+
+                                break;
                             }
+                        }
 
-                            break;
+                        player.getInventory().setItem(index, replaced);
+
+                        // Effects and announcement
+                        Utility.playEffect(player);
+                        player.sendMessage(ClaimPlugin.PREFIX + "Du hast den Chunk §6erfolgreich §7geclaimed.");
+
+                        if (type != ClaimerType.GROUP) {
+                            ScoreboardManager.getInstance().updateChunkCounter(player);
+
+                            Bukkit.broadcastMessage(ClaimPlugin.PREFIX + "§a§l" + player.getName()
+                                    + " §7hat seinen §e" + profile.getClaimedChunks().size()
+                                    + ". Chunk §7geclaimed!");
                         }
                     }
 
-                    player.getInventory().setItem(index, replaced);
-
-                    Utility.playEffect(player);
-
-                    ScoreboardManager.getInstance().updateChunkCounter(player);
-
-                    player.sendMessage(ClaimPlugin.PREFIX + "Du hast den Chunk §6erfolgreich §7geclaimed.");
-
-                    Bukkit.broadcastMessage(ClaimPlugin.PREFIX + "§a§l" + player.getName()
-                            + " §7hat seinen §e" + ClaimInformation.get(player.getUniqueId()).getChunks().size()
-                            + ". Chunk §7geclaimed!");
-                } catch (DatabaseException e) {
-                    e.printStackTrace();
-
-                    player.sendMessage(ClaimPlugin.PREFIX + "§cEin Datenbank-Fehler ist aufgetreten...");
-                }
+                    @Override
+                    public void exception(DatabaseException exception) {
+                        player.sendMessage(ClaimPlugin.PREFIX + "§cEin Datenbank-Fehler ist aufgetreten.");
+                    }
+                });
             } else if (args[0].equals("cancel")) {
                 player.sendMessage(ClaimPlugin.PREFIX + "Du hast den Vorgang abgebrochen.");
             }

@@ -2,6 +2,9 @@ package de.paul2708.claim.listener.player;
 
 import de.paul2708.claim.ClaimPlugin;
 import de.paul2708.claim.database.DatabaseException;
+import de.paul2708.claim.database.DatabaseResult;
+import de.paul2708.claim.model.ClaimProfile;
+import de.paul2708.claim.model.ProfileManager;
 import de.paul2708.claim.scoreboard.ScoreboardManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -25,19 +28,34 @@ public class PlayerJoinListener implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        try {
-            ClaimPlugin.getInstance().getDatabase().create(player.getUniqueId());
+        player.sendTitle("§cCommunity Attack", "", 20, 60, 20);
 
-            player.sendTitle("§cCommunity Attack", "", 20, 60, 20);
+        ScoreboardManager.getInstance().updateChunkCounter(player);
+        ScoreboardManager.getInstance().updateColors(player, false);
 
-            ScoreboardManager.getInstance().updateChunkCounter(player);
-            ScoreboardManager.getInstance().updateColors(player, false);
+        ScoreboardManager.getInstance().updateHeaderAndFooter(Bukkit.getOnlinePlayers().size());
 
-            ScoreboardManager.getInstance().updateHeaderAndFooter(Bukkit.getOnlinePlayers().size());
-        } catch (DatabaseException e) {
-            e.printStackTrace();
-
-            player.sendMessage(ClaimPlugin.PREFIX + "§cEin Datenbank-Fehler ist aufgetreten. Joine erneut.");
+        // Profile creation
+        if (ProfileManager.getInstance().doesProfileExist(player.getUniqueId())) {
+            return;
         }
+
+        ClaimPlugin.getInstance().getDatabase().create(player.getUniqueId(), new DatabaseResult<Integer>() {
+
+            @Override
+            public void success(Integer result) {
+                ClaimProfile profile = new ClaimProfile(player.getUniqueId(), 0);
+                profile.setId(result);
+
+                ProfileManager.getInstance().addProfile(profile);
+            }
+
+            @Override
+            public void exception(DatabaseException exception) {
+                player.kickPlayer(ClaimPlugin.PREFIX + "§cEin Datenbank-Fehler ist aufgetreten.");
+
+                exception.printStackTrace();
+            }
+        });
     }
 }

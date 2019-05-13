@@ -1,7 +1,6 @@
 package de.paul2708.claim.listener.block.hanging;
 
-import de.paul2708.claim.model.ClaimInformation;
-import de.paul2708.claim.util.Utility;
+import de.paul2708.claim.model.ProfileManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -24,11 +23,7 @@ public class HangingBreakListener implements Listener {
         if (event.getRemover() instanceof Player) {
             Player player = (Player) event.getRemover();
 
-            if (Utility.hasBypass(player)) {
-                return;
-            }
-
-            if (ClaimInformation.isClaimedByOthers(player, event.getEntity().getLocation().getChunk())) {
+            if (!ProfileManager.getInstance().hasAccess(player, event.getEntity().getLocation().getChunk())) {
                 event.setCancelled(true);
             }
         }

@@ -1,8 +1,7 @@
 package de.paul2708.claim.listener.entity;
 
 import de.paul2708.claim.ClaimPlugin;
-import de.paul2708.claim.model.ClaimInformation;
-import de.paul2708.claim.util.Utility;
+import de.paul2708.claim.model.ProfileManager;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -25,11 +24,7 @@ public class EntityDamageByEntityListener implements Listener {
         Player player = getDamager(event.getDamager());
 
         if (player != null) {
-            if (Utility.hasBypass(player)) {
-                return;
-            }
-
-            if (ClaimInformation.isClaimedByOthers(player, event.getEntity().getLocation().getChunk())) {
+            if (!ProfileManager.getInstance().hasAccess(player, event.getEntity().getLocation().getChunk())) {
                 if (event.getEntity() instanceof Monster || event.getEntity() instanceof Phantom) {
                     return;
                 }

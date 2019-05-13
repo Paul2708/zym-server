@@ -1,6 +1,6 @@
 package de.paul2708.claim.listener.block;
 
-import de.paul2708.claim.model.ClaimInformation;
+import de.paul2708.claim.model.ProfileManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockFromToEvent;
@@ -19,13 +19,10 @@ public class BlockFromToListener implements Listener {
      */
     @EventHandler
     public void onFromTo(BlockFromToEvent event) {
-        if (ClaimInformation.isClaimed(event.getToBlock().getChunk())) {
-            ClaimInformation originInformation = ClaimInformation.get(event.getBlock().getChunk());
-
-            if (originInformation == null) {
-                event.setCancelled(true);
-            } else if (!originInformation.getUuid().equals(ClaimInformation.get(event.getToBlock().getChunk())
-                    .getUuid())) {
+        if (ProfileManager.getInstance().isClaimed(event.getToBlock().getChunk())) {
+            if (!ProfileManager.getInstance().isClaimed(event.getBlock().getChunk())
+                    || !ProfileManager.getInstance().hasSameOwner(
+                            event.getToBlock().getChunk(), event.getBlock().getChunk())) {
                 event.setCancelled(true);
             }
         }

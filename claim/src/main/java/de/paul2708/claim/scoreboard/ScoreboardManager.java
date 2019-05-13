@@ -1,6 +1,8 @@
 package de.paul2708.claim.scoreboard;
 
-import de.paul2708.claim.model.ClaimInformation;
+import de.paul2708.claim.model.ClaimProfile;
+import de.paul2708.claim.model.ProfileManager;
+import de.paul2708.claim.model.chunk.ChunkData;
 import net.minecraft.server.v1_13_R2.IChatBaseComponent;
 import net.minecraft.server.v1_13_R2.PacketPlayOutPlayerListHeaderFooter;
 import org.bukkit.Bukkit;
@@ -92,7 +94,16 @@ public final class ScoreboardManager {
      * @param player player
      */
     public void updateChunkCounter(Player player) {
-        objective.getScore(player.getName()).setScore(ClaimInformation.get(player.getUniqueId()).getChunks().size());
+        ClaimProfile profile = ProfileManager.getInstance().getProfile(player);
+        int count = 0;
+
+        for (ChunkData claimedChunk : profile.getClaimedChunks()) {
+            if (!claimedChunk.isGroupChunk()) {
+                count++;
+            }
+        }
+
+        objective.getScore(player.getName()).setScore(count);
 
         player.setScoreboard(scoreboard);
     }

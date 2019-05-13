@@ -1,8 +1,7 @@
 package de.paul2708.claim.listener.player;
 
 import de.paul2708.claim.item.ItemManager;
-import de.paul2708.claim.model.ClaimInformation;
-import de.paul2708.claim.util.Utility;
+import de.paul2708.claim.model.ProfileManager;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -54,21 +53,17 @@ public class PlayerInteractListener implements Listener {
         }
 
         // Handle blocking
-        if (Utility.hasBypass(player)) {
-            return;
-        }
-
         Block block = event.getClickedBlock();
         Chunk chunk = block == null ? player.getLocation().getChunk() : block.getChunk();
 
         if (event.getAction() == Action.PHYSICAL) {
-            if (ClaimInformation.isClaimedByOthers(player, chunk)) {
+            if (!ProfileManager.getInstance().hasAccess(player, chunk)) {
                 if (block == null || !isWhitelisted(block.getType())) {
                     event.setCancelled(true);
                 }
             }
         } else if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR) {
-            if (ClaimInformation.isClaimedByOthers(player, chunk)) {
+            if (!ProfileManager.getInstance().hasAccess(player, chunk)) {
                 if (block != null && block.getType().isInteractable() && !isWhitelisted(block.getType())) {
                     event.setCancelled(true);
                 } else if (event.getItem() != null && isBlacklisted(event.getItem().getType())) {
