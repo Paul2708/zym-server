@@ -37,6 +37,7 @@ public class ClaimPlugin extends JavaPlugin {
     // TODO: Disable vehicle entering for mobs
     // TODO: Edit readme
     // TODO: Add change log message
+    // TODO: Cancel foreign claimer pickup
 
     /**
      * Name of the main world.

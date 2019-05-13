@@ -30,7 +30,7 @@ public class BlockPistonListener implements Listener {
 
             if (ProfileManager.getInstance().isClaimed(movedLocation.getChunk())) {
                 if (!ProfileManager.getInstance().isClaimed(event.getBlock().getChunk())
-                        || ProfileManager.getInstance().hasSameOwner(event.getBlock().getChunk(), movedLocation.getChunk())) {
+                        || !ProfileManager.getInstance().hasSameOwner(event.getBlock().getChunk(), movedLocation.getChunk())) {
                     event.setCancelled(true);
                 }
             }
@@ -47,7 +47,7 @@ public class BlockPistonListener implements Listener {
         for (Block block : event.getBlocks()) {
             if (ProfileManager.getInstance().isClaimed(block.getChunk())) {
                 if (!ProfileManager.getInstance().isClaimed(event.getBlock().getChunk())
-                        || ProfileManager.getInstance().hasSameOwner(event.getBlock().getChunk(), block.getChunk())) {
+                        || !ProfileManager.getInstance().hasSameOwner(event.getBlock().getChunk(), block.getChunk())) {
                     event.setCancelled(true);
                 }
             }
