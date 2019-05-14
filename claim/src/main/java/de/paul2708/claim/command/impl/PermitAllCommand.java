@@ -62,7 +62,7 @@ public class PermitAllCommand extends SubCommand {
                     player.sendMessage(ClaimPlugin.PREFIX + "§cDu kannst dir nicht selbst Rechte geben.");
                     return;
                 }
-                List<ChunkData> chunks = getMissingChunks(ownerProfile, targetProfile);
+                List<ChunkData> chunks = getMissingChunks(targetProfile, ownerProfile);
 
                 if (chunks.size() == 0) {
                     player.sendMessage(ClaimPlugin.PREFIX + "§c" + target.getName()
