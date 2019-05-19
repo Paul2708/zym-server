@@ -55,7 +55,7 @@ public class StructureGrowListener implements Listener {
             for (BlockState block : event.getBlocks()) {
                 if (ProfileManager.getInstance().isClaimed(block.getChunk())) {
                     if (!ProfileManager.getInstance().isClaimed(origin.getChunk())
-                            || ProfileManager.getInstance().hasSameOwner(origin.getChunk(), block.getChunk())) {
+                            || !ProfileManager.getInstance().hasSameOwner(origin.getChunk(), block.getChunk())) {
                         block.setType(Material.AIR);
                     }
                 }

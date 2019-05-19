@@ -35,9 +35,9 @@ public class ClaimPlugin extends JavaPlugin {
 
     // TODO: Fix buttons can be powered by other players
     // TODO: Disable vehicle entering for mobs
-    // TODO: Edit readme
-    // TODO: Add change log message
     // TODO: Cancel foreign claimer pickup
+    // TODO: Permit all from every where
+    // TODO: Forbid all command
 
     /**
      * Name of the main world.

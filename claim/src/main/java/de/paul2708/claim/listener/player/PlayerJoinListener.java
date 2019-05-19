@@ -30,13 +30,12 @@ public class PlayerJoinListener implements Listener {
 
         player.sendTitle("§cCommunity Attack", "", 20, 60, 20);
 
-        ScoreboardManager.getInstance().updateChunkCounter(player);
-        ScoreboardManager.getInstance().updateColors(player, false);
-
-        ScoreboardManager.getInstance().updateHeaderAndFooter(Bukkit.getOnlinePlayers().size());
-
         // Profile creation
         if (ProfileManager.getInstance().doesProfileExist(player.getUniqueId())) {
+            ScoreboardManager.getInstance().updateChunkCounter(player);
+            ScoreboardManager.getInstance().updateColors(player, false);
+
+            ScoreboardManager.getInstance().updateHeaderAndFooter(Bukkit.getOnlinePlayers().size());
             return;
         }
 
@@ -48,6 +47,11 @@ public class PlayerJoinListener implements Listener {
                 profile.setId(result);
 
                 ProfileManager.getInstance().addProfile(profile);
+
+                ScoreboardManager.getInstance().updateChunkCounter(player);
+                ScoreboardManager.getInstance().updateColors(player, false);
+
+                ScoreboardManager.getInstance().updateHeaderAndFooter(Bukkit.getOnlinePlayers().size());
             }
 
             @Override

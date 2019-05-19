@@ -1,4 +1,9 @@
 # Changelog
+### v2.0.1
+- fixed piston bug
+- fixed important join bug
+- fixed growing bug
+
 ## v2.0
 - switched from local json data storage to mysql
 - added city chunks

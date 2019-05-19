@@ -218,7 +218,9 @@ public final class ProfileManager {
             if (getClaimType(fromWrapper(chunkData.getWrapper())) == ClaimType.PLAYER) {
                 ClaimProfile profile = getProfile(fromWrapper(chunkData.getWrapper()));
 
-                if (!profile.getUuid().equals(player.getUniqueId()) && !chunkData.isGroupChunk()) {
+                if (profile.getUuid().equals(player.getUniqueId())) {
+                    break;
+                } else if (!profile.getUuid().equals(player.getUniqueId()) && !chunkData.isGroupChunk()) {
                     return ClaimResponse.BORDER;
                 }
             }

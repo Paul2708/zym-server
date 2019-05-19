@@ -101,6 +101,8 @@ public class InfoCommand extends SubCommand {
 
         // Print information
         player.sendMessage(ClaimPlugin.PREFIX + "Besitzer: §6" + name);
+        player.sendMessage(ClaimPlugin.PREFIX + "Gruppenchunk: §6"
+                + (manager.getChunkData(player.getLocation().getChunk()).isGroupChunk() ? "§jJa" : "§6nein"));
 
         if (player.isOp()) {
             player.sendMessage(ClaimPlugin.PREFIX + "zuletzt online: §6"
